@@ -9,23 +9,13 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".LoginActivity"
-            android:label="@string/app_name"
-            android:theme="@style/AppTheme.NoActionBar">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-
-        <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
-            android:parentActivityName=".LoginActivity"
+            android:parentActivityName=".LoginTabbedActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.balloonmail.app.balloonmail.LoginActivity" />
+                android:value=".LoginTabbedActivity" />
         </activity>
         <activity
             android:name=".MailsTabbedActivity"
@@ -35,6 +25,16 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.balloonmail.app.balloonmail.MainActivity" />
+        </activity>
+        <activity
+            android:name=".LoginTabbedActivity"
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme.NoActionBar">
+
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
         </activity>
     </application>
 
