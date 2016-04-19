@@ -26,7 +26,7 @@ router.post("/google", function (req, res, next) {
     }
 
     //verify the token
-    googleOauth.verifyIdToken(token,config.android_id,function(err, login){
+    googleOauth.verifyIdToken(token,config.android_client_id,function(err, login){
         //is there an error in verification?
         if(err)
         {
