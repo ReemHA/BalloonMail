@@ -6,3 +6,5 @@
 .DS_Store
 /build
 /captures
+/server/.idea/
+/server/node_modules/
