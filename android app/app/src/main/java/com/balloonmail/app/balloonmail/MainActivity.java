@@ -19,6 +19,15 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        //getSupportActionBar().setDisplayShowHomeEnabled(true);
+        //getSupportActionBar().setIcon(R.drawable.logo_balloonmail);
+        //getSupportActionBar().setDisplayShowTitleEnabled(true);
+        //getSupportActionBar().setTitle("BalloonMail");
+        //toolbar.setLogo(R.drawable.logo_balloonmail);
+        //toolbar.setTitle("BalloonMail");
+        //toolbar.setNavigationIcon(R.drawable.logo_balloonmail);
+        //toolbar.setTitle("BalloonMail");
+        //toolbar.show
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {

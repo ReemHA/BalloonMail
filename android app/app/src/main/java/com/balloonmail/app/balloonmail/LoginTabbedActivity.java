@@ -1,25 +1,20 @@
 package com.balloonmail.app.balloonmail;
 
-import android.content.Context;
 import android.content.Intent;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
+import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.View;
-import android.widget.Button;
-import android.widget.Toast;
 
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.SignInButton;
-import com.google.android.gms.common.api.GoogleApiClient;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -31,10 +26,15 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
-public class LoginActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener,
-        View.OnClickListener {
-    GoogleApiClient googleApiClient;
+public class LoginTabbedActivity extends AppCompatActivity{
+
+    private Toolbar toolbar;
+    private TabLayout tabLayout;
+    private ViewPager viewPager;
+
     private static final int RC_SIGN_IN = 9001;
     private static final String SIGN_IN_ERROR_TYPE = "Sign in";
     private static final String SERVER_RESPONSE_ERROR_TYPE = "Server response:";
@@ -45,54 +45,58 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
+        setContentView(R.layout.activity_login_tabbed);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
-        // Configure sign in to request the user's id token
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(getString(R.string.server_client_id))
-                .requestProfile()
-                .build();
+        viewPager = (ViewPager) findViewById(R.id.viewpager);
+        setupViewPager(viewPager);
 
-        // GoogleApiClient is main entry for Google Play services integration. Build GoogleApiClient to access the options specified by gso
-        googleApiClient = new GoogleApiClient.Builder(this)
-                .enableAutoManage(this, this)
-                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
-                .build();
-
-        SignInButton google_sign_in = (SignInButton) findViewById(R.id.login_google_button);
-        google_sign_in.setSize(SignInButton.SIZE_STANDARD);
-        google_sign_in.setScopes(gso.getScopeArray());
-        google_sign_in.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View view) {
-                switch (view.getId()) {
-                    case R.id.login_google_button:
-                        // attempts signing in
-                        signIn();
-                        break;
-                }
-            }
-        });
-        Button login = (Button) findViewById(R.id.login_button);
-        login.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                startActivity(intent);
-            }
-        });
-    }
-
-    @Override
-    public void onClick(View view) {
+        tabLayout = (TabLayout) findViewById(R.id.tabs);
+        tabLayout.setupWithViewPager(viewPager);
+        //setupTabIcons()
 
     }
+    /*private void setupTabIcons() {
+        tabLayout.getTabAt(0).setIcon(tabIcons[0]);
+        tabLayout.getTabAt(1).setIcon(tabIcons[1]);
+        tabLayout.getTabAt(2).setIcon(tabIcons[2]);
+    }*/
 
-    @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+    private void setupViewPager(ViewPager viewPager) {
+        ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
+        adapter.addFragment(new LoginFragment(), "Login");
+        adapter.addFragment(new SignUpFragment(), "Sign up");
+        viewPager.setAdapter(adapter);
+    }
 
+    class ViewPagerAdapter extends FragmentPagerAdapter {
+        private final List<Fragment> mFragmentList = new ArrayList<>();
+        private final List<String> mFragmentTitleList = new ArrayList<>();
+
+        public ViewPagerAdapter(FragmentManager manager) {
+            super(manager);
+        }
+
+        @Override
+        public Fragment getItem(int position) {
+            return mFragmentList.get(position);
+        }
+
+        @Override
+        public int getCount() {
+            return mFragmentList.size();
+        }
+
+        public void addFragment(Fragment fragment, String title) {
+            mFragmentList.add(fragment);
+            mFragmentTitleList.add(title);
+        }
+
+        @Override
+        public CharSequence getPageTitle(int position) {
+            return mFragmentTitleList.get(position);
+        }
     }
 
     @Override
@@ -108,28 +112,6 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                 handleSignIntent(result);
             }
         }
-    }
-
-    private void signIn() {
-        // check whether a network connection is available or not
-        if (checkNetworkConnection()) {
-            Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(googleApiClient);
-            startActivityForResult(signInIntent, RC_SIGN_IN);
-        } else {
-            Toast.makeText(this, NETWORK_CONNECTION_MSG, Toast.LENGTH_LONG).show();
-        }
-    }
-
-    private boolean checkNetworkConnection() {
-        // check the state of network connectivity
-        ConnectivityManager manager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-
-        // get an instance of the current active network
-        NetworkInfo info = manager.getActiveNetworkInfo();
-        if (info != null && info.isConnected()) {
-            return true;
-        }
-        return false;
     }
 
     private void handleSignIntent(GoogleSignInResult result) {
@@ -249,7 +231,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                 // get api_token of the user from the response
                 api_token = response.getString("api_token");
 
-                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                 startActivity(intent);
 
                 // checks if he is a new user
