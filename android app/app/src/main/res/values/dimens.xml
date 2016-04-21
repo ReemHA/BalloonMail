@@ -11,4 +11,5 @@
     <dimen name="editText_height">60dp</dimen>
     <dimen name="button_width">150dp</dimen>
     <dimen name="button_height">60dp</dimen>
+    <dimen name="icon_size_48">48dp</dimen>
 </resources>
