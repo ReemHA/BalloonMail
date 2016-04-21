@@ -8,7 +8,6 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.widget.Button;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,9 +30,7 @@ public class LoginTabbedActivity extends AppCompatActivity {
 
         tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
-        //setupTabIcons();
-
-        Button login = (Button)findViewById(R.id.login_button);
+        //setupTabIcons()
 
     }
     /*private void setupTabIcons() {
