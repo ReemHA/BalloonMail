@@ -1,6 +1,6 @@
 module.exports = {
     
-    database: "mongodb://localhost/balloon",
+    database: (process.env.MONGODB_URL || "mongodb://localhost/") + "balloon",
 
 
     //don't touch
