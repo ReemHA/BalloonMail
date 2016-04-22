@@ -2,5 +2,6 @@
     <string name="app_name">BalloonMail</string>
     <string name="action_settings">Settings</string>
     <string name="title_activity_mails_tabbed">BalloonMails</string>
+    <string name="server_url">http://app-balloonmail.rhcloud.com</string>
     <string name="server_client_id">287579982910-cotju4lsvdrdjcv45t4332m46htstqjl.apps.googleusercontent.com</string>
 </resources>
