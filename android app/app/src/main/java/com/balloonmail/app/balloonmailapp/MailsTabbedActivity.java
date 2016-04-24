@@ -12,6 +12,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 
+import com.balloonmail.app.balloonmail.Utilities.Global;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,6 +47,9 @@ public class MailsTabbedActivity extends AppCompatActivity {
 
         viewPager = (ViewPager) findViewById(R.id.viewpager);
         setupViewPager(viewPager);
+        int defaultValue = 0;
+        int page = getIntent().getIntExtra(Global.ARG_MAILS_TABBED_TAG, defaultValue);
+        viewPager.setCurrentItem(page);
 
         tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
