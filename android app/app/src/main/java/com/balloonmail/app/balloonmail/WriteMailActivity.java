@@ -1,10 +1,12 @@
 package com.balloonmail.app.balloonmail;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+
+import org.json.JSONObject;
 
 public class WriteMailActivity extends AppCompatActivity {
 
@@ -23,7 +25,11 @@ public class WriteMailActivity extends AppCompatActivity {
     }
 
     private void spreadMail(EditText mailText){
+
+        // get the mail text from the edit text
         String text = mailText.getText().toString();
+        JSONObject sentJson = new JSONObject();
+        //JsonObjectRequest sentMailJsonRequest = new JsonObjectRequest(Request.Method.POST, Global.SERVER_URL, )
         
     }
 }
