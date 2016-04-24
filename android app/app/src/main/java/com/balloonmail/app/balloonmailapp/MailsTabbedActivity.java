@@ -23,9 +23,9 @@ public class MailsTabbedActivity extends AppCompatActivity {
     private TabLayout tabLayout;
     private ViewPager viewPager;
     private int[] tabIcons = {
-            R.mipmap.ic_launcher, //Sent
-            R.mipmap.ic_launcher, //Received
-            R.mipmap.ic_launcher, //Likes
+            R.drawable.ic_sent_white_48px, //Sent
+            R.drawable.ic_received_white_48px, //Received
+            R.drawable.ic_liked_white_48px, //Likes
     };
 
     @Override
