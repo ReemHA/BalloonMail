@@ -12,6 +12,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 
+import com.balloonmail.app.balloonmail.Utilities.Global;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
@@ -145,7 +146,7 @@ public class LoginTabbedActivity extends AppCompatActivity{
         protected String doInBackground(String... strings) {
 
             try {
-                url = new URL(R.string.server_url+"/token/google");
+                url = new URL(Global.SERVER_URL+"/token/google");
                 connection = (HttpURLConnection) url.openConnection();
 
                 // set connection to allow output
