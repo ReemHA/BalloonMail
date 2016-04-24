@@ -2,7 +2,6 @@ package com.balloonmail.app.balloonmailapp;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -20,6 +19,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import it.gmariotti.cardslib.library.recyclerview.internal.CardArrayRecyclerViewAdapter;
+
 public class SentMailsFragment extends Fragment {
 
     private RecyclerView mRecyclerView;
@@ -36,24 +37,18 @@ public class SentMailsFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_sent_mails, container, false);
-        mRecyclerView = (RecyclerView) rootView.findViewById(R.id.sent_recyclerView);
+        /*mRecyclerView = (RecyclerView) rootView.findViewById(R.id.sent_recyclerView);
         mRecyclerView.setHasFixedSize(true);
 
         mLayoutManager = new LinearLayoutManager(getContext());
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        try {
-            mAdapter = new SentRecyclerViewAdapter(getDataSet());
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        mRecyclerView.setAdapter(mAdapter);
+        mAdapter = new SentRecyclerViewAdapter(getDataSet());
+        mRecyclerView.setAdapter(mAdapter);*/
 
-        //RecyclerView.ItemDecoration itemDecoration =
-        //        new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL);
-        //mRecyclerView.addItemDecoration(itemDecoration);
+        CardArrayRecyclerViewAdapter mCardArrayAdapter;
 
-        //((SentRecyclerViewAdapter)mAdapter).addItem(new Balloons("Example Text Message"), 0);
+        //((SentRecyclerViewAdapter)mAdapter).addItem(new Balloon("Example Text Message"), 0);
         return rootView;
     }
 
