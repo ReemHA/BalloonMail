@@ -12,6 +12,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 
+import com.balloonmail.app.balloonmail.Utilities.Global;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
@@ -40,7 +41,7 @@ public class LoginTabbedActivity extends AppCompatActivity{
     private static final String SERVER_RESPONSE_ERROR_TYPE = "Server response:";
     private static final String NETWORK_CONNECTION_MSG = "Please check your network connection.";
     private static final String ERROR_LOGGING_IN_MSG = "Error logging in. Please make sure you have a google account.";
-    private static final String SERVER_URL = "http://192.168.43.122:3000";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -145,7 +146,7 @@ public class LoginTabbedActivity extends AppCompatActivity{
         protected String doInBackground(String... strings) {
 
             try {
-                url = new URL(SERVER_URL+"/token/google");
+                url = new URL(Global.SERVER_URL+"/token/google");
                 connection = (HttpURLConnection) url.openConnection();
 
                 // set connection to allow output
@@ -163,8 +164,6 @@ public class LoginTabbedActivity extends AppCompatActivity{
                 // set charset property to utf-8
                 connection.setRequestProperty("charset", "utf-8");
 
-                // set host property
-                connection.setRequestProperty("Host", "192.168.43.122:3000");
 
                 // set accept property
                 connection.setRequestProperty("Accept", "application/json");

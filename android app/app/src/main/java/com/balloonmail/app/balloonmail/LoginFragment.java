@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.balloonmail.app.balloonmail.Utilities.Global;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.ConnectionResult;
@@ -43,7 +44,7 @@ public class LoginFragment extends Fragment implements GoogleApiClient.OnConnect
 
         // Configure sign in to request the user's id token
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(getString(R.string.server_client_id))
+                .requestIdToken(Global.SERVER_CLIENT_ID)
                 .requestProfile()
                 .build();
 

@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_id": "balloonmail-d87ec",
-    "project_number": "287579982910",
+    "project_id": "balloonmail-b90f4",
+    "project_number": "567322659417",
     "name": "BalloonMail"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:287579982910:android:65a2d6f77637e380",
+        "mobilesdk_app_id": "1:567322659417:android:65a2d6f77637e380",
         "client_id": "android:com.balloonmail.app.balloonmail",
         "client_type": 1,
         "android_client_info": {
@@ -17,7 +17,7 @@
       },
       "oauth_client": [
         {
-          "client_id": "287579982910-064askhvmcdr3b634t5dfpfc93gds6cl.apps.googleusercontent.com",
+          "client_id": "567322659417-gnffgm6bimoa3k35qudjruqnvrv5n8e1.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.balloonmail.app.balloonmail",
@@ -25,7 +25,7 @@
           }
         },
         {
-          "client_id": "287579982910-cotju4lsvdrdjcv45t4332m46htstqjl.apps.googleusercontent.com",
+          "client_id": "567322659417-delrcd8m4crvh94av75c06kgg00k9l1a.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
@@ -35,12 +35,17 @@
           "status": 1
         },
         "cloud_messaging_service": {
-          "status": 1,
+          "status": 2,
           "apns_config": []
         },
         "appinvite_service": {
-          "status": 1,
-          "other_platform_oauth_client": []
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "567322659417-delrcd8m4crvh94av75c06kgg00k9l1a.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         },
         "google_signin_service": {
           "status": 2
