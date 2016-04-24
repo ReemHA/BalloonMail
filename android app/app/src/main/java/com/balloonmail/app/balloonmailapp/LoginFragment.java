@@ -11,7 +11,6 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.Toast;
 
 import com.balloonmail.app.balloonmailapp.Utilities.Global;
@@ -68,15 +67,6 @@ public class LoginFragment extends Fragment implements GoogleApiClient.OnConnect
                         signIn();
                         break;
                 }
-            }
-        });
-
-        Button temp = (Button)rootView.findViewById(R.id.temp);
-        temp.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getActivity(), MailsTabbedActivity.class);
-                startActivity(intent);
             }
         });
         return rootView;

@@ -48,7 +48,7 @@ public class SentMailsFragment extends Fragment {
 
         CardArrayRecyclerViewAdapter mCardArrayAdapter;
 
-        //((SentRecyclerViewAdapter)mAdapter).addItem(new Balloon("Example Text Message"), 0);
+
         return rootView;
     }
 
