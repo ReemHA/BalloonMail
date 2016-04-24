@@ -13,4 +13,12 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="92dp" />
 
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/temp"
+        android:text="temp"
+        android:layout_centerVertical="true"
+        android:layout_alignRight="@+id/login_google_button"
+        android:layout_alignEnd="@+id/login_google_button" />
 </RelativeLayout>
