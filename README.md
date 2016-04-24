@@ -5,7 +5,7 @@ putting the server url in the `server_url` field in the `values/strings` file in
 
 # Setup locally 
 
-1. Install [Node.js 64-bit](https://nodejs.org/dist/v4.4.3/node-v4.4.3-x64.msi) or [Node.js 32-bit](https://nodejs.org/dist/v4.4.3/node-v4.4.3-x86.msi)
+1. Install  [Node.js 64-bit](https://nodejs.org/dist/v4.4.3/node-v4.4.3-x64.msi) or [Node.js 32-bit](https://nodejs.org/dist/v4.4.3/node-v4.4.3-x86.msi)
 2. Install [MongoDB 64-bit](https://fastdl.mongodb.org/win32/mongodb-win32-x86_64-3.2.5-signed.msi) or [Mongodb 32-bit](https://fastdl.mongodb.org/win32/mongodb-win32-i386-3.2.5-signed.msi)
 3. Add MongoDB bin folder to the System PATH variable. It is usually located here `C:\Program Files\MongoDB\Server\3.2\bin`, check where yours is installed.
 4. Open a terminal and type :
