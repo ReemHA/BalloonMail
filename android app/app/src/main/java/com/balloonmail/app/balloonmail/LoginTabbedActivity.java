@@ -39,9 +39,6 @@ public class LoginTabbedActivity extends AppCompatActivity{
     private static final int RC_SIGN_IN = 9001;
     private static final String SIGN_IN_ERROR_TYPE = "Sign in";
     private static final String SERVER_RESPONSE_ERROR_TYPE = "Server response:";
-    private static final String NETWORK_CONNECTION_MSG = "Please check your network connection.";
-    private static final String ERROR_LOGGING_IN_MSG = "Error logging in. Please make sure you have a google account.";
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +52,8 @@ public class LoginTabbedActivity extends AppCompatActivity{
 
         tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
+
+
         //setupTabIcons()
 
     }
