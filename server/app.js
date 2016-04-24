@@ -19,12 +19,6 @@ mongoose.connection.on('error', function (err) {
 mongoose.connect(config.database);
 
 
-// used by openshift cloud service
-app.get("/health", function(req, res){
-	res.writeHead(200);
-    res.end();
-});
-
 //--- routes ---//
 app.use("/token",require("./routes/tokens"));
 

@@ -1,0 +1,75 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background"
+    tools:context="com.balloonmail.app.balloonmail.HomeActivityFragment"
+    tools:showIn="@layout/activity_home">
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="-64dp"
+        android:id="@+id/home_clouds_and_balloons"
+        android:src="@drawable/home_clouds_and_balloons"
+        android:contentDescription="clouds_and_balloons" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/home_main_balloon"
+        android:src="@drawable/home_main_balloon"
+        android:contentDescription="main_balloon"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="32px"
+        android:layout_alignLeft="@+id/home_clouds_and_balloons"
+        android:layout_alignStart="@+id/home_clouds_and_balloons" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/home_mountains"
+        android:src="@drawable/home_mountains"
+        android:layout_marginBottom="-16px"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignBottom="@+id/home_main_balloon"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:padding="16dp"
+        android:layout_marginLeft="32dp"
+        android:layout_marginBottom="16dp"
+        android:layout_marginStart="32dp">
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/sentImageButton"
+            android:background="@drawable/ic_sent_white_48px"
+            android:layout_alignParentBottom="true"/>
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/receivedImageButton"
+            android:background="@drawable/ic_received_white_48px"
+            android:layout_alignParentBottom="true"
+            android:layout_centerInParent="true"/>
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/likedImageButton"
+            android:background="@drawable/ic_liked_white_48px"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"/>
+
+
+    </RelativeLayout>
+
+
+</RelativeLayout>
