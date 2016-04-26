@@ -4,14 +4,7 @@
     android:layout_height="match_parent"
     tools:context=".LoginFragment">
 
-    <com.google.android.gms.common.SignInButton
-        android:id="@+id/login_google_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="92dp" />
+
 
     <Button
         android:layout_width="wrap_content"
