@@ -6,9 +6,18 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
+import com.balloonmail.app.balloonmail.models.DatabaseHelper;
+import com.balloonmail.app.balloonmail.models.SentBalloons;
+import com.j256.ormlite.android.apptools.OpenHelperManager;
+import com.j256.ormlite.dao.RuntimeExceptionDao;
+
 import org.json.JSONObject;
 
+import java.sql.SQLException;
+
 public class WriteMailActivity extends AppCompatActivity {
+
+    DatabaseHelper dbHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -19,11 +28,24 @@ public class WriteMailActivity extends AppCompatActivity {
         spread.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                spreadMail(mailText);
+                try {
+                    writeMail(mailText);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
             }
         });
     }
 
+    private void writeMail(EditText mailText) throws SQLException {
+        dbHelper = OpenHelperManager.getHelper(this, DatabaseHelper.class);
+        RuntimeExceptionDao<SentBalloons, Integer> sentBalloonsDao = dbHelper.getSentBalloonRuntimeExceptionDao();
+
+        // create a new balloon
+        sentBalloonsDao.create(new SentBalloons(mailText.getText().toString()));
+
+        OpenHelperManager.releaseHelper();
+    }
     private void spreadMail(EditText mailText){
 
         // get the mail text from the edit text

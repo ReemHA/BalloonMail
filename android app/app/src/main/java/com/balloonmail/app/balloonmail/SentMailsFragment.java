@@ -10,9 +10,15 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.balloonmail.app.balloonmail.adapters.SentRecyclerViewAdapter;
-import com.balloonmail.app.balloonmail.models.Balloon;
+import com.balloonmail.app.balloonmail.models.Balloons;
+import com.balloonmail.app.balloonmail.models.DatabaseHelper;
+import com.balloonmail.app.balloonmail.models.SentBalloons;
+import com.j256.ormlite.android.apptools.OpenHelperManager;
+import com.j256.ormlite.dao.RuntimeExceptionDao;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 
 public class SentMailsFragment extends Fragment {
 
@@ -20,7 +26,7 @@ public class SentMailsFragment extends Fragment {
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
     private static String LOG_TAG = "SentMailsFragment";
-
+    private DatabaseHelper dbHelper;
     public SentMailsFragment() {
         // Required empty public constructor
     }
@@ -36,14 +42,18 @@ public class SentMailsFragment extends Fragment {
         mLayoutManager = new LinearLayoutManager(getContext());
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        mAdapter = new SentRecyclerViewAdapter(getDataSet());
+        try {
+            mAdapter = new SentRecyclerViewAdapter(getDataSet());
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         mRecyclerView.setAdapter(mAdapter);
 
         //RecyclerView.ItemDecoration itemDecoration =
         //        new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL);
         //mRecyclerView.addItemDecoration(itemDecoration);
 
-        //((SentRecyclerViewAdapter)mAdapter).addItem(new Balloon("Example Text Message"), 0);
+        //((SentRecyclerViewAdapter)mAdapter).addItem(new Balloons("Example Text Message"), 0);
         return rootView;
     }
 
@@ -59,12 +69,19 @@ public class SentMailsFragment extends Fragment {
                 });
     }
 
-    private ArrayList<Balloon> getDataSet() {
-        ArrayList results = new ArrayList<Balloon>();
-        for (int index = 0; index < 20; index++) {
-            Balloon obj = new Balloon("Example Text Message " + index);
-            results.add(index, obj);
+    private ArrayList<Balloons> getDataSet() throws SQLException {
+        dbHelper = OpenHelperManager.getHelper(getContext(), DatabaseHelper.class);
+        RuntimeExceptionDao<SentBalloons, Integer> sentBalloonsDao = dbHelper.getSentBalloonRuntimeExceptionDao();
+
+        // query will return a list
+        List<SentBalloons> sentBalloonsList = sentBalloonsDao.queryForAll();
+
+        ArrayList results = new ArrayList<>();
+        for (int index = 0; index < sentBalloonsList.size(); index++) {
+            results.add(index, sentBalloonsList.get(index).getText());
         }
+
+        OpenHelperManager.releaseHelper();
         return results;
     }
 }

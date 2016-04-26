@@ -8,7 +8,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.balloonmail.app.balloonmail.R;
-import com.balloonmail.app.balloonmail.models.Balloon;
+import com.balloonmail.app.balloonmail.models.Balloons;
 
 import java.util.ArrayList;
 
@@ -18,7 +18,7 @@ import java.util.ArrayList;
 public class SentRecyclerViewAdapter extends RecyclerView.Adapter<SentRecyclerViewAdapter.BalloonHolder>{
 
     private static String LOG_TAG = "SentRecyclerView";
-    private ArrayList<Balloon> sentBalloonsArrayList;
+    private ArrayList<Balloons> sentBalloonsArrayList;
     private static MyClickListener myClickListener;
 
     public static class BalloonHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
@@ -40,7 +40,7 @@ public class SentRecyclerViewAdapter extends RecyclerView.Adapter<SentRecyclerVi
         this.myClickListener = myClickListener;
     }
 
-    public SentRecyclerViewAdapter(ArrayList<Balloon> dataset) {
+    public SentRecyclerViewAdapter(ArrayList<Balloons> dataset) {
         sentBalloonsArrayList = dataset;
     }
 
@@ -59,7 +59,7 @@ public class SentRecyclerViewAdapter extends RecyclerView.Adapter<SentRecyclerVi
         holder.text.setText(sentBalloonsArrayList.get(position).getText());
     }
 
-    public void addItem(Balloon dataObj, int index) {
+    public void addItem(Balloons dataObj, int index) {
         sentBalloonsArrayList.add(dataObj);
         notifyItemInserted(index);
     }
