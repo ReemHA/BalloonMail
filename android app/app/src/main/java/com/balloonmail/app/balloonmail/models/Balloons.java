@@ -3,7 +3,7 @@ package com.balloonmail.app.balloonmail.models;
 /**
  * Created by Dalia on 4/23/2016.
  */
-public class Balloon {
+public abstract class Balloons {
     String text;
     int noOfRefills;
     int noOfCreeps;
@@ -11,7 +11,7 @@ public class Balloon {
     double reach;
     double sentDate;
 
-    public Balloon(String text){
+    public Balloons(String text){
         this.text = text;
     }
     public double getDistance() {
