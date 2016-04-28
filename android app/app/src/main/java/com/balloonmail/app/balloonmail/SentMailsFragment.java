@@ -14,7 +14,7 @@ import com.balloonmail.app.balloonmail.models.Balloons;
 import com.balloonmail.app.balloonmail.models.DatabaseHelper;
 import com.balloonmail.app.balloonmail.models.SentBalloons;
 import com.j256.ormlite.android.apptools.OpenHelperManager;
-import com.j256.ormlite.dao.RuntimeExceptionDao;
+import com.j256.ormlite.dao.Dao;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -71,14 +71,14 @@ public class SentMailsFragment extends Fragment {
 
     private ArrayList<Balloons> getDataSet() throws SQLException {
         dbHelper = OpenHelperManager.getHelper(getContext(), DatabaseHelper.class);
-        RuntimeExceptionDao<SentBalloons, Integer> sentBalloonsDao = dbHelper.getSentBalloonRuntimeExceptionDao();
+        Dao<SentBalloons, Integer> sentBalloonsDao = dbHelper.getSentBalloonDao();
 
         // query will return a list
         List<SentBalloons> sentBalloonsList = sentBalloonsDao.queryForAll();
 
         ArrayList results = new ArrayList<>();
         for (int index = 0; index < sentBalloonsList.size(); index++) {
-            results.add(index, sentBalloonsList.get(index).getText());
+            results.add(index, sentBalloonsList.get(index));
         }
 
         OpenHelperManager.releaseHelper();
