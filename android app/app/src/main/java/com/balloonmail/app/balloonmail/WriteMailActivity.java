@@ -9,7 +9,7 @@ import android.widget.EditText;
 import com.balloonmail.app.balloonmail.models.DatabaseHelper;
 import com.balloonmail.app.balloonmail.models.SentBalloons;
 import com.j256.ormlite.android.apptools.OpenHelperManager;
-import com.j256.ormlite.dao.RuntimeExceptionDao;
+import com.j256.ormlite.dao.Dao;
 
 import org.json.JSONObject;
 
@@ -39,7 +39,7 @@ public class WriteMailActivity extends AppCompatActivity {
 
     private void writeMail(EditText mailText) throws SQLException {
         dbHelper = OpenHelperManager.getHelper(this, DatabaseHelper.class);
-        RuntimeExceptionDao<SentBalloons, Integer> sentBalloonsDao = dbHelper.getSentBalloonRuntimeExceptionDao();
+        Dao<SentBalloons, Integer> sentBalloonsDao = dbHelper.getSentBalloonDao();
 
         // create a new balloon
         sentBalloonsDao.create(new SentBalloons(mailText.getText().toString()));

@@ -5,6 +5,9 @@ package com.balloonmail.app.balloonmail.models;
  */
 public class LikedBalloons extends Balloons {
 
+    public LikedBalloons(){
+
+    }
     public LikedBalloons(String text) {
         super(text);
     }
