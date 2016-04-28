@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -12,6 +11,13 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.VolleyLog;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
 import com.balloonmail.app.balloonmailapp.Utilities.Global;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -24,19 +30,13 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 
 public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener{
 
     private static final int RC_SIGN_IN = 9001;
     private static final String SIGN_IN_ERROR_TAG = "handle sign in";
-    private static final String SERVER_RESPONSE_ERROR_TYPE = "Server response:";
     private static final String NETWORK_CONNECTION_MSG = "Please check your network connection.";
 
     private GoogleApiClient googleApiClient;
@@ -88,8 +88,12 @@ public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiC
                 // store returned data
                 GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
 
-                // handle returned data
-                handleSignIntent(result);
+                try {
+                    // handle returned data
+                    handleSignIntent(result);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }
@@ -112,6 +116,7 @@ public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiC
 
     // check internet internet connection
     private boolean checkNetworkConnection() {
+
         // check the state of network connectivity
         ConnectivityManager manager = (ConnectivityManager) getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
 
@@ -124,7 +129,7 @@ public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiC
     }
 
     // handle the data returned from onActivityResult
-    private void handleSignIntent(GoogleSignInResult result) {
+    private void handleSignIntent(GoogleSignInResult result) throws JSONException {
         if (result.isSuccess()) {
 
             // fetch idToken of the user
@@ -144,120 +149,68 @@ public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiC
     }
 
 
-    // send data to server asynchronously
-    private void sendDataToServer(String idToken, String userName) {
-        new sendJSONDataToServer().execute(idToken,userName);
-    }
+    // send data to server
+    private void sendDataToServer(String idToken, String userName) throws JSONException {
 
-    class sendJSONDataToServer extends AsyncTask<String, String, String> {
-        URL url;
-        HttpURLConnection connection;
+        JSONObject jsonRequestParam = new JSONObject();
+        jsonRequestParam.put("access_token", idToken);
+        jsonRequestParam.put("user_name", userName);
 
-        @Override
-        protected String doInBackground(String... strings) {
+        // send request
+        final JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST,
+                Global.SERVER_URL+"/token/google",
+                jsonRequestParam, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                try {
+                    VolleyLog.d("volley", "no error in response");
+                    JSONObject jsonResponse = response.getJSONObject("result");
 
-            try {
-                url = new URL(Global.SERVER_URL+"/token/google");
-                connection = (HttpURLConnection) url.openConnection();
+                    // checks if an error is in the response
+                    if (!jsonResponse.has("error")) {
+                        String userID, api_token;
 
-                // set connection to allow output
-                connection.setDoOutput(true);
+                        // get api_token of the user from the response
+                        api_token = jsonResponse.getString("api_token");
 
-                // set connection to allow input
-                connection.setDoInput(true);
+                        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                        startActivity(intent);
 
-                // set the request method to POST
-                connection.setRequestMethod("POST");
+                        // checks if he is a new user
+                        if (jsonResponse.getBoolean("created")) {
+                            // insert a new user record
+                            //insertNewUserData(userID, api_token);
 
-                // set content-type property
-                connection.setRequestProperty("Content-Type", "application/json");
-
-                // set charset property to utf-8
-                connection.setRequestProperty("charset", "utf-8");
-
-
-                // set accept property
-                connection.setRequestProperty("Accept", "application/json");
-
-                // put user name and id token in a JSONObject
-                JSONObject jsonBody = new JSONObject();
-                jsonBody.put("access_token", strings[0]);
-                jsonBody.put("user_name", strings[1]);
-
-                // connect to server
-                connection.connect();
-
-                DataOutputStream outputStream = new DataOutputStream(connection.getOutputStream());
-
-                // write JSON body to the output stream
-                outputStream.write(jsonBody.toString().getBytes("utf-8"));
-
-                // flush to ensure all data in the stream is sent
-                outputStream.flush();
-
-                // close stream
-                outputStream.close();
-
-                // receive the response from server
-                getResponseFromServer();
-
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            return null;
-
-        }
-
-        private void getResponseFromServer() throws IOException, JSONException {
-            // create StringBuilder object to append the input stream in
-            StringBuilder sb = new StringBuilder();
-            String line;
-
-            // get input stream
-            BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-
-            // append stream in a the StringBuilder object
-            while ((line = reader.readLine()) != null) {
-                sb.append(line + "\n");
-            }
-            reader.close();
-
-            // convert StringBuilder object to string and store it in a variable
-            String JSONResponse = sb.toString();
-            Log.d(SERVER_RESPONSE_ERROR_TYPE, JSONResponse);
-
-            // convert response to JSONObject
-            JSONObject response = new JSONObject(JSONResponse);
-            response = response.getJSONObject("result");
-
-            // checks if an error is in the response
-            if (!response.has("error")) {
-                String userID, api_token;
-
-                // get api_token of the user from the response
-                api_token = response.getString("api_token");
-
-                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                startActivity(intent);
-
-                // checks if he is a new user
-                if (response.getBoolean("created")) {
-                    // insert a new user record
-                    //insertNewUserData(userID, api_token);
-
-                } else {
-                    // save api_token in the record of the user of this userID
-                    //insertApiTokenToUser(userID, api_token);
+                        } else {
+                            // save api_token in the record of the user of this userID
+                            //insertApiTokenToUser(userID, api_token);
+                        }
+                    } else {
+                        Log.d("Response from Server: ", jsonResponse.getString("error"));
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
                 }
-            } else {
-                Log.d("Response from Server: ", response.getString("error"));
-            }
 
-            return;
-        }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                VolleyLog.d("volley", error.getLocalizedMessage());
+                Toast.makeText(getApplicationContext(), error.getLocalizedMessage(), Toast.LENGTH_LONG).show();
+            }
+        }){
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap<>();
+                headers.put("Content-Type", "application/json; charset=utf-8");
+                return headers;
+            }
+        };
+
+
+
+        Volley.newRequestQueue(this).add(jsonObjectRequest);
     }
+
 }
