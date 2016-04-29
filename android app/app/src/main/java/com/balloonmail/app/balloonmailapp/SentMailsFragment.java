@@ -21,12 +21,21 @@ import java.util.List;
 
 import it.gmariotti.cardslib.library.recyclerview.internal.CardArrayRecyclerViewAdapter;
 
+import it.gmariotti.cardslib.library.internal.Card;
+import it.gmariotti.cardslib.library.internal.CardExpand;
+import it.gmariotti.cardslib.library.recyclerview.internal.CardArrayRecyclerViewAdapter;
+import it.gmariotti.cardslib.library.recyclerview.view.CardRecyclerView;
+
 public class SentMailsFragment extends Fragment {
 
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
     private static String LOG_TAG = "SentMailsFragment";
+    ArrayList<Card> cards;
+
+    View rootView;
+
     private DatabaseHelper dbHelper;
     public SentMailsFragment() {
         // Required empty public constructor
@@ -35,33 +44,51 @@ public class SentMailsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        View rootView = inflater.inflate(R.layout.fragment_sent_mails, container, false);
-        /*mRecyclerView = (RecyclerView) rootView.findViewById(R.id.sent_recyclerView);
-        mRecyclerView.setHasFixedSize(true);
 
-        mLayoutManager = new LinearLayoutManager(getContext());
-        mRecyclerView.setLayoutManager(mLayoutManager);
+        rootView = inflater.inflate(R.layout.fragment_sent_mails, container, false);
 
-        mAdapter = new SentRecyclerViewAdapter(getDataSet());
-        mRecyclerView.setAdapter(mAdapter);*/
+        cards = new ArrayList<Card>();
+        cards = initCards();
 
-        CardArrayRecyclerViewAdapter mCardArrayAdapter;
+        CardArrayRecyclerViewAdapter mCardArrayAdapter = new CardArrayRecyclerViewAdapter(getActivity(), cards);
 
+        //Staggered grid view
+        CardRecyclerView mRecyclerView = (CardRecyclerView) rootView.findViewById(R.id.cvCardRecyclerView);
+        mRecyclerView.setHasFixedSize(false);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+
+        //Set the empty view
+        if (mRecyclerView != null) {
+            mRecyclerView.setAdapter(mCardArrayAdapter);
+        }
 
         return rootView;
+    }
+
+    public ArrayList<Card> initCards(){
+        ArrayList<Card> cards = new ArrayList<Card>();
+
+        for(int i=0; i<10; i++){
+            Balloon balloon = new Balloon("This is an example of text message no. " + i + " sent by a balloon.");
+            Card card = new CardSent(getActivity().getBaseContext(), balloon);
+            //CardHeader cardHeader = new CustomSentHeaderCard(getActivity().getBaseContext());
+            //cardHeader.setButtonExpandVisible(true);
+            //card.addCardHeader(cardHeader);
+
+            CardExpand cardExpand = new CustomSentExpandCard(getActivity().getBaseContext());
+            card.addCardExpand(cardExpand);
+
+            card.setCardElevation(getResources().getDimension(R.dimen.card_shadow_elevation));
+
+            cards.add(card);
+        }
+
+        return cards;
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        ((SentRecyclerViewAdapter) mAdapter).setOnItemClickListener(
-                new SentRecyclerViewAdapter.MyClickListener() {
-                    @Override
-                    public void onItemClick(int position, View v) {
-                        Log.i(LOG_TAG, " Clicked on Item " + position);
-                    }
-                });
     }
 
     private ArrayList<Balloons> getDataSet() throws SQLException {

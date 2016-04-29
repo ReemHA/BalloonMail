@@ -1,24 +1,12 @@
 package com.balloonmail.app.balloonmailapp.adapters;
 
-import android.support.v7.widget.RecyclerView;
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
-
-import com.balloonmail.app.balloonmailapp.R;
-import com.balloonmail.app.balloonmailapp.models.Balloons;
-
-import java.util.ArrayList;
-
 /**
  * Created by Dalia on 4/23/2016.
  */
-public class SentRecyclerViewAdapter extends RecyclerView.Adapter<SentRecyclerViewAdapter.BalloonHolder>{
+public class SentRecyclerViewAdapter {//extends RecyclerView.Adapter<SentRecyclerViewAdapter.BalloonHolder>{
 
-    private static String LOG_TAG = "SentRecyclerView";
-    private ArrayList<Balloons> sentBalloonsArrayList;
+    /*private static String LOG_TAG = "SentRecyclerView";
+    private ArrayList<Balloon> sentBalloonsArrayList;
     private static MyClickListener myClickListener;
 
     public static class BalloonHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
@@ -40,7 +28,7 @@ public class SentRecyclerViewAdapter extends RecyclerView.Adapter<SentRecyclerVi
         this.myClickListener = myClickListener;
     }
 
-    public SentRecyclerViewAdapter(ArrayList<Balloons> dataset) {
+    public SentRecyclerViewAdapter(ArrayList<Balloon> dataset) {
         sentBalloonsArrayList = dataset;
     }
 
@@ -59,7 +47,7 @@ public class SentRecyclerViewAdapter extends RecyclerView.Adapter<SentRecyclerVi
         holder.text.setText(sentBalloonsArrayList.get(position).getText());
     }
 
-    public void addItem(Balloons dataObj, int index) {
+    public void addItem(Balloon dataObj, int index) {
         sentBalloonsArrayList.add(dataObj);
         notifyItemInserted(index);
     }
@@ -76,5 +64,5 @@ public class SentRecyclerViewAdapter extends RecyclerView.Adapter<SentRecyclerVi
 
     public interface MyClickListener {
         public void onItemClick(int position, View v);
-    }
+    }*/
 }
