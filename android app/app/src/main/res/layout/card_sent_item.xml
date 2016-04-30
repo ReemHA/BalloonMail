@@ -35,6 +35,84 @@
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true" />
 
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/sentBalloonTextTv"
+            android:paddingTop="@dimen/actions_padding"
+            android:orientation="horizontal"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentLeft="true"
+            android:weightSum="3">
+
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/refillRelativeLayout"
+                android:layout_weight="1">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:id="@+id/refillImageButton"
+                    android:background="@drawable/ic_refill_grey_24px"
+                    />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:id="@+id/refillTv"
+                    android:layout_toRightOf="@id/refillImageButton"
+                    android:text=" refills"/>
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/reachRelativeLayout"
+                android:layout_weight="1">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:id="@+id/reachImageButton"
+                    android:src="@drawable/ic_reach_grey_24px"
+                    />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:id="@+id/reachTv"
+                    android:layout_toRightOf="@id/reachImageButton"
+                    android:text=" reach"/>
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/creepRelativeLayout"
+                android:layout_weight="1">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:id="@+id/creepImageButton"
+                    android:background="@drawable/ic_creepy_grey_24px"
+                    />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:id="@+id/creepTv"
+                    android:layout_toRightOf="@id/creepImageButton"
+                    android:text=" creeps"/>
+            </RelativeLayout>
+
+        </LinearLayout>
     </RelativeLayout>
 
 </LinearLayout>
