@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.balloonmail.app.balloonmail">
+    package="com.balloonmail.app.balloonmailapp">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -13,28 +13,28 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".MainActivity"
+            android:name="com.balloonmail.app.balloonmailapp.MainActivity"
             android:label="@string/app_name"
-            android:parentActivityName=".LoginTabbedActivity"
+            android:parentActivityName="com.balloonmail.app.balloonmailapp.LoginTabbedActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".LoginTabbedActivity" />
+                android:value="com.balloonmail.app.balloonmailapp.LoginTabbedActivity" />
         </activity>
         <activity
-            android:name=".MailsTabbedActivity"
+            android:name="com.balloonmail.app.balloonmailapp.MailsTabbedActivity"
             android:label="@string/title_activity_mails_tabbed"
-            android:parentActivityName=".MainActivity"
+            android:parentActivityName="com.balloonmail.app.balloonmailapp.MainActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.balloonmail.app.balloonmail.MainActivity" />
+                android:value="com.balloonmail.app.balloonmailapp.MainActivity" />
         </activity>
         <activity
-            android:name=".LoginTabbedActivity"
+            android:name="com.balloonmail.app.balloonmailapp.LoginTabbedActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar"></activity>
-        <activity android:name=".SplashScreen">
+        <activity android:name="com.balloonmail.app.balloonmailapp.SplashScreen">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -42,10 +42,10 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".HomeActivity"
+            android:name="com.balloonmail.app.balloonmailapp.HomeActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".WriteMailActivity"></activity>
+        <activity android:name="com.balloonmail.app.balloonmailapp.WriteMailActivity"></activity>
     </application>
 
 </manifest>
