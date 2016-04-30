@@ -23,6 +23,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/sentBalloonTextTv"
+            android:layout_alignParentLeft="true"
             android:layout_toLeftOf="@+id/mapImageButton"
             android:maxLines="2"/>
 

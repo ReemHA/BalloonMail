@@ -19,7 +19,7 @@ fieldName=login_date
 # --table-end--
 #################################
 # --table-start--
-dataClass=com.balloonmail.app.balloonmailapp.models.ReceivedBalloons
+dataClass=com.balloonmail.app.balloonmailapp.models.ReceivedBalloon
 tableName=receivedballoons
 # --table-fields-start--
 # --field-start--
@@ -49,7 +49,7 @@ fieldName=sentDate
 # --table-end--
 #################################
 # --table-start--
-dataClass=com.balloonmail.app.balloonmailapp.models.SentBalloons
+dataClass=com.balloonmail.app.balloonmailapp.models.SentBalloon
 tableName=sentballoons
 # --table-fields-start--
 # --field-start--
@@ -79,7 +79,7 @@ fieldName=sentDate
 # --table-end--
 #################################
 # --table-start--
-dataClass=com.balloonmail.app.balloonmailapp.models.LikedBalloons
+dataClass=com.balloonmail.app.balloonmailapp.models.LikedBalloon
 tableName=likedballoons
 # --table-fields-start--
 # --field-start--
