@@ -1,31 +1,31 @@
 {
   "project_info": {
-    "project_id": "balloonmail-b90f4",
-    "project_number": "567322659417",
-    "name": "BalloonMail"
+    "project_id": "balloonmailapp-1293",
+    "project_number": "113808451021",
+    "name": "BalloonMailApp"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:567322659417:android:65a2d6f77637e380",
-        "client_id": "android:com.balloonmail.app.balloonmail",
+        "mobilesdk_app_id": "1:113808451021:android:150ff9fabdd91916",
+        "client_id": "android:com.balloonmail.app.balloonmailapp",
         "client_type": 1,
         "android_client_info": {
-          "package_name": "com.balloonmail.app.balloonmail",
+          "package_name": "com.balloonmail.app.balloonmailapp",
           "certificate_hash": []
         }
       },
       "oauth_client": [
         {
-          "client_id": "567322659417-gnffgm6bimoa3k35qudjruqnvrv5n8e1.apps.googleusercontent.com",
+          "client_id": "113808451021-im0he0rlcbmtf37q1n2a4aootpvmk2lt.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.balloonmail.app.balloonmail",
+            "package_name": "com.balloonmail.app.balloonmailapp",
             "certificate_hash": "6F50621AE0D9E6C3C7E0CAED400E35C63B296304"
           }
         },
         {
-          "client_id": "567322659417-delrcd8m4crvh94av75c06kgg00k9l1a.apps.googleusercontent.com",
+          "client_id": "113808451021-5bbh4fp49eo7tdq8j93arot30tt49q8j.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
@@ -42,7 +42,7 @@
           "status": 2,
           "other_platform_oauth_client": [
             {
-              "client_id": "567322659417-delrcd8m4crvh94av75c06kgg00k9l1a.apps.googleusercontent.com",
+              "client_id": "113808451021-5bbh4fp49eo7tdq8j93arot30tt49q8j.apps.googleusercontent.com",
               "client_type": 3
             }
           ]
