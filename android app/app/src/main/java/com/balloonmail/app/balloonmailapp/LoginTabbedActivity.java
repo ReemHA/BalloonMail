@@ -11,14 +11,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.VolleyLog;
-import com.android.volley.toolbox.JsonObjectRequest;
 import com.balloonmail.app.balloonmailapp.Utilities.Global;
-import com.balloonmail.app.balloonmailapp.controller.RequestQueueSingleton;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -28,10 +21,6 @@ import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
 
 import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
 
@@ -93,17 +82,12 @@ public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiC
                     handleSignIntent(result);
                 } catch (JSONException e) {
                     e.printStackTrace();
-                } catch (AuthFailureError authFailureError) {
-                    authFailureError.printStackTrace();
-                }
             }
+        }
         }
     }
 
-    @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-        Toast.makeText(getApplicationContext(), connectionResult.getErrorMessage(), Toast.LENGTH_LONG).show();
-    }
+
 
     private void signIn() {
 
@@ -135,7 +119,7 @@ public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiC
     }
 
     // handle the data returned from onActivityResult
-    private void handleSignIntent(GoogleSignInResult result) throws JSONException, AuthFailureError {
+    private void handleSignIntent(GoogleSignInResult result) throws JSONException {
         if (result.isSuccess()) {
 
             // get the idToken of the user
@@ -155,78 +139,13 @@ public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiC
     }
 
 
-    private void sendDataToServer(String idToken, String userName) throws JSONException, AuthFailureError {
-
-        // store the idToken and username in a JSONObject
-        final Map<String, String> params = new HashMap<>();
-        params.put("access_token", idToken);
-        params.put("user_name", userName);
-
-        // send the json object as a request
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST,
-                Global.SERVER_URL + "/token/google",
-                new JSONObject(params), new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-                try {
-                    JSONObject jsonResponse = response.getJSONObject("result");
-
-                    // checks if an error is in the response
-                    if (!jsonResponse.has("error")) {
-                        String userID, api_token;
-
-                        // get api_token of the user from the response
-                        api_token = jsonResponse.getString("api_token");
-
-                        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                        startActivity(intent);
-
-                        // checks if he is a new user
-                        if (jsonResponse.getBoolean("created")) {
-                            // insert a new user record
-                            //insertNewUserData(userID, api_token);
-
-                        } else {
-                            // save api_token in the record of the user of this userID
-                            //insertApiTokenToUser(userID, api_token);
-                        }
-                    } else {
-                        Log.d("Response from Server: ", jsonResponse.getString("error"));
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                if (error.getMessage() != null) {
-                    VolleyLog.d(error.getMessage());
-                }else{
-                    VolleyLog.d(VOLLEY_TAG, "No error msg");
-                }
-                // show a toast in case of an error returned from the server
-                Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_LONG).show();
-            }
-        }) {
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                return params;
-            }
-
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-
-                // set request http header
-                Map<String, String> headers = new HashMap<>();
-                headers.put("Content-Type", "application/json; charset=utf-8");
-                return headers;
-            }
-        };
-
-        // add the request to the queue to be executed and set its tag
-        RequestQueueSingleton.getInstance(this).addToRequestQueue(jsonObjectRequest, "sign in");
+    private void sendDataToServer(String idToken, String userName) throws JSONException {
+        
     }
 
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+        Toast.makeText(getApplicationContext(), connectionResult.getErrorMessage(), Toast.LENGTH_LONG).show();
+
+    }
 }
