@@ -1,4 +1,4 @@
-package com.balloonmail.app.balloonmail;
+package com.balloonmail.app.balloonmailapp;
 
 import android.content.Context;
 import android.view.View;

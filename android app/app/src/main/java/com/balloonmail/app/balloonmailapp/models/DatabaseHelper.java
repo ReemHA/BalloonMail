@@ -20,14 +20,14 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
     private static final int DATABASE_VERSION = 1;
 
     private Dao<User, String> userDao = null;
-    private Dao<ReceivedBalloons, Integer> receivedBalloonDao = null;
-    private Dao<SentBalloons, Integer> sentBalloonDao = null;
-    private Dao<LikedBalloons, Integer> likedBalloonDao = null;
+    private Dao<ReceivedBalloon, Integer> receivedBalloonDao = null;
+    private Dao<SentBalloon, Integer> sentBalloonDao = null;
+    private Dao<LikedBalloon, Integer> likedBalloonDao = null;
 
     private RuntimeExceptionDao<User, String> userRuntimeExceptionDao = null;
-    private RuntimeExceptionDao<ReceivedBalloons, Integer> receivedBalloonRuntimeExceptionDao = null;
-    private RuntimeExceptionDao<SentBalloons, Integer> sentBalloonRuntimeExceptionDao = null;
-    private RuntimeExceptionDao<LikedBalloons, Integer> likedBalloonRuntimeExceptionDao = null;
+    private RuntimeExceptionDao<ReceivedBalloon, Integer> receivedBalloonRuntimeExceptionDao = null;
+    private RuntimeExceptionDao<SentBalloon, Integer> sentBalloonRuntimeExceptionDao = null;
+    private RuntimeExceptionDao<LikedBalloon, Integer> likedBalloonRuntimeExceptionDao = null;
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION, R.raw.ormlite_config);
@@ -39,9 +39,9 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         // create tables
         try {
             TableUtils.createTable(connectionSource, User.class);
-            TableUtils.createTable(connectionSource, LikedBalloons.class);
-            TableUtils.createTable(connectionSource, ReceivedBalloons.class);
-            TableUtils.createTable(connectionSource, SentBalloons.class);
+            TableUtils.createTable(connectionSource, LikedBalloon.class);
+            TableUtils.createTable(connectionSource, ReceivedBalloon.class);
+            TableUtils.createTable(connectionSource, SentBalloon.class);
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -53,9 +53,9 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         try {
             // drop tables
             TableUtils.dropTable(connectionSource, User.class, true);
-            TableUtils.dropTable(connectionSource, LikedBalloons.class, true);
-            TableUtils.dropTable(connectionSource, ReceivedBalloons.class, true);
-            TableUtils.dropTable(connectionSource, SentBalloons.class, true);
+            TableUtils.dropTable(connectionSource, LikedBalloon.class, true);
+            TableUtils.dropTable(connectionSource, ReceivedBalloon.class, true);
+            TableUtils.dropTable(connectionSource, SentBalloon.class, true);
 
             // re-create database
             onCreate(sqLiteDatabase);
@@ -80,46 +80,46 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         return userRuntimeExceptionDao;
     }
 
-    public Dao<ReceivedBalloons, Integer> getReceivedBalloonDao() throws SQLException {
+    public Dao<ReceivedBalloon, Integer> getReceivedBalloonDao() throws SQLException {
        if (receivedBalloonDao == null){
-           receivedBalloonDao = getDao(ReceivedBalloons.class);
+           receivedBalloonDao = getDao(ReceivedBalloon.class);
        }
         return receivedBalloonDao;
     }
 
-    public RuntimeExceptionDao<ReceivedBalloons, Integer> getReceivedBalloonRuntimeExceptionDao() throws SQLException {
+    public RuntimeExceptionDao<ReceivedBalloon, Integer> getReceivedBalloonRuntimeExceptionDao() throws SQLException {
         if (receivedBalloonRuntimeExceptionDao == null){
-            receivedBalloonRuntimeExceptionDao = getDao(ReceivedBalloons.class);
+            receivedBalloonRuntimeExceptionDao = getDao(ReceivedBalloon.class);
         }
         return receivedBalloonRuntimeExceptionDao;
     }
 
-    public Dao<SentBalloons, Integer> getSentBalloonDao() throws SQLException{
+    public Dao<SentBalloon, Integer> getSentBalloonDao() throws SQLException{
         if (sentBalloonDao == null){
-            sentBalloonDao = getDao(SentBalloons.class);
+            sentBalloonDao = getDao(SentBalloon.class);
         }
 
         return sentBalloonDao;
     }
 
-    public RuntimeExceptionDao<SentBalloons, Integer> getSentBalloonRuntimeExceptionDao() throws SQLException{
+    public RuntimeExceptionDao<SentBalloon, Integer> getSentBalloonRuntimeExceptionDao() throws SQLException{
         if (sentBalloonRuntimeExceptionDao == null){
-            sentBalloonRuntimeExceptionDao = getDao(SentBalloons.class);
+            sentBalloonRuntimeExceptionDao = getDao(SentBalloon.class);
         }
 
         return (RuntimeExceptionDao) sentBalloonRuntimeExceptionDao;
     }
-    public Dao<LikedBalloons, Integer> getLikedBalloonDao() throws SQLException{
+    public Dao<LikedBalloon, Integer> getLikedBalloonDao() throws SQLException{
         if (likedBalloonDao == null){
-            likedBalloonDao = getDao(LikedBalloons.class);
+            likedBalloonDao = getDao(LikedBalloon.class);
         }
 
         return likedBalloonDao;
     }
 
-    public RuntimeExceptionDao<LikedBalloons, Integer> getLikedBalloonRuntimeExceptionDao() throws SQLException{
+    public RuntimeExceptionDao<LikedBalloon, Integer> getLikedBalloonRuntimeExceptionDao() throws SQLException{
         if (likedBalloonRuntimeExceptionDao == null){
-            likedBalloonRuntimeExceptionDao = getDao(LikedBalloons.class);
+            likedBalloonRuntimeExceptionDao = getDao(LikedBalloon.class);
         }
 
         return likedBalloonRuntimeExceptionDao;

@@ -1,4 +1,4 @@
-package com.balloonmail.app.balloonmail;
+package com.balloonmail.app.balloonmailapp;
 
 import android.content.Context;
 import android.view.View;
@@ -6,7 +6,7 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
-import com.balloonmail.app.balloonmail.models.Balloon;
+import com.balloonmail.app.balloonmailapp.models.Balloon;
 
 import it.gmariotti.cardslib.library.internal.Card;
 import it.gmariotti.cardslib.library.internal.ViewToClickToExpand;

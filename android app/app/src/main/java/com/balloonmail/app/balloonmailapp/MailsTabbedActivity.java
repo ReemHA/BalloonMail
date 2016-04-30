@@ -12,7 +12,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 
-import com.balloonmail.app.balloonmail.Utilities.Global;
+import com.balloonmail.app.balloonmailapp.Utilities.Global;
 
 import java.util.ArrayList;
 import java.util.List;

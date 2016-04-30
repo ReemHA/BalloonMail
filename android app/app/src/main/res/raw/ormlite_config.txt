@@ -2,7 +2,7 @@
 # generated on 2016/04/26 08:53:57
 #
 # --table-start--
-dataClass=com.balloonmail.app.balloonmail.models.User
+dataClass=com.balloonmail.app.balloonmailapp.models.User
 tableName=user
 # --table-fields-start--
 # --field-start--
@@ -19,7 +19,7 @@ fieldName=login_date
 # --table-end--
 #################################
 # --table-start--
-dataClass=com.balloonmail.app.balloonmail.models.ReceivedBalloons
+dataClass=com.balloonmail.app.balloonmailapp.models.ReceivedBalloons
 tableName=receivedballoons
 # --table-fields-start--
 # --field-start--
@@ -49,7 +49,7 @@ fieldName=sentDate
 # --table-end--
 #################################
 # --table-start--
-dataClass=com.balloonmail.app.balloonmail.models.SentBalloons
+dataClass=com.balloonmail.app.balloonmailapp.models.SentBalloons
 tableName=sentballoons
 # --table-fields-start--
 # --field-start--
@@ -79,7 +79,7 @@ fieldName=sentDate
 # --table-end--
 #################################
 # --table-start--
-dataClass=com.balloonmail.app.balloonmail.models.LikedBalloons
+dataClass=com.balloonmail.app.balloonmailapp.models.LikedBalloons
 tableName=likedballoons
 # --table-fields-start--
 # --field-start--

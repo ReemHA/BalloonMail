@@ -8,7 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 
-import com.balloonmail.app.balloonmail.Utilities.Global;
+import com.balloonmail.app.balloonmailapp.Utilities.Global;
 
 public class HomeActivityFragment extends Fragment {
 

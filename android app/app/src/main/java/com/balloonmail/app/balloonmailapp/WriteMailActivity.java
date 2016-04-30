@@ -7,7 +7,7 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.balloonmail.app.balloonmailapp.models.DatabaseHelper;
-import com.balloonmail.app.balloonmailapp.models.SentBalloons;
+import com.balloonmail.app.balloonmailapp.models.SentBalloon;
 import com.j256.ormlite.android.apptools.OpenHelperManager;
 import com.j256.ormlite.dao.Dao;
 
@@ -39,10 +39,10 @@ public class WriteMailActivity extends AppCompatActivity {
 
     private void writeMail(EditText mailText) throws SQLException {
         dbHelper = OpenHelperManager.getHelper(this, DatabaseHelper.class);
-        Dao<SentBalloons, Integer> sentBalloonsDao = dbHelper.getSentBalloonDao();
+        Dao<SentBalloon, Integer> sentBalloonsDao = dbHelper.getSentBalloonDao();
 
         // create a new balloon
-        sentBalloonsDao.create(new SentBalloons(mailText.getText().toString()));
+        sentBalloonsDao.create(new SentBalloon(mailText.getText().toString()));
 
         OpenHelperManager.releaseHelper();
     }

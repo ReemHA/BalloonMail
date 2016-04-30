@@ -3,12 +3,11 @@ package com.balloonmail.app.balloonmailapp.models;
 /**
  * Created by Reem Hamdy on 4/26/2016.
  */
-public class LikedBalloons extends Balloons {
-
-    public LikedBalloons(){
-
+public class SentBalloon extends Balloon {
+    public SentBalloon() {
     }
-    public LikedBalloons(String text) {
+
+    public SentBalloon(String text) {
         super(text);
     }
 }
