@@ -11,7 +11,7 @@ import java.sql.SQLException;
  */
 public class DatabaseConfigUtil extends OrmLiteConfigUtil {
 
-    private static final Class<?> [] classes = new Class[]{User.class, ReceivedBalloons.class, SentBalloons.class, LikedBalloons.class};
+    private static final Class<?> [] classes = new Class[]{User.class, ReceivedBalloon.class, SentBalloon.class, LikedBalloon.class};
     public static void main(String[] args) throws SQLException, IOException {
         writeConfigFile(new File("C:\\Users\\Reem Hamdy\\Git\\BalloonMail\\android app" +
                 "\\app\\src\\main\\res\\raw\\ormlite_config.txt")

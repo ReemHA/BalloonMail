@@ -12,6 +12,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 
+import com.balloonmail.app.balloonmailapp.Utilities.Global;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,9 +23,9 @@ public class MailsTabbedActivity extends AppCompatActivity {
     private TabLayout tabLayout;
     private ViewPager viewPager;
     private int[] tabIcons = {
-            R.mipmap.ic_launcher, //Sent
-            R.mipmap.ic_launcher, //Received
-            R.mipmap.ic_launcher, //Likes
+            R.drawable.ic_sent_white_48px, //Sent
+            R.drawable.ic_received_white_48px, //Received
+            R.drawable.ic_liked_white_48px, //Likes
     };
 
     @Override
@@ -45,6 +47,9 @@ public class MailsTabbedActivity extends AppCompatActivity {
 
         viewPager = (ViewPager) findViewById(R.id.viewpager);
         setupViewPager(viewPager);
+        int defaultValue = 0;
+        int page = getIntent().getIntExtra(Global.ARG_MAILS_TABBED_TAG, defaultValue);
+        viewPager.setCurrentItem(page);
 
         tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);

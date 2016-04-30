@@ -1,19 +1,8 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<?xml version="1.0" encoding="utf-8"?>
+<it.gmariotti.cardslib.library.recyclerview.view.CardRecyclerView
+    xmlns:card="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    tools:context="com.balloonmail.app.balloonmailapp.SentMailsFragment"
-    android:background="?android:attr/selectableItemBackground">
-
-
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/sent_recyclerView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:scrollbars="vertical">
-
-
-    </android.support.v7.widget.RecyclerView>
-
-
-</FrameLayout>
+    android:layout_height="match_parent"
+    card:list_card_layout_resourceID="@layout/native_recyclerview_card_layout"
+    android:id="@+id/cvCardRecyclerView" />

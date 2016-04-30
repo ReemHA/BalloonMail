@@ -7,7 +7,7 @@ import java.util.Date;
 /**
  * Created by Dalia on 4/23/2016.
  */
-public abstract class Balloons {
+public abstract class Balloon {
 
     @DatabaseField(unique = true, generatedId = true)
     int balloonId;
@@ -30,10 +30,10 @@ public abstract class Balloons {
     @DatabaseField
     Date sentDate;
 
-    public Balloons() {
+    public Balloon() {
     }
 
-    public Balloons(String text){
+    public Balloon(String text){
         setText(text);
         this.sentDate = new Date(System.currentTimeMillis());
     }

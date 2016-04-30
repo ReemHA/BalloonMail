@@ -5,4 +5,6 @@
     <color name="colorAccent">#FFC107</color>
     <color name="background">#B2EBF2</color>
     <color name="red">#C1494E</color>
+    <color name="card_backgroundExpand">#ffffff</color>
+    <color name="grey">#647D84</color>
 </resources>
