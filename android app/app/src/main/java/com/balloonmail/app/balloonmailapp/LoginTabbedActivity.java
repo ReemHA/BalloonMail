@@ -9,6 +9,7 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.balloonmail.app.balloonmailapp.Utilities.Global;
@@ -62,6 +63,17 @@ public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiC
                 }
             }
         });
+
+        Button button = (Button) findViewById(R.id.temp);
+        button.setOnClickListener( new View.OnClickListener(){
+
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(LoginTabbedActivity.this, HomeActivity.class);
+                startActivity(intent);
+            }
+        });
+
     }
 
     @Override

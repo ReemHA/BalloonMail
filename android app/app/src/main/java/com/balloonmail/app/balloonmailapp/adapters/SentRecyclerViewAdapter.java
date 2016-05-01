@@ -5,7 +5,7 @@ package com.balloonmail.app.balloonmailapp.adapters;
  */
 public class SentRecyclerViewAdapter {//extends RecyclerView.Adapter<SentRecyclerViewAdapter.BalloonHolder>{
 
-    /*private static String LOG_TAG = "SentRecyclerView";
+   /* private static String LOG_TAG = "SentRecyclerView";
     private ArrayList<Balloon> sentBalloonsArrayList;
     private static MyClickListener myClickListener;
 
@@ -59,7 +59,7 @@ public class SentRecyclerViewAdapter {//extends RecyclerView.Adapter<SentRecycle
 
     @Override
     public int getItemCount() {
-        return sentBalloonsArrayList.size();
+        return sentBalloonArrayList.size();
     }
 
     public interface MyClickListener {

@@ -1,15 +1,16 @@
 package com.balloonmail.app.balloonmailapp;
 
-
-import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-public class LoginFragment extends Fragment {
-
-    public LoginFragment() {
+/**
+ * Created by Reem Hamdy on 4/30/2016.
+ */
+public class ReceivedMailsFragment  extends Fragment{
+    public ReceivedMailsFragment() {
         // Required empty public constructor
     }
 
@@ -18,8 +19,7 @@ public class LoginFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View rootView = inflater.inflate(R.layout.fragment_login, container, false);
-
-        return rootView;
+        return inflater.inflate(R.layout.fragment_received_mails, container, false);
     }
+
 }
