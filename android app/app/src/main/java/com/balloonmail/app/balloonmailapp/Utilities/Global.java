@@ -10,4 +10,5 @@ public class Global {
     public static final int SENT_TABBED_PAGE = 0;
     public static final int RECEIVED_TABBED_PAGE = 1;
     public static final int LIKES_TABBED_PAGE = 2;
+    public static final String LOG_TAG = "DOWN";
 }
