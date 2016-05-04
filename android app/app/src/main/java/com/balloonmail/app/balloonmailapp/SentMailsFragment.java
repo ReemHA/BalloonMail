@@ -1,6 +1,7 @@
 package com.balloonmail.app.balloonmailapp;
 
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.util.Log;
@@ -36,10 +37,16 @@ public class SentMailsFragment extends Fragment {
     }
 
     @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState){
 
         rootView = inflater.inflate(R.layout.fragment_sent_mails, container, false);
+
 
         cards = new ArrayList<Card>();
         try{
@@ -80,7 +87,7 @@ public class SentMailsFragment extends Fragment {
         //cardHeader.setButtonExpandVisible(true);
         //card.addCardHeader(cardHeader);
 
-        CardExpand cardExpand = new CustomSentExpandCard(getActivity().getBaseContext());
+        CardExpand cardExpand = new CustomSentExpandCard(getActivity().getBaseContext(), getFragmentManager());
         card.addCardExpand(cardExpand);
 
         card.setCardElevation(getResources().getDimension(R.dimen.card_shadow_elevation));
