@@ -252,7 +252,9 @@ public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiC
 
             @Override
             public void onFailure(Call<ServerResponse> call, Throwable t) {
-                Log.d("Error", t.getMessage());
+                if (t.getMessage() != null) {
+                    Log.d("Error", t.getMessage());
+                }
             }
         });
 
