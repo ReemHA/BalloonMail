@@ -1,5 +1,5 @@
 #
-# generated on 2016/04/26 08:53:57
+# generated on 2016/05/03 10:45:39
 #
 # --table-start--
 dataClass=com.balloonmail.app.balloonmailapp.models.User
@@ -9,8 +9,11 @@ tableName=user
 fieldName=user_name
 # --field-end--
 # --field-start--
-fieldName=api_token
+fieldName=user_email
 unique=true
+# --field-end--
+# --field-start--
+fieldName=api_token
 # --field-end--
 # --field-start--
 fieldName=login_date
@@ -20,7 +23,7 @@ fieldName=login_date
 #################################
 # --table-start--
 dataClass=com.balloonmail.app.balloonmailapp.models.ReceivedBalloon
-tableName=receivedballoons
+tableName=receivedballoon
 # --table-fields-start--
 # --field-start--
 fieldName=balloonId
@@ -50,7 +53,7 @@ fieldName=sentDate
 #################################
 # --table-start--
 dataClass=com.balloonmail.app.balloonmailapp.models.SentBalloon
-tableName=sentballoons
+tableName=sentballoon
 # --table-fields-start--
 # --field-start--
 fieldName=balloonId
@@ -80,7 +83,7 @@ fieldName=sentDate
 #################################
 # --table-start--
 dataClass=com.balloonmail.app.balloonmailapp.models.LikedBalloon
-tableName=likedballoons
+tableName=likedballoon
 # --table-fields-start--
 # --field-start--
 fieldName=balloonId

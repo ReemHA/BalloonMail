@@ -1,15 +1,15 @@
 package com.balloonmail.app.balloonmailapp;
 
-
-import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-public class ReceivedMailsFragment extends Fragment {
-
-
+/**
+ * Created by Reem Hamdy on 4/30/2016.
+ */
+public class ReceivedMailsFragment  extends Fragment{
     public ReceivedMailsFragment() {
         // Required empty public constructor
     }

@@ -88,7 +88,7 @@ public abstract class Balloon {
 
     @Override
     public String toString() {
-        return "Balloons{" +
+        return "Balloon{" +
                 "balloonId=" + balloonId +
                 ", text='" + text + '\'' +
                 ", noOfRefills=" + noOfRefills +

@@ -1,0 +1,10 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <com.balloonmail.app.balloonmailapp.SignOutDialogPreference
+        android:title="@string/sign_out_title"
+        android:dialogMessage="@string/sign_out_confirmation_msg"
+        android:negativeButtonText="No"
+        android:positiveButtonText="Yes"
+        />
+
+</PreferenceScreen>

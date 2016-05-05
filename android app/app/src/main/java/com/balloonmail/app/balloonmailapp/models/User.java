@@ -13,6 +13,9 @@ public class User {
     String user_name;
 
     @DatabaseField(unique = true)
+    String user_email;
+
+    @DatabaseField
     String api_token;
 
     @DatabaseField
@@ -21,9 +24,10 @@ public class User {
     public User() {
     }
 
-    public User(String api_token, String user_name) {
+    public User(String api_token, String user_name, String user_email) {
         this.api_token = api_token;
         this.user_name = user_name;
+        this.user_email = user_email;
         this.login_date = new Date(System.currentTimeMillis());
     }
 
@@ -31,6 +35,7 @@ public class User {
     public String toString() {
         return "User{" +
                 "user_name='" + user_name + '\'' +
+                ", user_email='" + user_email + '\'' +
                 ", api_token='" + api_token + '\'' +
                 ", login_date=" + login_date +
                 '}';
