@@ -30,6 +30,7 @@ public class SentMailsFragment extends Fragment {
     ArrayList<Card> cards;
 
     View rootView;
+    Bundle savedInstanceState;
 
     private DatabaseHelper dbHelper;
     public SentMailsFragment() {
@@ -46,7 +47,7 @@ public class SentMailsFragment extends Fragment {
                              Bundle savedInstanceState){
 
         rootView = inflater.inflate(R.layout.fragment_sent_mails, container, false);
-
+        this.savedInstanceState = savedInstanceState;
 
         cards = new ArrayList<Card>();
         try{
@@ -87,7 +88,7 @@ public class SentMailsFragment extends Fragment {
         //cardHeader.setButtonExpandVisible(true);
         //card.addCardHeader(cardHeader);
 
-        CardExpand cardExpand = new CustomSentExpandCard(getActivity().getBaseContext(), getFragmentManager());
+        CardExpand cardExpand = new CustomSentExpandCard(getActivity().getBaseContext(), savedInstanceState);
         card.addCardExpand(cardExpand);
 
         card.setCardElevation(getResources().getDimension(R.dimen.card_shadow_elevation));
