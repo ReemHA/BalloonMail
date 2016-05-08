@@ -28,6 +28,22 @@
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true" />
 
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/likeActionBtn_received"
+            android:layout_marginBottom="@dimen/actions_padding_button"
+            android:background="@drawable/ic_like_grey_24px"
+            android:layout_below="@+id/refillActionBtn_received"/>
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/creepActionBtn_received"
+            android:background="@drawable/ic_creepy_grey_24px"
+            android:layout_below="@+id/likeActionBtn_received"/>
+
+
     </RelativeLayout>
 
 </LinearLayout>
