@@ -1,8 +1,11 @@
 package com.balloonmail.app.balloonmailapp.models;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.j256.ormlite.field.DatabaseField;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 
 /**
  * Created by Dalia on 4/23/2016.
@@ -29,6 +32,9 @@ public abstract class Balloon {
 
     @DatabaseField
     Date sentDate;
+
+    LatLng source;
+    HashMap<LatLng, ArrayList<LatLng>> destinationsHashMap;
 
     public Balloon() {
     }

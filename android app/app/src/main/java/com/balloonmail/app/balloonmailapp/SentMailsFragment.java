@@ -83,12 +83,12 @@ public class SentMailsFragment extends Fragment {
     }
 
     private Card createCard(Balloon balloon){
-        Card card = new CardSent(getActivity().getBaseContext(), balloon);
+        Card card = new CardSent(balloon, getActivity().getBaseContext());
         //CardHeader cardHeader = new CustomSentHeaderCard(getActivity().getBaseContext());
         //cardHeader.setButtonExpandVisible(true);
         //card.addCardHeader(cardHeader);
 
-        CardExpand cardExpand = new CustomSentExpandCard(getActivity().getBaseContext(), savedInstanceState);
+        CardExpand cardExpand = new CustomSentExpandCard(balloon, getActivity().getBaseContext(), savedInstanceState);
         card.addCardExpand(cardExpand);
 
         card.setCardElevation(getResources().getDimension(R.dimen.card_shadow_elevation));

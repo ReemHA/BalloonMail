@@ -1,10 +1,12 @@
 package com.balloonmail.app.balloonmailapp;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.balloonmail.app.balloonmailapp.models.Balloon;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -13,33 +15,57 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PolylineOptions;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 
 import it.gmariotti.cardslib.library.internal.CardExpand;
 
 /**
  * Created by Dalia on 4/25/2016.
  */
-public class CustomSentExpandCard extends CardExpand implements OnMapReadyCallback{
+public class CustomSentExpandCard extends CardExpand{
+
+    Balloon balloon;
 
     private GoogleMap mMap;
     private Context context;
     private Bundle savedInstanceState;
 
-    MapView mapView;
-
-    private static final String MAP_FRAGMENT_TAG = "map";
+    // Map Attributes
+    LatLng sourceBalloon;
+    HashMap<LatLng, ArrayList<LatLng>> destinationsHashMap;
 
     //Use your resource ID for your inner layout
     public CustomSentExpandCard(Context context) {
         super(context, R.layout.card_sent_expand);
         this.context = context;
     }
-    public CustomSentExpandCard(Context context, Bundle savedInstanceState) {
+    public CustomSentExpandCard(Balloon balloon, Context context, Bundle savedInstanceState) {
         super(context, R.layout.card_sent_expand);
+        this.balloon = balloon;
         this.context = context;
         this.savedInstanceState = savedInstanceState;
+
+        //will be replaced with the attributes of the balloon when received from the server
+        sourceBalloon = new LatLng(30.065136, 31.278821);
+        initializeHashMap();
     }
 
+    private void initializeHashMap(){
+        destinationsHashMap = new HashMap<>();
+        ArrayList<LatLng> destinationsArrayList = new ArrayList<>();
+        destinationsArrayList.add(new LatLng(-37.81319, 144.96298));
+        destinationsArrayList.add(new LatLng(-33.87365, 151.20689));
+        destinationsArrayList.add(new LatLng(-34.92873, 138.59995));
+        destinationsArrayList.add(new LatLng(-31.95285, 115.85734));
+        destinationsArrayList.add(new LatLng(51.471547, -0.460052));
+        destinationsArrayList.add(new LatLng(33.936524, -118.377686));
+        destinationsArrayList.add(new LatLng(40.641051, -73.777485));
+        destinationsArrayList.add(new LatLng(-37.006254, 174.783018));
+        destinationsHashMap.put(sourceBalloon, destinationsArrayList);
+    }
     @Override
     public void setupInnerViewElements(ViewGroup parent, View view){
         View row = view;
@@ -59,18 +85,19 @@ public class CustomSentExpandCard extends CardExpand implements OnMapReadyCallba
         }
     }
 
-    @Override
-    public void onMapReady(GoogleMap map) {
-        map.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker"));
-    }
-
-    private static void setMapLocation(GoogleMap map) {
+    private void setMapLocation(GoogleMap map) {
         // Add a marker for this item and set the camera
-        map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(39.937795, 116.387224), 13f));
-        map.addMarker(new MarkerOptions().position(new LatLng(39.937795, 116.387224)));
+        //map.moveCamera(CameraUpdateFactory.newLatLngZoom(sourceBalloon, 13f));
+        map.addMarker(new MarkerOptions().position(sourceBalloon));
 
-        // Set the map type back to normal.
-        map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+        for(int i=0; i<destinationsHashMap.get(sourceBalloon).size(); i++){
+            map.addPolyline(new PolylineOptions().add(sourceBalloon, destinationsHashMap.get(sourceBalloon).get(i))
+                    .color(Color.parseColor("#C1494E"))
+                    .width(5)
+                    .zIndex(i)
+                    .geodesic(true)
+            );
+        }
     }
 
     class SentExpandCardViewHolder implements OnMapReadyCallback {
@@ -89,10 +116,9 @@ public class CustomSentExpandCard extends CardExpand implements OnMapReadyCallba
             }*/
             setMapLocation(map);
 
-            map.getUiSettings().setZoomGesturesEnabled(false); //gestures not enabled in lite mode
             CameraPosition cameraPosition = new CameraPosition.Builder()
-                    .target(new LatLng(37.4, -122.1))      // Sets the center of the map to Mountain View
-                    .zoom(5)                   // Sets the zoom
+                    .target(sourceBalloon)      // Sets the center of the map to Mountain View
+                    .zoom(1)                   // Sets the zoom
                     .bearing(90)                // Sets the orientation of the camera to east
                     .tilt(30)                   // Sets the tilt of the camera to 30 degrees
                     .build();                   // Creates a CameraPosition from the builder
@@ -112,6 +138,7 @@ public class CustomSentExpandCard extends CardExpand implements OnMapReadyCallba
                 // Set the map ready callback to receive the GoogleMap object
                 mapView.getMapAsync(this);
                 mapView.setClickable(false);
+
             }
         }
 

@@ -14,9 +14,9 @@
 
         <com.google.android.gms.maps.MapView
             android:id="@+id/row_map"
-            android:layout_width="match_parent"
-            android:layout_height="150dp"
+            android:layout_width="wrap_content"
+            android:layout_height="200dp"
             map:liteMode="true"
-            map:mapType="none"/>
+            map:mapType="normal"/>
 
 </LinearLayout>

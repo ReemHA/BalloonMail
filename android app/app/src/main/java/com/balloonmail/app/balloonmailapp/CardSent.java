@@ -17,7 +17,7 @@ import it.gmariotti.cardslib.library.internal.ViewToClickToExpand;
 public class CardSent extends Card {
     Balloon balloon;
 
-    public CardSent(Context context, Balloon balloon) {
+    public CardSent(Balloon balloon, Context context) {
         super(context,R.layout.card_sent_item);
         this.balloon = balloon;
     }
