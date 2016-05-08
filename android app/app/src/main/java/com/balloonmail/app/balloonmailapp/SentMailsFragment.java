@@ -3,7 +3,6 @@ package com.balloonmail.app.balloonmailapp;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,9 +25,6 @@ import it.gmariotti.cardslib.library.recyclerview.view.CardRecyclerView;
 
 public class SentMailsFragment extends Fragment {
 
-    private RecyclerView mRecyclerView;
-    private RecyclerView.Adapter mAdapter;
-    private RecyclerView.LayoutManager mLayoutManager;
     private static String LOG_TAG = "SentMailsFragment";
     ArrayList<Card> cards;
 
