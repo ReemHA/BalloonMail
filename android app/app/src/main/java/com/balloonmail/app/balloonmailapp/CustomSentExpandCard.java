@@ -1,6 +1,7 @@
 package com.balloonmail.app.balloonmailapp;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
@@ -12,6 +13,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -88,16 +90,42 @@ public class CustomSentExpandCard extends CardExpand{
     private void setMapLocation(GoogleMap map) {
         // Add a marker for this item and set the camera
         //map.moveCamera(CameraUpdateFactory.newLatLngZoom(sourceBalloon, 13f));
-        map.addMarker(new MarkerOptions().position(sourceBalloon));
+        map.addMarker(new MarkerOptions()
+                .position(sourceBalloon)
+                .icon(BitmapDescriptorFactory.fromResource(R.drawable.marker_source_balloon)));
 
         for(int i=0; i<destinationsHashMap.get(sourceBalloon).size(); i++){
-            map.addPolyline(new PolylineOptions().add(sourceBalloon, destinationsHashMap.get(sourceBalloon).get(i))
+            LatLng destination = destinationsHashMap.get(sourceBalloon).get(i);
+            map.addPolyline(new PolylineOptions().add(sourceBalloon, destination)
                     .color(Color.parseColor("#C1494E"))
                     .width(5)
                     .zIndex(i)
                     .geodesic(true)
             );
+            map.addMarker(new MarkerOptions()
+                    .position(destination)
+                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.marker_destination)));
         }
+
+        CameraPosition cameraPosition = new CameraPosition.Builder()
+                .target(sourceBalloon)      // Sets the center of the map to Mountain View
+                .zoom(1)                   // Sets the zoom
+                .bearing(90)                // Sets the orientation of the camera to east
+                .tilt(30)                   // Sets the tilt of the camera to 30 degrees
+                .build();                   // Creates a CameraPosition from the builder
+        map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+
+        map.getUiSettings().setCompassEnabled(false);
+        map.getUiSettings().setMapToolbarEnabled(false);
+
+        map.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+            @Override
+            public void onMapClick(LatLng latLng) {
+                Intent intent = new Intent(context, MailDetailsAndMapActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                context.startActivity(intent);
+            }
+        });
     }
 
     class SentExpandCardViewHolder implements OnMapReadyCallback {
@@ -115,17 +143,6 @@ public class CustomSentExpandCard extends CardExpand{
                 setMapLocation(map, data);
             }*/
             setMapLocation(map);
-
-            CameraPosition cameraPosition = new CameraPosition.Builder()
-                    .target(sourceBalloon)      // Sets the center of the map to Mountain View
-                    .zoom(1)                   // Sets the zoom
-                    .bearing(90)                // Sets the orientation of the camera to east
-                    .tilt(30)                   // Sets the tilt of the camera to 30 degrees
-                    .build();                   // Creates a CameraPosition from the builder
-            map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-
-            //map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(-33.87365, 151.20689), 10));
-
         }
 
         /**
@@ -137,7 +154,7 @@ public class CustomSentExpandCard extends CardExpand{
                 mapView.onCreate(savedInstanceState);
                 // Set the map ready callback to receive the GoogleMap object
                 mapView.getMapAsync(this);
-                mapView.setClickable(false);
+                //mapView.setClickable(false);
 
             }
         }
