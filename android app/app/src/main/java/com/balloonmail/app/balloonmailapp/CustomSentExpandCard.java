@@ -35,10 +35,6 @@ public class CustomSentExpandCard extends CardExpand{
     private Context context;
     private Bundle savedInstanceState;
 
-    // Map Attributes
-    LatLng sourceBalloon;
-    HashMap<LatLng, ArrayList<LatLng>> destinationsHashMap;
-
     //Use your resource ID for your inner layout
     public CustomSentExpandCard(Context context) {
         super(context, R.layout.card_sent_expand);
@@ -50,24 +46,8 @@ public class CustomSentExpandCard extends CardExpand{
         this.context = context;
         this.savedInstanceState = savedInstanceState;
 
-        //will be replaced with the attributes of the balloon when received from the server
-        sourceBalloon = new LatLng(30.065136, 31.278821);
-        initializeHashMap();
     }
 
-    private void initializeHashMap(){
-        destinationsHashMap = new HashMap<>();
-        ArrayList<LatLng> destinationsArrayList = new ArrayList<>();
-        destinationsArrayList.add(new LatLng(-37.81319, 144.96298));
-        destinationsArrayList.add(new LatLng(-33.87365, 151.20689));
-        destinationsArrayList.add(new LatLng(-34.92873, 138.59995));
-        destinationsArrayList.add(new LatLng(-31.95285, 115.85734));
-        destinationsArrayList.add(new LatLng(51.471547, -0.460052));
-        destinationsArrayList.add(new LatLng(33.936524, -118.377686));
-        destinationsArrayList.add(new LatLng(40.641051, -73.777485));
-        destinationsArrayList.add(new LatLng(-37.006254, 174.783018));
-        destinationsHashMap.put(sourceBalloon, destinationsArrayList);
-    }
     @Override
     public void setupInnerViewElements(ViewGroup parent, View view){
         View row = view;
@@ -88,32 +68,39 @@ public class CustomSentExpandCard extends CardExpand{
     }
 
     private void setMapLocation(GoogleMap map) {
-        // Add a marker for this item and set the camera
-        //map.moveCamera(CameraUpdateFactory.newLatLngZoom(sourceBalloon, 13f));
-        map.addMarker(new MarkerOptions()
-                .position(sourceBalloon)
-                .icon(BitmapDescriptorFactory.fromResource(R.drawable.marker_source_balloon)));
 
-        for(int i=0; i<destinationsHashMap.get(sourceBalloon).size(); i++){
-            LatLng destination = destinationsHashMap.get(sourceBalloon).get(i);
-            map.addPolyline(new PolylineOptions().add(sourceBalloon, destination)
-                    .color(Color.parseColor("#C1494E"))
-                    .width(5)
-                    .zIndex(i)
-                    .geodesic(true)
-            );
+        LatLng sourceBalloon = balloon.getSourceBalloon();
+        HashMap<LatLng, ArrayList<LatLng>> destinationsHashMap = balloon.getDestinationsHashMap();
+
+        if(sourceBalloon != null){
             map.addMarker(new MarkerOptions()
-                    .position(destination)
-                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.marker_destination)));
+                    .position(sourceBalloon)
+                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.marker_source_balloon)));
+
+            if(destinationsHashMap != null){
+                for(int i=0; i<destinationsHashMap.get(sourceBalloon).size(); i++){
+                    LatLng destination = destinationsHashMap.get(sourceBalloon).get(i);
+                    map.addPolyline(new PolylineOptions().add(sourceBalloon, destination)
+                            .color(Color.parseColor("#C1494E"))
+                            .width(5)
+                            .zIndex(i)
+                            .geodesic(true)
+                    );
+                    map.addMarker(new MarkerOptions()
+                            .position(destination)
+                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.marker_destination)));
+                }
+            }
+
+            CameraPosition cameraPosition = new CameraPosition.Builder()
+                    .target(sourceBalloon)      // Sets the center of the map to Mountain View
+                    .zoom(1)                   // Sets the zoom
+                    .bearing(90)                // Sets the orientation of the camera to east
+                    .tilt(30)                   // Sets the tilt of the camera to 30 degrees
+                    .build();                   // Creates a CameraPosition from the builder
+            map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
         }
 
-        CameraPosition cameraPosition = new CameraPosition.Builder()
-                .target(sourceBalloon)      // Sets the center of the map to Mountain View
-                .zoom(1)                   // Sets the zoom
-                .bearing(90)                // Sets the orientation of the camera to east
-                .tilt(30)                   // Sets the tilt of the camera to 30 degrees
-                .build();                   // Creates a CameraPosition from the builder
-        map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 
         map.getUiSettings().setCompassEnabled(false);
         map.getUiSettings().setMapToolbarEnabled(false);
@@ -123,6 +110,9 @@ public class CustomSentExpandCard extends CardExpand{
             public void onMapClick(LatLng latLng) {
                 Intent intent = new Intent(context, MailDetailsAndMapActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                Bundle bundle = new Bundle();
+                bundle.putSerializable("balloon", balloon);
+                intent.putExtras(bundle);
                 context.startActivity(intent);
             }
         });

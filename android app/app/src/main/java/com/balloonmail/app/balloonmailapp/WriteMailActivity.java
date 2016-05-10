@@ -8,6 +8,7 @@ import android.widget.EditText;
 
 import com.balloonmail.app.balloonmailapp.models.DatabaseHelper;
 import com.balloonmail.app.balloonmailapp.models.SentBalloon;
+import com.google.android.gms.maps.model.LatLng;
 import com.j256.ormlite.android.apptools.OpenHelperManager;
 import com.j256.ormlite.dao.Dao;
 
@@ -42,7 +43,8 @@ public class WriteMailActivity extends AppCompatActivity {
         Dao<SentBalloon, Integer> sentBalloonsDao = dbHelper.getSentBalloonDao();
 
         // create a new balloon
-        sentBalloonsDao.create(new SentBalloon(mailText.getText().toString()));
+        SentBalloon balloon = new SentBalloon(mailText.getText().toString(), 0, 0, 0);
+        sentBalloonsDao.create(balloon);
 
         OpenHelperManager.releaseHelper();
     }

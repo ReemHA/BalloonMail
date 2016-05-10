@@ -1,31 +1,23 @@
-<?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    style="@style/card.shadow_image">
+    android:layout_height="match_parent"
+    tools:context="com.balloonmail.app.balloonmailapp.MailDetailsAndMapActivityFragment"
+    tools:showIn="@layout/activity_mail_details_and_map">
 
-        <!-- This is the base Inner View inside a Card.
-        You can customize it with your layout xml file and your Card.
-        You can populate your element with Card#setupInnerViewElements() method -->
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/mail_detail_layout"
+        android:padding="@dimen/activity_horizontal_margin">
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/sentBalloonTextTv"
             tools:text="Balloon Text Message"
             android:layout_alignParentLeft="true"
-            android:layout_toLeftOf="@+id/mapImageButton"
             android:maxLines="2"/>
-
-        <ImageButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/mapImageButton"
-            android:background="@drawable/ic_map_48px"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true" />
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -41,46 +33,46 @@
             <RelativeLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/refillRelativeLayout"
+                android:id="@+id/refillRelativeLayout_details"
                 android:layout_weight="1">
 
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
-                    android:id="@+id/refillImageButton"
+                    android:id="@+id/refillImageButton_details"
                     android:background="@drawable/ic_refill_grey_24px"
                     />
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
-                    android:id="@+id/refillTv"
+                    android:id="@+id/refillTv_details"
                     android:layout_marginLeft="@dimen/actions_padding_left"
-                    android:layout_toRightOf="@id/refillImageButton"
+                    android:layout_toRightOf="@id/refillImageButton_details"
                     tools:text=" refills"/>
             </RelativeLayout>
 
             <RelativeLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/reachRelativeLayout"
+                android:id="@+id/reachRelativeLayout_details"
                 android:layout_weight="1">
 
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
-                    android:id="@+id/reachImageButton"
+                    android:id="@+id/reachImageButton_details"
                     android:src="@drawable/ic_reach_grey_24px"
                     />
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
-                    android:id="@+id/reachTv"
+                    android:id="@+id/reachTv_details"
                     android:layout_marginLeft="@dimen/actions_padding_left"
-                    android:layout_toRightOf="@id/reachImageButton"
+                    android:layout_toRightOf="@id/reachImageButton_details"
                     tools:text=" reach"/>
             </RelativeLayout>
 
@@ -94,19 +86,32 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
-                    android:id="@+id/creepImageButton"
+                    android:id="@+id/creepImageButton_details"
                     android:background="@drawable/ic_creepy_grey_24px"
                     />
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
-                    android:id="@+id/creepTv"
+                    android:id="@+id/creepTv_details"
                     android:layout_marginLeft="@dimen/actions_padding_left"
-                    android:layout_toRightOf="@id/creepImageButton"
+                    android:layout_toRightOf="@id/creepImageButton_details"
                     tools:text=" creeps"/>
             </RelativeLayout>
 
         </LinearLayout>
+
+    </RelativeLayout>
+
+    <fragment
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:id="@+id/map_detail_fragment"
+        android:layout_below="@+id/mail_detail_layout"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="16dp" />
+
 
 </RelativeLayout>

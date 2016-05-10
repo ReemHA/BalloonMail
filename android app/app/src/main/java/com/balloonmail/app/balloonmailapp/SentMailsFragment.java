@@ -109,6 +109,8 @@ public class SentMailsFragment extends Fragment {
 
         ArrayList results = new ArrayList<>();
         for (int index = 0; index < sentBalloonsList.size(); index++) {
+            // TODO remove when source balloon attribute added to local db
+            sentBalloonsList.get(index).setSourceBalloon(30.065136, 31.278821);
             results.add(index, sentBalloonsList.get(index));
         }
 

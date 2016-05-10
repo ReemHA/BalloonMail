@@ -84,7 +84,7 @@ public class LikedMailsFragment extends Fragment {
 
         ArrayList results = new ArrayList<>();
         for (int index = 0; index < 10; index++) {
-            results.add(index, new LikedBalloon("Like no. " + index));
+            results.add(index, new LikedBalloon("Like no. " + index, 0, 0 ,0));
         }
 
         return results;
