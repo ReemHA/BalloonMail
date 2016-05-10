@@ -1,5 +1,6 @@
 package com.balloonmail.app.balloonmailapp;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -87,6 +88,19 @@ public class SentMailsFragment extends Fragment {
         //CardHeader cardHeader = new CustomSentHeaderCard(getActivity().getBaseContext());
         //cardHeader.setButtonExpandVisible(true);
         //card.addCardHeader(cardHeader);
+
+        final Balloon balloon1 = balloon;
+        card.setOnClickListener(new Card.OnCardClickListener() {
+            @Override
+            public void onClick(Card card, View view) {
+                Intent intent = new Intent(getContext(), MailDetailsAndMapActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                Bundle bundle = new Bundle();
+                bundle.putSerializable("balloon", balloon1);
+                intent.putExtras(bundle);
+                getContext().startActivity(intent);
+            }
+        });
 
         CardExpand cardExpand = new CustomSentExpandCard(balloon, getActivity().getBaseContext(), savedInstanceState);
         card.addCardExpand(cardExpand);

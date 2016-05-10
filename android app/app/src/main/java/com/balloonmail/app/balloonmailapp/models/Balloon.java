@@ -31,8 +31,11 @@ public abstract class Balloon implements Serializable{
     @DatabaseField
     double reach;
 
+    @DatabaseField
     private double latSource;
+    @DatabaseField
     private double lngSource;
+
     private HashMap<LatLng, ArrayList<LatLng>> destinationsHashMap;
 
     @DatabaseField

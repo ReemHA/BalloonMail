@@ -37,6 +37,15 @@ public class CardSent extends Card {
                                 .setupView(mapBtn);
                 setViewToClickToExpand(viewToClickToExpand);
             }
+
+            TextView refill = (TextView)view.findViewById(R.id.refillTv);
+            refill.setText(String.valueOf(balloon.getNoOfRefills()) + " refills");
+
+            TextView reach = (TextView)view.findViewById(R.id.reachTv);
+            reach.setText(String.valueOf(balloon.getReach()) + " reach");
+
+            TextView creep = (TextView)view.findViewById(R.id.creepTv);
+            creep.setText(String.valueOf(balloon.getNoOfCreeps()) + " creeps");
         }
     }
 }
