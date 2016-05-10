@@ -2,6 +2,7 @@ package com.balloonmail.app.balloonmailapp;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
@@ -13,11 +14,10 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.balloonmail.app.balloonmailapp.Utilities.Global;
-import com.balloonmail.app.balloonmailapp.models.DatabaseHelper;
-import com.balloonmail.app.balloonmailapp.models.User;
+import com.balloonmail.app.balloonmailapp.controller.DatabaseUtilities;
 import com.balloonmail.app.balloonmailapp.rest.RInterface;
-import com.balloonmail.app.balloonmailapp.rest.model.ServerRequest;
-import com.balloonmail.app.balloonmailapp.rest.model.ServerResponse;
+import com.balloonmail.app.balloonmailapp.rest.model.LoginServerRequest;
+import com.balloonmail.app.balloonmailapp.rest.model.LoginServerResponse;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -27,14 +27,8 @@ import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
-import com.j256.ormlite.android.apptools.OpenHelperManager;
-import com.j256.ormlite.dao.Dao;
-import com.j256.ormlite.stmt.DeleteBuilder;
-import com.j256.ormlite.stmt.UpdateBuilder;
 
 import org.json.JSONException;
-
-import java.sql.SQLException;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -48,25 +42,34 @@ public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiC
     private static final String SIGN_IN_ERROR_TAG = "handle sign in";
     private static final String NETWORK_CONNECTION_MSG = "Please check your network connection.";
     private GoogleApiClient googleApiClient;
-    private DatabaseHelper dbHelper;
     private int i = 0;
-
+    DatabaseUtilities databaseUtilities;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login_tabbed);
 
-        if (!isSignedOut()) {
+        databaseUtilities = new DatabaseUtilities();
+
+        // get api_token from the shared preference
+        SharedPreferences sharedPreferences = this.getSharedPreferences(Global.USER_INFO_PREF_FILE, Context.MODE_PRIVATE);
+        String api_token = sharedPreferences.getString(Global.PREF_USER_API_TOKEN, "");
+        Log.d(LoginTabbedActivity.class.getSimpleName(), api_token);
+
+        if (!isSignedOut() && api_token != "") {
             Intent intent = new Intent(LoginTabbedActivity.this, HomeActivity.class);
             startActivity(intent);
             LoginTabbedActivity.this.finish();
         }
 
+        // create a new blank database for the user
+        databaseUtilities.createDatabase(LoginTabbedActivity.this);
 
         // Configure sign in to request the user's id token
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(Global.SERVER_CLIENT_ID)
                 .requestProfile()
+                .requestEmail()
                 .build();
 
         // GoogleApiClient is main entry for Google Play services integration. Build GoogleApiClient to access the options specified by gso
@@ -171,6 +174,7 @@ public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiC
             // get the idToken of the user
             GoogleSignInAccount account = result.getSignInAccount();
             String idToken = account.getIdToken();
+            Log.d(LoginTabbedActivity.class.getSimpleName(), "id: " + idToken);
 
             // get the user name
             String userName = account.getDisplayName();
@@ -189,7 +193,7 @@ public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiC
 
 
     private void sendDataToServer(String idToken, final String userName, final String userEmail) {
-        ServerRequest body = new ServerRequest(userName, idToken);
+        LoginServerRequest body = new LoginServerRequest(userName, idToken);
 
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(Global.SERVER_URL)
@@ -197,66 +201,55 @@ public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiC
                 .build();
 
         RInterface request = retrofit.create(RInterface.class);
-        Call<ServerResponse> call = request.postData(body);
-        call.enqueue(new Callback<ServerResponse>() {
-            @Override
-            public void onResponse(Call<ServerResponse> call, Response<ServerResponse> response) {
-                ServerResponse jsonResponse = response.body();
+        Call<LoginServerResponse> call = request.postData(body);
+        call.enqueue(new Callback<LoginServerResponse>() {
+                         @Override
+                         public void onResponse(Call<LoginServerResponse> call, Response<LoginServerResponse> response) {
+                             LoginServerResponse jsonResponse = response.body();
 
-                // checks if an error is in the response
-                if (!jsonResponse.toString().contains("error")) {
-                    String api_token;
+                             // checks if an error is in the response
+                             if (!jsonResponse.toString().contains("error")) {
+                                 String api_token;
+                                 Log.d(LoginTabbedActivity.class.getSimpleName(), jsonResponse.toString());
 
-                    // get api_token of the user from the response
-                    api_token = jsonResponse.getApi_token();
+                                 // get api_token of the user from the response
+                                 api_token = jsonResponse.getApi_token();
 
-                    Intent intent = new Intent(LoginTabbedActivity.this, HomeActivity.class);
-                    startActivity(intent);
-                    LoginTabbedActivity.this.finish();
+                                 // add api_token to SharedPreferences
+                                 SharedPreferences sharedPreferences = LoginTabbedActivity.this.getSharedPreferences(Global.USER_INFO_PREF_FILE, MODE_PRIVATE);
+                                 if (sharedPreferences.edit().putString(Global.PREF_USER_API_TOKEN, api_token).commit() &&
+                                         sharedPreferences.edit().putString(Global.PREF_USER_NAME, userName).commit() &&
+                                         sharedPreferences.edit().putString(Global.PREF_USER_EMAIL, userEmail).commit()) {
+                                     Log.d(LoginTabbedActivity.class.getSimpleName(), "api_token: " + api_token + "\\n" +
+                                             "user name: " + userName + "\\n" + "user email: " + userEmail + " are saved into shared pref.");
+                                 }
 
-                    dbHelper = OpenHelperManager.getHelper(LoginTabbedActivity.this, DatabaseHelper.class);
-                    Dao<User, String> userDao = null;
-                    try {
-                        userDao = dbHelper.getUserDao();
-                    } catch (SQLException e) {
-                        e.printStackTrace();
-                    }
+                                 // checks if he is a new user
+                                 if (jsonResponse.isCreated()) {
+                                     sharedPreferences.edit().putBoolean(Global.PREF_USER_IS_CREATED, true).commit();
+                                     Log.d(LoginTabbedActivity.class.getSimpleName(), "user is new user.");
+                                 } else {
+                                     sharedPreferences.edit().putBoolean(Global.PREF_USER_IS_CREATED, false).commit();
+                                     Log.d(LoginTabbedActivity.class.getSimpleName(), "user is an old user.");
+                                 }
 
-                    // checks if he is a new user
-                    if (jsonResponse.isCreated()) {
+                                 Intent intent = new Intent(LoginTabbedActivity.this, HomeActivity.class);
+                                 startActivity(intent);
+                                 LoginTabbedActivity.this.finish();
+                             } else {
+                                 Log.d("Response from Server: ", jsonResponse.getError());
+                             }
+                         }
 
-                        try {
-                            // insert a new user record
-                            userDao.create(new User(api_token, userName, userEmail));
-                        } catch (SQLException e) {
-                            e.printStackTrace();
-                        }
-                    } else {
+                         @Override
+                         public void onFailure(Call<LoginServerResponse> call, Throwable t) {
+                             if (t.getMessage() != null) {
+                                 Log.d("Error", t.getMessage());
+                             }
+                         }
+                     }
 
-                        try {
-                            // update the api_token field in the record of the user with specified email
-                            UpdateBuilder<User, String> updateBuilder = userDao.updateBuilder();
-                            updateBuilder.where().eq("user_email", userEmail);
-                            updateBuilder.updateColumnValue("api_token", api_token);
-                            updateBuilder.update();
-                        } catch (SQLException e) {
-                            e.printStackTrace();
-                        }
-
-                    }
-                    OpenHelperManager.releaseHelper();
-                } else {
-                    Log.d("Response from Server: ", jsonResponse.getError());
-                }
-            }
-
-            @Override
-            public void onFailure(Call<ServerResponse> call, Throwable t) {
-                if (t.getMessage() != null) {
-                    Log.d("Error", t.getMessage());
-                }
-            }
-        });
+        );
 
     }
 
@@ -303,19 +296,21 @@ public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiC
         Auth.GoogleSignInApi.signOut(googleApiClient).setResultCallback(new ResultCallback<Status>() {
             @Override
             public void onResult(@NonNull Status status) {
-                dbHelper = OpenHelperManager.getHelper(getApplicationContext(), DatabaseHelper.class);
-                try {
-                    Dao<User, String> userDao = dbHelper.getUserDao();
-                    DeleteBuilder<User, String> deleteBuilder = userDao.deleteBuilder();
-                    deleteBuilder.where().isNotNull("api_token");
-                    deleteBuilder.delete();
-                    Log.d(Global.LOG_TAG, "signOut status:" + status.isSuccess());
 
-                } catch (SQLException e) {
-                    e.printStackTrace();
+                //delete user info from the shared preferences
+                SharedPreferences sharedPref = LoginTabbedActivity.this.getSharedPreferences(Global.USER_INFO_PREF_FILE,
+                        Context.MODE_PRIVATE);
+
+                // delete associated local database
+                DatabaseUtilities databaseUtilities = new DatabaseUtilities();
+                databaseUtilities.resetDatabase(LoginTabbedActivity.this);
+
+                if (sharedPref.edit().clear().commit()) {
+                    Log.d(LoginTabbedActivity.class.getSimpleName(), "User info is removed from shared pref.");
                 }
-            }
 
+                Log.d(Global.LOG_TAG, "signOut status:" + status.isSuccess());
+            }
         });
     }
 
@@ -324,5 +319,4 @@ public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiC
         googleApiClient.connect();
 
     }
-
 }

@@ -1,26 +1,6 @@
 #
-# generated on 2016/05/03 10:45:39
+# generated on 2016/05/09 12:23:26
 #
-# --table-start--
-dataClass=com.balloonmail.app.balloonmailapp.models.User
-tableName=user
-# --table-fields-start--
-# --field-start--
-fieldName=user_name
-# --field-end--
-# --field-start--
-fieldName=user_email
-unique=true
-# --field-end--
-# --field-start--
-fieldName=api_token
-# --field-end--
-# --field-start--
-fieldName=login_date
-# --field-end--
-# --table-fields-end--
-# --table-end--
-#################################
 # --table-start--
 dataClass=com.balloonmail.app.balloonmailapp.models.ReceivedBalloon
 tableName=receivedballoon

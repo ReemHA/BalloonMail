@@ -1,7 +1,7 @@
 package com.balloonmail.app.balloonmailapp.rest;
 
-import com.balloonmail.app.balloonmailapp.rest.model.ServerRequest;
-import com.balloonmail.app.balloonmailapp.rest.model.ServerResponse;
+import com.balloonmail.app.balloonmailapp.rest.model.LoginServerRequest;
+import com.balloonmail.app.balloonmailapp.rest.model.LoginServerResponse;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -15,6 +15,6 @@ public interface RInterface {
 
     @Headers({"Content-type: application/json"})
     @POST("/token/google")
-    Call<ServerResponse> postData(@Body ServerRequest body);
+    Call<LoginServerResponse> postData(@Body LoginServerRequest body);
 
 }
