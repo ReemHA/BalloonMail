@@ -1,6 +1,8 @@
 package com.balloonmail.app.balloonmailapp;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.util.Log;
@@ -29,6 +31,7 @@ public class SentMailsFragment extends Fragment {
     ArrayList<Card> cards;
 
     View rootView;
+    Bundle savedInstanceState;
 
     private DatabaseHelper dbHelper;
     public SentMailsFragment() {
@@ -36,10 +39,16 @@ public class SentMailsFragment extends Fragment {
     }
 
     @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState){
 
         rootView = inflater.inflate(R.layout.fragment_sent_mails, container, false);
+        this.savedInstanceState = savedInstanceState;
 
         cards = new ArrayList<Card>();
         try{
@@ -75,12 +84,25 @@ public class SentMailsFragment extends Fragment {
     }
 
     private Card createCard(Balloon balloon){
-        Card card = new CardSent(getActivity().getBaseContext(), balloon);
+        Card card = new CardSent(balloon, getActivity().getBaseContext());
         //CardHeader cardHeader = new CustomSentHeaderCard(getActivity().getBaseContext());
         //cardHeader.setButtonExpandVisible(true);
         //card.addCardHeader(cardHeader);
 
-        CardExpand cardExpand = new CustomSentExpandCard(getActivity().getBaseContext());
+        final Balloon balloon1 = balloon;
+        card.setOnClickListener(new Card.OnCardClickListener() {
+            @Override
+            public void onClick(Card card, View view) {
+                Intent intent = new Intent(getContext(), MailDetailsAndMapActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                Bundle bundle = new Bundle();
+                bundle.putSerializable("balloon", balloon1);
+                intent.putExtras(bundle);
+                getContext().startActivity(intent);
+            }
+        });
+
+        CardExpand cardExpand = new CustomSentExpandCard(balloon, getActivity().getBaseContext(), savedInstanceState);
         card.addCardExpand(cardExpand);
 
         card.setCardElevation(getResources().getDimension(R.dimen.card_shadow_elevation));
@@ -101,6 +123,8 @@ public class SentMailsFragment extends Fragment {
 
         ArrayList results = new ArrayList<>();
         for (int index = 0; index < sentBalloonsList.size(); index++) {
+            // TODO remove when source balloon attribute added to local db
+            sentBalloonsList.get(index).setSourceBalloon(30.065136, 31.278821);
             results.add(index, sentBalloonsList.get(index));
         }
 

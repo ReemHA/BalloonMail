@@ -64,4 +64,8 @@
     <string name="pref_ringtone_silent">Silent</string>
 
     <string name="pref_title_vibrate">Vibrate</string>
+
+    <string name="google_maps_key">AIzaSyC6qeyCbfRtqTs1Rehh66aZ46504NvovOE</string>
+    <string name="title_activity_mail_details_and_map">Mail</string>
+
 </resources>

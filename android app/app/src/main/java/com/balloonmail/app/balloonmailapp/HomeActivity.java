@@ -23,7 +23,7 @@ public class HomeActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(HomeActivity.this, WriteMailActivity.class);
+                Intent intent = new Intent(getApplicationContext(), WriteMailActivity.class);
                 startActivity(intent);
             }
         });

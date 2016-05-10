@@ -7,7 +7,7 @@ public class SentBalloon extends Balloon {
     public SentBalloon() {
     }
 
-    public SentBalloon(String text) {
-        super(text);
+    public SentBalloon(String text, int noOfRefills, int noOfCreeps, double reach) {
+        super(text, noOfRefills, noOfCreeps, reach);
     }
 }

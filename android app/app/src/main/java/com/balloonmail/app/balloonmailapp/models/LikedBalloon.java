@@ -8,7 +8,7 @@ public class LikedBalloon extends Balloon {
     public LikedBalloon(){
 
     }
-    public LikedBalloon(String text) {
-        super(text);
+    public LikedBalloon (String text, int noOfRefills, int noOfCreeps, double reach) {
+        super(text, noOfRefills, noOfCreeps, reach);
     }
 }
