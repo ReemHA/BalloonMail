@@ -3,39 +3,72 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.balloonmail.app.balloonmailapp.WriteMailActivity">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context="com.balloonmail.app.balloonmailapp.WriteMailActivity"
+    android:background="@drawable/writemail_ui_clouds">
 
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:weightSum="10"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:orientation="vertical">
 
-        <EditText
-            android:id="@+id/mail_text"
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/write_mail_balloon_imageView"
+            android:layout_centerVertical="true"
+            android:layout_centerHorizontal="true"
+            android:layout_weight="2"
+            android:background="@drawable/writemail_ui_balloon"/>
+        <View
             android:layout_width="match_parent"
-            android:layout_height="400dp" />
+            android:layout_height="match_parent"
+            android:layout_weight="8"/>
+    </LinearLayout>
+
+    <android.support.design.widget.TextInputLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/text_input_view"
+            android:padding="@dimen/activity_horizontal_margin"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentStart="true"
+            app:counterEnabled="true"
+            app:counterMaxLength="500"
+            app:counterOverflowTextAppearance="@style/MyOverflowText"
+            >
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textMultiLine"
+                android:ems="30"
+                android:id="@+id/mail_text"
+                android:theme="@style/MyEditText"
+                android:hint="Share your inner thoughts"/>
+
+        </android.support.design.widget.TextInputLayout>
+
+
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_below="@+id/mail_text"
-            android:layout_centerHorizontal="true">
-
-            <Button
-                android:id="@+id/let_it_go"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Let it go" />
+            android:layout_below="@+id/text_input_view"
+            android:layout_centerHorizontal="true"
+            android:id="@+id/linearLayout">
 
             <Button
                 android:id="@+id/spread"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Spread"/>
+                android:text="Spread"
+                android:theme="@style/MyButton"/>
         </LinearLayout>
-    </RelativeLayout>
+
 </RelativeLayout>
