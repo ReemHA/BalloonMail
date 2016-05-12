@@ -6,6 +6,11 @@
     android:layout_height="match_parent"
     style="@style/card.shadow_image">
 
+    <View
+        android:layout_width="10dp"
+        android:layout_height="match_parent"
+        android:id="@+id/sentiment_indication">
+    </View>
     <com.google.android.gms.maps.MapView
         android:id="@+id/row_map"
         android:layout_width="100dp"

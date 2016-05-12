@@ -68,4 +68,9 @@
     <string name="google_maps_key">AIzaSyC6qeyCbfRtqTs1Rehh66aZ46504NvovOE</string>
     <string name="title_activity_mail_details_and_map">Mail</string>
 
+    <string-array name="sentiment">
+        <item>positive</item>
+        <item>neutral</item>
+        <item>negative</item>
+    </string-array>
 </resources>
