@@ -2,7 +2,9 @@ package com.balloonmail.app.balloonmailapp;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.design.widget.TextInputEditText;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -28,6 +30,7 @@ public class WriteMailActivity extends AppCompatActivity {
 
     EditText mailText;
     Button spread;
+    EditText editText;
     private static final String CONFIRMATION_TO_SENT_MAIL = "Mail is successsfully sent to server.";
     private static final String FAILURE_TO_SENT_MAIL = "Mail is not sent to server.";
 
@@ -60,8 +63,7 @@ public class WriteMailActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_write_mail);
-        mailText = (EditText) findViewById(R.id.mail_text);
-        String mailTextValue = mailText.getText().toString();
+        mailText = (TextInputEditText) findViewById(R.id.mail_text);
         spread = (Button) findViewById(R.id.spread);
 
         enableOrDisableEditText();
@@ -69,8 +71,8 @@ public class WriteMailActivity extends AppCompatActivity {
         spread.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                sendBalloonToServer(mailText.getText().toString());
-                moveToIntent();
+                String text = mailText.getText().toString();
+                sendBalloonToServer(text);
 
             }
         });
@@ -89,7 +91,10 @@ public class WriteMailActivity extends AppCompatActivity {
         finish();
     }
 
-    private void sendBalloonToServer(String mailText) {
+
+    class SendingBalloonsToServer extends AsyncTask<>
+
+    /*private void sendBalloonToServer(String mailText) {
         SendBalloonRequest body = new SendBalloonRequest(mailText);
         Retrofit retrofit = Global.getRetrofit(this);
         RInterface rInterface = retrofit.create(RInterface.class);
@@ -99,34 +104,38 @@ public class WriteMailActivity extends AppCompatActivity {
         mProgressDialog.setMessage("Sending...");
         mProgressDialog.show();
         call.enqueue(new Callback<SendBalloonRespond>() {
-            @Override
-            public void onResponse(Call<SendBalloonRespond> call, Response<SendBalloonRespond> response) {
-                if (mProgressDialog.isShowing())
-                    mProgressDialog.dismiss();
-                SendBalloonRespond balloon = response.body();
-                Log.d(WriteMailActivity.class.getSimpleName(), response.body().toString());
-                if (balloon.getError() == null) {
-                    Log.d(WriteMailActivity.class.getSimpleName(), balloon.toString());
-                    BalloonHolder balloonHolder = BalloonHolder.getInstance();
-                    SentBalloon sentBalloon = new SentBalloon(balloon.getText(),
-                            balloon.getBalloon_id(), balloon.getReach(), balloon.getCreep(), balloon.getRefill(),
-                            balloon.getSentiment(), balloon.getSent_date());
-                    balloonHolder.setBalloon(sentBalloon);
-                    Toast.makeText(getApplicationContext(), CONFIRMATION_TO_SENT_MAIL, Toast.LENGTH_SHORT).show();
-                } else {
-                    Log.d(WriteMailActivity.class.getSimpleName(), "Server error response:" + response.body().getError());
-                }
-            }
+                         @Override
+                         public void onResponse(Call<SendBalloonRespond> call, Response<SendBalloonRespond> response) {
+                             if (response.isSuccessful()) {
+                                 Log.d(WriteMailActivity.class.getSimpleName(), response.body().toString());
+                                 if (mProgressDialog.isShowing())
+                                     mProgressDialog.dismiss();
+                                 SendBalloonRespond balloon = response.body();
+                                 if (balloon.getError() == null) {
+                                     Log.d(WriteMailActivity.class.getSimpleName(), balloon.toString());
+                                     BalloonHolder balloonHolder = BalloonHolder.getInstance();
+                                     SentBalloon sentBalloon = new SentBalloon(balloon.getText(),
+                                             balloon.getBalloon_id(), balloon.getReach(), balloon.getCreeps(), balloon.getRefills(),
+                                             balloon.getSentiment(), balloon.getSent_at());
+                                     balloonHolder.setBalloon(sentBalloon);
+                                     Toast.makeText(getApplicationContext(), CONFIRMATION_TO_SENT_MAIL, Toast.LENGTH_SHORT).show();
+                                     moveToIntent();
+                                 } else {
+                                     Log.d(WriteMailActivity.class.getSimpleName(), "Server error response:" + response.body().getError());
+                                 }
+                             }
+                         }
 
-            @Override
-            public void onFailure(Call<SendBalloonRespond> call, Throwable t) {
-                if (mProgressDialog.isShowing())
-                    mProgressDialog.dismiss();
-                Toast.makeText(getApplicationContext(), t.getMessage(), Toast.LENGTH_SHORT).show();
-                if (t.getMessage() != null) {
-                    Log.d("Error", t.getMessage());
-                }
-            }
-        });
-    }
+                         @Override
+                         public void onFailure(Call<SendBalloonRespond> call, Throwable t) {
+                             if (mProgressDialog.isShowing())
+                                 mProgressDialog.dismiss();
+                             if (t.getMessage() != null) {
+                                 Log.d("Error", t.getMessage());
+                             }
+                         }
+                     }
+
+        );
+    }*/
 }

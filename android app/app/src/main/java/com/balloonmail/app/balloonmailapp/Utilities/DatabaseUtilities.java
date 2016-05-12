@@ -1,4 +1,4 @@
-package com.balloonmail.app.balloonmailapp.controller;
+package com.balloonmail.app.balloonmailapp.Utilities;
 
 import android.content.Context;
 

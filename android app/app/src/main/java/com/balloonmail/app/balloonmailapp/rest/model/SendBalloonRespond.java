@@ -10,11 +10,11 @@ public class SendBalloonRespond implements Serializable {
     String error;
     String balloon_id;
     String text;
-    int refill;
-    int creep;
+    int refills;
+    int creeps;
     double reach;
     double sentiment;
-    Date sent_date;
+    Date sent_at;
 
     public String getError() {
         return error;
@@ -28,12 +28,12 @@ public class SendBalloonRespond implements Serializable {
         return text;
     }
 
-    public int getRefill() {
-        return refill;
+    public int getRefills() {
+        return refills;
     }
 
-    public int getCreep() {
-        return creep;
+    public int getCreeps() {
+        return creeps;
     }
 
     public double getReach() {
@@ -44,17 +44,31 @@ public class SendBalloonRespond implements Serializable {
         return sentiment;
     }
 
-    public Date getSent_date() {
-        return sent_date;
+    public Date getSent_at() {
+        return sent_at;
     }
 
-    public SendBalloonRespond(String text, String balloon_id, double reach, int creep, int refill, double sentiment, Date sent_date) {
+    public SendBalloonRespond(String text, String balloon_id, double reach, int creeps, int refills, double sentiment, Date sent_at) {
         this.text = text;
         this.balloon_id = balloon_id;
         this.reach = reach;
-        this.creep = creep;
-        this.refill = refill;
+        this.creeps = creeps;
+        this.refills = refills;
         this.sentiment = sentiment;
-        this.sent_date = sent_date;
+        this.sent_at = sent_at;
+    }
+
+    @Override
+    public String toString() {
+        return "SendBalloonRespond{" +
+                "error='" + error + '\'' +
+                ", balloon_id='" + balloon_id + '\'' +
+                ", text='" + text + '\'' +
+                ", refills=" + refills +
+                ", creeps=" + creeps +
+                ", reach=" + reach +
+                ", sentiment=" + sentiment +
+                ", sent_at=" + sent_at +
+                '}';
     }
 }

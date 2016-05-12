@@ -45,7 +45,7 @@ public class SentMailsFragment extends Fragment {
     CardArrayRecyclerViewAdapter mCardArrayAdapter;
     private final static int BALLOON_LIMIT = 4;
     private static DateFormat dateFormat;
-
+    private static List<SentBalloon> sentBalloonList;
     View rootView;
     Bundle savedInstanceState;
 
@@ -76,7 +76,8 @@ public class SentMailsFragment extends Fragment {
             mRecyclerView.setAdapter(mCardArrayAdapter);
         }
 
-        mListener.getSentBalloons((List<SentBalloon>) hashMapForUpdates.keySet());
+        sentBalloonList.addAll(hashMapForUpdates.keySet());
+        mListener.getSentBalloons(sentBalloonList);
 
         mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
 
@@ -182,8 +183,8 @@ public class SentMailsFragment extends Fragment {
                         List<SendBalloonRespond> list = response.body();
                         for (int i = 0; i < list.size(); i++) {
                             SentBalloon sentBalloon = new SentBalloon(list.get(i).getText(), list.get(i).getBalloon_id(), list.get(i).getReach(),
-                                    list.get(i).getCreep(), list.get(i).getRefill(), list.get(i).getSentiment(),
-                                    list.get(i).getSent_date());
+                                    list.get(i).getCreeps(), list.get(i).getRefills(), list.get(i).getSentiment(),
+                                    list.get(i).getSent_at());
                             mCardArrayAdapter.add(createCard(sentBalloon));
                         }
                     } else {
@@ -210,8 +211,8 @@ public class SentMailsFragment extends Fragment {
                         List<SendBalloonRespond> list = response.body();
                         for (int i = 0; i < list.size(); i++) {
                             SentBalloon sentBalloon = new SentBalloon(list.get(i).getText(), list.get(i).getBalloon_id(), list.get(i).getReach(),
-                                    list.get(i).getCreep(), list.get(i).getRefill(), list.get(i).getSentiment(),
-                                    list.get(i).getSent_date());
+                                    list.get(i).getCreeps(), list.get(i).getRefills(), list.get(i).getSentiment(),
+                                    list.get(i).getSent_at());
                             mCardArrayAdapter.add(createCard(sentBalloon));
 
                         }

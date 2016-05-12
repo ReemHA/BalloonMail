@@ -14,7 +14,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.balloonmail.app.balloonmailapp.Utilities.Global;
-import com.balloonmail.app.balloonmailapp.controller.DatabaseUtilities;
+import com.balloonmail.app.balloonmailapp.Utilities.DatabaseUtilities;
 import com.balloonmail.app.balloonmailapp.rest.RInterface;
 import com.balloonmail.app.balloonmailapp.rest.model.LoginServerRequest;
 import com.balloonmail.app.balloonmailapp.rest.model.LoginServerResponse;

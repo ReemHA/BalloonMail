@@ -17,10 +17,10 @@ fieldName=balloon_id
 fieldName=text
 # --field-end--
 # --field-start--
-fieldName=refill
+fieldName=refills
 # --field-end--
 # --field-start--
-fieldName=creep
+fieldName=creeps
 # --field-end--
 # --field-start--
 fieldName=reach
@@ -29,7 +29,7 @@ fieldName=reach
 fieldName=sentiment
 # --field-end--
 # --field-start--
-fieldName=sent_date
+fieldName=sent_at
 # --field-end--
 # --table-fields-end--
 # --table-end--
@@ -50,10 +50,10 @@ fieldName=balloon_id
 fieldName=text
 # --field-end--
 # --field-start--
-fieldName=refill
+fieldName=refills
 # --field-end--
 # --field-start--
-fieldName=creep
+fieldName=creeps
 # --field-end--
 # --field-start--
 fieldName=reach
@@ -62,7 +62,7 @@ fieldName=reach
 fieldName=sentiment
 # --field-end--
 # --field-start--
-fieldName=sent_date
+fieldName=sent_at
 # --field-end--
 # --table-fields-end--
 # --table-end--
@@ -83,10 +83,10 @@ fieldName=balloon_id
 fieldName=text
 # --field-end--
 # --field-start--
-fieldName=refill
+fieldName=refills
 # --field-end--
 # --field-start--
-fieldName=creep
+fieldName=creeps
 # --field-end--
 # --field-start--
 fieldName=reach
@@ -95,7 +95,7 @@ fieldName=reach
 fieldName=sentiment
 # --field-end--
 # --field-start--
-fieldName=sent_date
+fieldName=sent_at
 # --field-end--
 # --table-fields-end--
 # --table-end--
