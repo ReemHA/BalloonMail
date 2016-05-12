@@ -4,9 +4,11 @@ import android.content.Context;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.balloonmail.app.balloonmailapp.models.Balloon;
+import com.balloonmail.app.balloonmailapp.models.ReceivedBalloon;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -28,6 +30,8 @@ public class CardReceived extends Card {
     private Context context;
     private Bundle savedInstanceState;
 
+    ReceivedCardViewHolder holder;
+
     public CardReceived(Balloon balloon, Context context, Bundle savedInstanceState) {
         super(context,R.layout.card_received_item);
         this.balloon = balloon;
@@ -46,12 +50,10 @@ public class CardReceived extends Card {
             }
 
             View row = view;
-            ReceivedCardViewHolder holder;
 
             if (row == null){ return; }
 
             holder = new ReceivedCardViewHolder();
-            //holder.title = (TextView) view.findViewById(R.id.e_textView);
             holder.mapView = (MapView) view.findViewById(R.id.row_map);
 
             holder.initializeMapView();
@@ -60,7 +62,71 @@ public class CardReceived extends Card {
                 // The map is already ready to be used
                 setMapLocation(holder.map);
             }
+
+            holder.refillBtn = (ImageButton) view.findViewById(R.id.refillActionBtn_received);
+            holder.likeBtn = (ImageButton) view.findViewById(R.id.likeActionBtn_received);
+            holder.creepBtn = (ImageButton) view.findViewById(R.id.creepActionBtn_received);
+
+            holder.likeBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    requestLikeToServer();
+                    changeStateOfLikeBtn();
+                }
+            });
+
+            holder.refillBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    requestRefillToServer();
+                    changeStateOfRefillBtn();
+                }
+            });
+
+            holder.creepBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    requestCreepToServer();
+                    changeStateOfCreepBtn();
+                }
+            });
         }
+    }
+
+    private void changeStateOfLikeBtn(){
+        if(((ReceivedBalloon)balloon).getIs_liked() == 0){
+            holder.likeBtn.setImageResource(R.drawable.ic_like_grey_24px);
+        }else{
+            holder.likeBtn.setImageResource(R.drawable.ic_like_clicked_24px);
+        }
+    }
+
+    private void requestLikeToServer(){
+
+    }
+
+    private void changeStateOfRefillBtn(){
+        if(((ReceivedBalloon)balloon).getIs_refilled() == 0){
+            holder.refillBtn.setImageResource(R.drawable.ic_refill_grey_24px);
+        }else{
+            holder.refillBtn.setImageResource(R.drawable.ic_refill_primary_24px);
+        }
+    }
+
+    private void requestRefillToServer(){
+
+    }
+
+    private void changeStateOfCreepBtn(){
+        if(((ReceivedBalloon)balloon).getIs_creeped() == 0){
+            holder.creepBtn.setImageResource(R.drawable.ic_creepy_grey_24px);
+        }else{
+            holder.creepBtn.setImageResource(R.drawable.ic_creepy_clicked_24px);
+        }
+    }
+
+    private void requestCreepToServer(){
+
     }
 
     private void setMapLocation(GoogleMap map) {
@@ -90,6 +156,7 @@ public class CardReceived extends Card {
         MapView mapView;
 
         GoogleMap map;
+        ImageButton refillBtn; ImageButton likeBtn; ImageButton creepBtn;
 
         @Override
         public void onMapReady(GoogleMap googleMap) {
