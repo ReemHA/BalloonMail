@@ -65,7 +65,7 @@ public class LikedMailsFragment extends Fragment {
     }
 
     private Card createCard(Balloon balloon){
-        Card card = new CardReceived(getActivity().getBaseContext(), balloon);
+        Card card = new CardLikes(getActivity().getBaseContext(), balloon);
         //CardHeader cardHeader = new CustomSentHeaderCard(getActivity().getBaseContext());
         //cardHeader.setButtonExpandVisible(true);
         //card.addCardHeader(cardHeader);

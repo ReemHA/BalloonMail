@@ -22,6 +22,8 @@ public class ReceivedMailsFragment extends Fragment {
     private static String LOG_TAG = "ReceivedMailsFragment";
     ArrayList<Card> cards;
 
+    Bundle savedInstanceState;
+
     View rootView;
     public ReceivedMailsFragment() {
         // Required empty public constructor
@@ -32,6 +34,7 @@ public class ReceivedMailsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.fragment_received_mails, container, false);
+        this.savedInstanceState = savedInstanceState;
 
         cards = new ArrayList<Card>();
 
@@ -64,10 +67,7 @@ public class ReceivedMailsFragment extends Fragment {
     }
 
     private Card createCard(Balloon balloon){
-        Card card = new CardReceived(getActivity().getBaseContext(), balloon);
-        //CardHeader cardHeader = new CustomSentHeaderCard(getActivity().getBaseContext());
-        //cardHeader.setButtonExpandVisible(true);
-        //card.addCardHeader(cardHeader);
+        Card card = new CardReceived(balloon, getActivity().getBaseContext(), savedInstanceState);
 
         card.setCardElevation(getResources().getDimension(R.dimen.card_shadow_elevation));
 
