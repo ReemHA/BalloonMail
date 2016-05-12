@@ -4,6 +4,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.j256.ormlite.field.DatabaseField;
 
 import java.io.Serializable;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -11,22 +12,22 @@ import java.util.HashMap;
 /**
  * Created by Dalia on 4/23/2016.
  */
-public abstract class Balloon implements Serializable{
+public abstract class Balloon implements Serializable {
 
-    @DatabaseField(unique = true, generatedId = true)
-    int balloonId;
+    //@DatabaseField(unique = true, generatedId = true)
+    //int local_balloon_id;
+
+    @DatabaseField
+    String balloon_id;
 
     @DatabaseField
     String text;
 
     @DatabaseField
-    int noOfRefills;
+    int refill;
 
     @DatabaseField
-    int noOfCreeps;
-
-    @DatabaseField
-    double distance;
+    int creep;
 
     @DatabaseField
     double reach;
@@ -39,7 +40,10 @@ public abstract class Balloon implements Serializable{
     private HashMap<LatLng, ArrayList<LatLng>> destinationsHashMap;
 
     @DatabaseField
-    Date sentDate;
+    double sentiment;
+
+    @DatabaseField
+    Date sent_date;
 
     public Balloon() {
     }
@@ -107,16 +111,52 @@ public abstract class Balloon implements Serializable{
         return text;
     }
 
-    private void setText(String text) {
+    public void setText(String text) {
         this.text = text;
     }
 
-    public Date getSentDate() {
-        return sentDate;
+    public void setRefill(int refill) {
+        this.refill = refill;
     }
 
-    public int getBalloonId() {
-        return balloonId;
+    public void setBalloon_id(String balloon_id) {
+        this.balloon_id = balloon_id;
+    }
+
+    public void setCreep(int creep) {
+        this.creep = creep;
+    }
+
+    public void setSentiment(double sentiment) {
+        this.sentiment = sentiment;
+    }
+
+    public void setSent_date(Date sent_date) {
+        this.sent_date = sent_date;
+    }
+
+//    public int getLocal_balloon_id() {
+//        return local_balloon_id;
+//    }
+
+    public String getBalloon_id() {
+        return balloon_id;
+    }
+
+    public double getSentiment() {
+        return sentiment;
+    }
+
+    public int getCreep() {
+        return creep;
+    }
+
+    public int getRefill() {
+        return refill;
+    }
+
+    public Date getSent_date() {
+        return sent_date;
     }
 
     public HashMap<LatLng, ArrayList<LatLng>> getDestinationsHashMap() {
@@ -139,13 +179,13 @@ public abstract class Balloon implements Serializable{
     @Override
     public String toString() {
         return "Balloon{" +
-                "balloonId=" + balloonId +
+                "balloon_id='" + balloon_id + '\'' +
                 ", text='" + text + '\'' +
-                ", noOfRefills=" + noOfRefills +
-                ", noOfCreeps=" + noOfCreeps +
-                ", distance=" + distance +
+                ", refill=" + refill +
+                ", creep=" + creep +
                 ", reach=" + reach +
-                ", sentDate=" + sentDate +
+                ", sentiment=" + sentiment +
+                ", sent_date=" + sent_date +
                 '}';
     }
 }

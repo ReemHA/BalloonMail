@@ -34,7 +34,6 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks {
 
@@ -44,6 +43,7 @@ public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiC
     private GoogleApiClient googleApiClient;
     private int i = 0;
     DatabaseUtilities databaseUtilities;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,9 +62,10 @@ public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiC
             LoginTabbedActivity.this.finish();
         }
 
-        // create a new blank database for the user
-        databaseUtilities.createDatabase(LoginTabbedActivity.this);
-
+        // create a new blank database for the new signed in user
+        if (isSignedOut()) {
+            databaseUtilities.createDatabase(LoginTabbedActivity.this);
+        }
         // Configure sign in to request the user's id token
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(Global.SERVER_CLIENT_ID)
@@ -194,48 +195,45 @@ public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiC
 
     private void sendDataToServer(String idToken, final String userName, final String userEmail) {
         LoginServerRequest body = new LoginServerRequest(userName, idToken);
-
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(Global.SERVER_URL)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-
+        Retrofit retrofit = Global.getRetrofit(this);
         RInterface request = retrofit.create(RInterface.class);
         Call<LoginServerResponse> call = request.postData(body);
         call.enqueue(new Callback<LoginServerResponse>() {
                          @Override
                          public void onResponse(Call<LoginServerResponse> call, Response<LoginServerResponse> response) {
                              LoginServerResponse jsonResponse = response.body();
+                             Log.d(LoginTabbedActivity.class.getSimpleName(), jsonResponse.toString());
+                             if (jsonResponse != null) {
+                                 // checks if an error is in the response
+                                 if (!jsonResponse.toString().contains("error")) {
+                                     String api_token;
+                                     Log.d(LoginTabbedActivity.class.getSimpleName(), jsonResponse.toString());
 
-                             // checks if an error is in the response
-                             if (!jsonResponse.toString().contains("error")) {
-                                 String api_token;
-                                 Log.d(LoginTabbedActivity.class.getSimpleName(), jsonResponse.toString());
+                                     // get api_token of the user from the response
+                                     api_token = jsonResponse.getApi_token();
 
-                                 // get api_token of the user from the response
-                                 api_token = jsonResponse.getApi_token();
+                                     // add api_token to SharedPreferences
+                                     SharedPreferences sharedPreferences = LoginTabbedActivity.this.getSharedPreferences(Global.USER_INFO_PREF_FILE, MODE_PRIVATE);
+                                     if (sharedPreferences.edit().putString(Global.PREF_USER_API_TOKEN, api_token).commit() &&
+                                             sharedPreferences.edit().putString(Global.PREF_USER_NAME, userName).commit() &&
+                                             sharedPreferences.edit().putString(Global.PREF_USER_EMAIL, userEmail).commit()) {
+                                         Log.d(LoginTabbedActivity.class.getSimpleName(), "api_token: " + api_token + "\\n" +
+                                                 "user name: " + userName + "\\n" + "user email: " + userEmail + " are saved into shared pref.");
+                                     }
 
-                                 // add api_token to SharedPreferences
-                                 SharedPreferences sharedPreferences = LoginTabbedActivity.this.getSharedPreferences(Global.USER_INFO_PREF_FILE, MODE_PRIVATE);
-                                 if (sharedPreferences.edit().putString(Global.PREF_USER_API_TOKEN, api_token).commit() &&
-                                         sharedPreferences.edit().putString(Global.PREF_USER_NAME, userName).commit() &&
-                                         sharedPreferences.edit().putString(Global.PREF_USER_EMAIL, userEmail).commit()) {
-                                     Log.d(LoginTabbedActivity.class.getSimpleName(), "api_token: " + api_token + "\\n" +
-                                             "user name: " + userName + "\\n" + "user email: " + userEmail + " are saved into shared pref.");
+                                     // checks if he is a new user
+                                     if (jsonResponse.isCreated()) {
+                                         sharedPreferences.edit().putBoolean(Global.PREF_USER_IS_CREATED, true).commit();
+                                         Log.d(LoginTabbedActivity.class.getSimpleName(), "user is new user.");
+                                     } else {
+                                         sharedPreferences.edit().putBoolean(Global.PREF_USER_IS_CREATED, false).commit();
+                                         Log.d(LoginTabbedActivity.class.getSimpleName(), "user is an old user.");
+                                     }
+
+                                     Intent intent = new Intent(LoginTabbedActivity.this, HomeActivity.class);
+                                     startActivity(intent);
+                                     LoginTabbedActivity.this.finish();
                                  }
-
-                                 // checks if he is a new user
-                                 if (jsonResponse.isCreated()) {
-                                     sharedPreferences.edit().putBoolean(Global.PREF_USER_IS_CREATED, true).commit();
-                                     Log.d(LoginTabbedActivity.class.getSimpleName(), "user is new user.");
-                                 } else {
-                                     sharedPreferences.edit().putBoolean(Global.PREF_USER_IS_CREATED, false).commit();
-                                     Log.d(LoginTabbedActivity.class.getSimpleName(), "user is an old user.");
-                                 }
-
-                                 Intent intent = new Intent(LoginTabbedActivity.this, HomeActivity.class);
-                                 startActivity(intent);
-                                 LoginTabbedActivity.this.finish();
                              } else {
                                  Log.d("Response from Server: ", jsonResponse.getError());
                              }

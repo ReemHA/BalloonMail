@@ -1,32 +1,35 @@
 #
-# generated on 2016/05/09 12:23:26
+# generated on 2016/05/10 03:38:27
 #
 # --table-start--
 dataClass=com.balloonmail.app.balloonmailapp.models.ReceivedBalloon
 tableName=receivedballoon
 # --table-fields-start--
 # --field-start--
-fieldName=balloonId
+fieldName=local_balloon_id
 generatedId=true
 unique=true
+# --field-end--
+# --field-start--
+fieldName=balloon_id
 # --field-end--
 # --field-start--
 fieldName=text
 # --field-end--
 # --field-start--
-fieldName=noOfRefills
+fieldName=refill
 # --field-end--
 # --field-start--
-fieldName=noOfCreeps
-# --field-end--
-# --field-start--
-fieldName=distance
+fieldName=creep
 # --field-end--
 # --field-start--
 fieldName=reach
 # --field-end--
 # --field-start--
-fieldName=sentDate
+fieldName=sentiment
+# --field-end--
+# --field-start--
+fieldName=sent_date
 # --field-end--
 # --table-fields-end--
 # --table-end--
@@ -36,27 +39,30 @@ dataClass=com.balloonmail.app.balloonmailapp.models.SentBalloon
 tableName=sentballoon
 # --table-fields-start--
 # --field-start--
-fieldName=balloonId
+fieldName=local_balloon_id
 generatedId=true
 unique=true
+# --field-end--
+# --field-start--
+fieldName=balloon_id
 # --field-end--
 # --field-start--
 fieldName=text
 # --field-end--
 # --field-start--
-fieldName=noOfRefills
+fieldName=refill
 # --field-end--
 # --field-start--
-fieldName=noOfCreeps
-# --field-end--
-# --field-start--
-fieldName=distance
+fieldName=creep
 # --field-end--
 # --field-start--
 fieldName=reach
 # --field-end--
 # --field-start--
-fieldName=sentDate
+fieldName=sentiment
+# --field-end--
+# --field-start--
+fieldName=sent_date
 # --field-end--
 # --table-fields-end--
 # --table-end--
@@ -66,27 +72,30 @@ dataClass=com.balloonmail.app.balloonmailapp.models.LikedBalloon
 tableName=likedballoon
 # --table-fields-start--
 # --field-start--
-fieldName=balloonId
+fieldName=local_balloon_id
 generatedId=true
 unique=true
+# --field-end--
+# --field-start--
+fieldName=balloon_id
 # --field-end--
 # --field-start--
 fieldName=text
 # --field-end--
 # --field-start--
-fieldName=noOfRefills
+fieldName=refill
 # --field-end--
 # --field-start--
-fieldName=noOfCreeps
-# --field-end--
-# --field-start--
-fieldName=distance
+fieldName=creep
 # --field-end--
 # --field-start--
 fieldName=reach
 # --field-end--
 # --field-start--
-fieldName=sentDate
+fieldName=sentiment
+# --field-end--
+# --field-start--
+fieldName=sent_date
 # --field-end--
 # --table-fields-end--
 # --table-end--

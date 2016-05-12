@@ -1,6 +1,7 @@
 package com.balloonmail.app.balloonmailapp;
 
 import android.content.Intent;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -13,16 +14,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.balloonmail.app.balloonmailapp.Utilities.BalloonHolder;
 import com.balloonmail.app.balloonmailapp.Utilities.Global;
-import com.balloonmail.app.balloonmailapp.models.DatabaseHelper;
 import com.balloonmail.app.balloonmailapp.models.SentBalloon;
 import com.balloonmail.app.balloonmailapp.rest.RInterface;
 import com.balloonmail.app.balloonmailapp.rest.model.SendBalloonRequest;
-import com.balloonmail.app.balloonmailapp.rest.model.SendBalloonResponse;
-import com.j256.ormlite.android.apptools.OpenHelperManager;
-import com.j256.ormlite.dao.Dao;
-
-import org.json.JSONObject;
 
 import java.sql.SQLException;
 
@@ -30,13 +26,15 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 public class WriteMailActivity extends AppCompatActivity {
 
     DatabaseHelper dbHelper;
     EditText mailText;
     Button spread;
+    SharedPreferences sharedPreferences;
+    private static final String CONFIRMATION_TO_SENT_MAIL = "Mail is successsfully sent to server.";
+    private static final String FAILURE_TO_SENT_MAIL = "Mail is not sent to server.";
 
     //TextWatcher
     private TextWatcher textWatcher = new TextWatcher() {
@@ -75,6 +73,7 @@ public class WriteMailActivity extends AppCompatActivity {
         spread.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                sendBalloonToServer(mailText.getText().toString());
                 try {
                     writeMail(mailText);
                     moveToIntent();
@@ -110,25 +109,38 @@ public class WriteMailActivity extends AppCompatActivity {
 
 
     }
-    private void sendBalloonToServer(String mailText, String userEmail){
-        SendBalloonRequest body = new SendBalloonRequest(mailText, userEmail);
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(Global.SERVER_URL)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
+
+    private void sendBalloonToServer(String mailText) {
+        SendBalloonRequest body = new SendBalloonRequest(mailText);
+        Retrofit retrofit = Global.getRetrofit(this);
         RInterface rInterface = retrofit.create(RInterface.class);
-        Call<SendBalloonResponse> call = rInterface.postMail(body);
-        call.enqueue(new Callback<SendBalloonResponse>() {
+        Call<SentBalloon> call = rInterface.postSentBalloon(body);
+        final ProgressDialog mProgressDialog = new ProgressDialog(WriteMailActivity.this);
+        mProgressDialog.setIndeterminate(true);
+        mProgressDialog.setMessage("Sending...");
+        mProgressDialog.show();
+        call.enqueue(new Callback<SentBalloon>() {
             @Override
-            public void onResponse(Call<SendBalloonResponse> call, Response<SendBalloonResponse> response) {
-                if (response.body().getResponse().equals("true")){
-                    Toast.makeText(getApplicationContext(), CONFIRMATION_TO_SENT_MAIL, Toast.LENGTH_SHORT).show();
+            public void onResponse(Call<SentBalloon> call, Response<SentBalloon> response) {
+                if (mProgressDialog.isShowing())
+                    mProgressDialog.dismiss();
+                SentBalloon balloon = response.body();
+                Log.d(WriteMailActivity.class.getSimpleName(), response.body().toString());
+                if (balloon.getError() == null) {
+                    Log.d(WriteMailActivity.class.getSimpleName(), balloon.toString());
+                    BalloonHolder balloonHolder = BalloonHolder.getInstance();
+                    balloonHolder.setBalloon(balloon);
+                    Toast.makeText(getApplicationContext(), "HEY", Toast.LENGTH_SHORT).show();
+                }else {
+                    Log.d(WriteMailActivity.class.getSimpleName(), "Server error response:" + response.body().getError());
                 }
             }
 
             @Override
-            public void onFailure(Call<SendBalloonResponse> call, Throwable t) {
-                Toast.makeText(getApplicationContext(),FAILURE_TO_SENT_MAIL, Toast.LENGTH_SHORT).show();
+            public void onFailure(Call<SentBalloon> call, Throwable t) {
+                if (mProgressDialog.isShowing())
+                    mProgressDialog.dismiss();
+                Toast.makeText(getApplicationContext(), t.getMessage(), Toast.LENGTH_SHORT).show();
                 if (t.getMessage() != null) {
                     Log.d("Error", t.getMessage());
                 }
