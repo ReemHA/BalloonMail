@@ -4,7 +4,6 @@ import com.google.android.gms.maps.model.LatLng;
 import com.j256.ormlite.field.DatabaseField;
 
 import java.io.Serializable;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -13,9 +12,6 @@ import java.util.HashMap;
  * Created by Dalia on 4/23/2016.
  */
 public abstract class Balloon implements Serializable {
-
-    //@DatabaseField(unique = true, generatedId = true)
-    //int local_balloon_id;
 
     @DatabaseField
     String balloon_id;
@@ -50,9 +46,9 @@ public abstract class Balloon implements Serializable {
 
     public Balloon(String text, int noOfRefills, int noOfCreeps, double reach){
         this.text = text;
-        this.sentDate = new Date(System.currentTimeMillis());
-        this.noOfRefills = noOfRefills;
-        this.noOfCreeps = noOfCreeps;
+        this.sent_date = new Date(System.currentTimeMillis());
+        this.refill = noOfRefills;
+        this.creep = noOfCreeps;
         this.reach = reach;
 
         // TODO will be replaced with the attributes of the balloon when received from the server
@@ -75,29 +71,6 @@ public abstract class Balloon implements Serializable {
         this.destinationsHashMap.put(new LatLng(latSource, lngSource), destinationsArrayList);
     }
 
-    public double getDistance() {
-        return distance;
-    }
-
-    public void setDistance(double distance) {
-        this.distance = distance;
-    }
-
-    public int getNoOfCreeps() {
-        return noOfCreeps;
-    }
-
-    public void setNoOfCreeps(int noOfCreeps) {
-        this.noOfCreeps = noOfCreeps;
-    }
-
-    public int getNoOfRefills() {
-        return noOfRefills;
-    }
-
-    public void setNoOfRefills(int noOfRefills) {
-        this.noOfRefills = noOfRefills;
-    }
 
     public double getReach() {
         return reach;
@@ -134,10 +107,6 @@ public abstract class Balloon implements Serializable {
     public void setSent_date(Date sent_date) {
         this.sent_date = sent_date;
     }
-
-//    public int getLocal_balloon_id() {
-//        return local_balloon_id;
-//    }
 
     public String getBalloon_id() {
         return balloon_id;

@@ -2,7 +2,6 @@ package com.balloonmail.app.balloonmailapp;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -17,6 +16,7 @@ import com.balloonmail.app.balloonmailapp.Utilities.Global;
 import com.balloonmail.app.balloonmailapp.models.Balloon;
 import com.balloonmail.app.balloonmailapp.models.SentBalloon;
 import com.balloonmail.app.balloonmailapp.rest.RInterface;
+import com.balloonmail.app.balloonmailapp.rest.model.SendBalloonRespond;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -38,7 +38,6 @@ import retrofit2.Retrofit;
 public class SentMailsFragment extends Fragment {
 
     private ArrayList<Card> cards;
-    private View rootView;
     private LinearLayoutManager mLayoutManager;
     private HashMap<SentBalloon, Card> hashMapForUpdates;
     private SentBalloonsListener mListener;
@@ -50,7 +49,6 @@ public class SentMailsFragment extends Fragment {
     View rootView;
     Bundle savedInstanceState;
 
-    private DatabaseHelper dbHelper;
     public SentMailsFragment() {
         // Required empty public constructor
     }
@@ -65,6 +63,7 @@ public class SentMailsFragment extends Fragment {
         cards = initCards();
         mCardArrayAdapter = new CardArrayRecyclerViewAdapter(getActivity(), cards);
         dateFormat = new SimpleDateFormat("MMMM d, yyyy", Locale.ENGLISH);
+        this.savedInstanceState = savedInstanceState;
 
         //Staggered grid view
         CardRecyclerView mRecyclerView = (CardRecyclerView) rootView.findViewById(R.id.cvCardRecyclerView);
@@ -126,7 +125,7 @@ public class SentMailsFragment extends Fragment {
         return cards;
     }
 
-    private Card createCard(Balloon balloon){
+    private Card createCard(Balloon balloon) {
         Card card = new CardSent(balloon, getActivity().getBaseContext());
 
         final Balloon balloon1 = balloon;
@@ -149,14 +148,12 @@ public class SentMailsFragment extends Fragment {
 
         return card;
     }
+
     @Override
     public void onResume() {
         super.onResume();
     }
 
-    private ArrayList<Balloon> getDataSet() throws SQLException {
-        dbHelper = OpenHelperManager.getHelper(getContext(), DatabaseHelper.class);
-        Dao<SentBalloon, Integer> sentBalloonsDao = dbHelper.getSentBalloonDao();
 
     @Override
     public void onPause() {
@@ -176,15 +173,18 @@ public class SentMailsFragment extends Fragment {
         Retrofit retrofit = Global.getRetrofit(getActivity());
         RInterface rInterface = retrofit.create(RInterface.class);
         if (!cards.isEmpty()) {
-            Call<List<SentBalloon>> call = rInterface.requestSentBalloonListWithDate(BALLOON_LIMIT, dateFormat.parse(last_date));
-            call.enqueue(new Callback<List<SentBalloon>>() {
+            Call<List<SendBalloonRespond>> call = rInterface.requestSentBalloonListWithDate(BALLOON_LIMIT, dateFormat.parse(last_date));
+            call.enqueue(new Callback<List<SendBalloonRespond>>() {
                 @Override
-                public void onResponse(Call<List<SentBalloon>> call, Response<List<SentBalloon>> response) {
+                public void onResponse(Call<List<SendBalloonRespond>> call, Response<List<SendBalloonRespond>> response) {
                     loading = false;
                     if (response != null) {
-                        List<SentBalloon> list = response.body();
+                        List<SendBalloonRespond> list = response.body();
                         for (int i = 0; i < list.size(); i++) {
-                            mCardArrayAdapter.add(createCard(list.get(i)));
+                            SentBalloon sentBalloon = new SentBalloon(list.get(i).getText(), list.get(i).getBalloon_id(), list.get(i).getReach(),
+                                    list.get(i).getCreep(), list.get(i).getRefill(), list.get(i).getSentiment(),
+                                    list.get(i).getSent_date());
+                            mCardArrayAdapter.add(createCard(sentBalloon));
                         }
                     } else {
                         loading = true;
@@ -193,7 +193,7 @@ public class SentMailsFragment extends Fragment {
                 }
 
                 @Override
-                public void onFailure(Call<List<SentBalloon>> call, Throwable t) {
+                public void onFailure(Call<List<SendBalloonRespond>> call, Throwable t) {
                     if (t.getMessage() != null) {
                         Log.d(SentMailsFragment.class.getSimpleName(),
                                 "Server failure:" + t.getMessage());
@@ -201,15 +201,19 @@ public class SentMailsFragment extends Fragment {
                 }
             });
         } else {
-            Call<List<SentBalloon>> call = rInterface.requestSentBalloonList(BALLOON_LIMIT);
-            call.enqueue(new Callback<List<SentBalloon>>() {
+            Call<List<SendBalloonRespond>> call = rInterface.requestSentBalloonList(BALLOON_LIMIT);
+            call.enqueue(new Callback<List<SendBalloonRespond>>() {
                 @Override
-                public void onResponse(Call<List<SentBalloon>> call, Response<List<SentBalloon>> response) {
+                public void onResponse(Call<List<SendBalloonRespond>> call, Response<List<SendBalloonRespond>> response) {
                     loading = false;
                     if (response != null) {
-                        List<SentBalloon> list = response.body();
+                        List<SendBalloonRespond> list = response.body();
                         for (int i = 0; i < list.size(); i++) {
-                            mCardArrayAdapter.add(createCard(list.get(i)));
+                            SentBalloon sentBalloon = new SentBalloon(list.get(i).getText(), list.get(i).getBalloon_id(), list.get(i).getReach(),
+                                    list.get(i).getCreep(), list.get(i).getRefill(), list.get(i).getSentiment(),
+                                    list.get(i).getSent_date());
+                            mCardArrayAdapter.add(createCard(sentBalloon));
+
                         }
                     } else {
                         loading = true;
@@ -218,7 +222,7 @@ public class SentMailsFragment extends Fragment {
                 }
 
                 @Override
-                public void onFailure(Call<List<SentBalloon>> call, Throwable t) {
+                public void onFailure(Call<List<SendBalloonRespond>> call, Throwable t) {
                     if (t.getMessage() != null) {
                         Toast.makeText(getContext(), "Server failure:" + t.getMessage(), Toast.LENGTH_LONG).show();
                     }

@@ -95,7 +95,6 @@ public class MailsTabbedActivity extends AppCompatActivity implements SentMailsF
     public void getSentBalloons(List<SentBalloon> balloonList) {
         Log.d(MailsTabbedActivity.class.getSimpleName(), "getting sent balloons from fragment");
         sentBalloonList = balloonList;
-        Log.d(MailsTabbedActivity.class.getSimpleName(), sentBalloonList.get(0).getText());
     }
 
     class ViewPagerAdapter extends FragmentPagerAdapter {

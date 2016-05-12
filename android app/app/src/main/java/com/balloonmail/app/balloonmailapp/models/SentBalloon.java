@@ -13,11 +13,6 @@ import java.util.Date;
  */
 @DatabaseTable(tableName="sentballoon")
 public class SentBalloon extends Balloon {
-    String error;
-
-    public String getError() {
-        return error;
-    }
 
     public SentBalloon() {
     }
