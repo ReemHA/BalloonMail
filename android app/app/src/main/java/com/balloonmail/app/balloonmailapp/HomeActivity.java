@@ -1,7 +1,11 @@
 package com.balloonmail.app.balloonmailapp;
 
 import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
@@ -11,18 +15,21 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
 
+import com.balloonmail.app.balloonmailapp.Utilities.Global;
+
 public class HomeActivity extends AppCompatActivity {
     private BroadcastReceiver mRegistrationBroadcastReceiver;
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
     private static final String TAG = "HomeActivity";
     private boolean isReceiverRegistered;
+    SharedPreferences sharedPreferences;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
+        SharedPreferences sharedPreferences = this.getSharedPreferences(Global.USER_INFO_PREF_FILE, Context.MODE_PRIVATE);
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -68,4 +75,22 @@ public class HomeActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+
+    private boolean checkNetworkConnection() {
+
+        // check the state of network connectivity
+        ConnectivityManager manager = (ConnectivityManager) getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        // get an instance of the current active network
+        NetworkInfo info = manager.getActiveNetworkInfo();
+        if (info != null && info.isConnected()) {
+            sharedPreferences.edit().putBoolean(Global.PREF_INTERNET_CONN, true).commit();
+            return true;
+
+        }
+        sharedPreferences.edit().putBoolean(Global.PREF_INTERNET_CONN, false).commit();
+        return false;
+    }
+
+
 }

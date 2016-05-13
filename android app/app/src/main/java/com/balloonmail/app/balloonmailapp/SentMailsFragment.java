@@ -1,23 +1,36 @@
 package com.balloonmail.app.balloonmailapp;
 
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
-import com.balloonmail.app.balloonmailapp.Utilities.BalloonHolder;
 import com.balloonmail.app.balloonmailapp.Utilities.Global;
 import com.balloonmail.app.balloonmailapp.models.Balloon;
+import com.balloonmail.app.balloonmailapp.models.DatabaseHelper;
 import com.balloonmail.app.balloonmailapp.models.SentBalloon;
-import com.balloonmail.app.balloonmailapp.rest.RInterface;
-import com.balloonmail.app.balloonmailapp.rest.model.SendBalloonRespond;
+import com.j256.ormlite.android.apptools.OpenHelperManager;
+import com.j256.ormlite.dao.Dao;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -25,15 +38,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.ExecutionException;
 
 import it.gmariotti.cardslib.library.internal.Card;
 import it.gmariotti.cardslib.library.internal.CardExpand;
 import it.gmariotti.cardslib.library.recyclerview.internal.CardArrayRecyclerViewAdapter;
 import it.gmariotti.cardslib.library.recyclerview.view.CardRecyclerView;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
 
 public class SentMailsFragment extends Fragment {
 
@@ -42,12 +52,18 @@ public class SentMailsFragment extends Fragment {
     private HashMap<SentBalloon, Card> hashMapForUpdates;
     private SentBalloonsListener mListener;
     private static boolean loading = false;
-    CardArrayRecyclerViewAdapter mCardArrayAdapter;
     private final static int BALLOON_LIMIT = 4;
-    private static DateFormat dateFormat;
     private static List<SentBalloon> sentBalloonList;
+    private DatabaseHelper dbHelper;
+    private Dao<SentBalloon, Integer> sentBalloonDao;
+    private static boolean adapterIsEmpty;
+    private DateFormat dateFormat;
+    private ProgressDialog mProgressDialog;
+    private boolean isConnected;
     View rootView;
     Bundle savedInstanceState;
+    CardArrayRecyclerViewAdapter mCardArrayAdapter;
+    SharedPreferences sharedPreferences;
 
     public SentMailsFragment() {
         // Required empty public constructor
@@ -56,18 +72,47 @@ public class SentMailsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
         rootView = inflater.inflate(R.layout.fragment_sent_mails, container, false);
-        hashMapForUpdates = new HashMap<>();
-        cards = new ArrayList<>();
-        cards = initCards();
-        mCardArrayAdapter = new CardArrayRecyclerViewAdapter(getActivity(), cards);
-        dateFormat = new SimpleDateFormat("MMMM d, yyyy", Locale.ENGLISH);
+        dbHelper = OpenHelperManager.getHelper(getContext(), DatabaseHelper.class);
         this.savedInstanceState = savedInstanceState;
+        dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss", Locale.ENGLISH);
+        sharedPreferences = getContext().getSharedPreferences(Global.USER_INFO_PREF_FILE, Context.MODE_PRIVATE);
+        hashMapForUpdates = new HashMap<>();
+        isConnected = sharedPreferences.getBoolean(Global.PREF_INTERNET_CONN, false);
+        cards = new ArrayList<>();
+        sentBalloonList = new ArrayList<>();
+
+
+        // Doa of SentBalloon table
+        sentBalloonDao = null;
+        try {
+            sentBalloonDao = dbHelper.getSentBalloonDao();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        if (false) {
+            try {
+                loadSentBalloons();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        } else
+            try {
+                cards = initCardsFromLocalDb();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+
+
+        mCardArrayAdapter = new CardArrayRecyclerViewAdapter(getActivity(), cards);
 
         //Staggered grid view
         CardRecyclerView mRecyclerView = (CardRecyclerView) rootView.findViewById(R.id.cvCardRecyclerView);
         mRecyclerView.setHasFixedSize(false);
+
         mLayoutManager = new LinearLayoutManager(getActivity());
         mRecyclerView.setLayoutManager(mLayoutManager);
 
@@ -78,51 +123,34 @@ public class SentMailsFragment extends Fragment {
 
         sentBalloonList.addAll(hashMapForUpdates.keySet());
         mListener.getSentBalloons(sentBalloonList);
-
-        mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-
-            @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-                Toast.makeText(getContext(), "scrolling", Toast.LENGTH_SHORT).show();
-                // get the current number of child views attached to the layout
-                int currVisibleItemCount = mLayoutManager.getChildCount(); //8
-
-                // get the total number of items in the layout
-                int totalItemCount = mLayoutManager.getItemCount(); //8
-
-                // get the adapter's position of the first visible view
-                int pastVisibleItemCount = mLayoutManager.findFirstVisibleItemPosition(); //8
-
-                if (!loading) {
-                    if (currVisibleItemCount + pastVisibleItemCount >= totalItemCount) {
-                        String last_date = mCardArrayAdapter.getItem(pastVisibleItemCount).getId();
-                        try {
-                            loadSentBalloons(last_date);
-                        } catch (ParseException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
-            }
-        });
         return rootView;
     }
 
-    public ArrayList<Card> initCards() {
+    public ArrayList<Card> initCardsFromLocalDb() throws SQLException {
         ArrayList<Card> cards = new ArrayList<>();
         Card card;
-        BalloonHolder balloonHolder = BalloonHolder.getInstance();
-        if (balloonHolder.getBalloon() != null) {
-            card = createCard(balloonHolder.getBalloon());
+
+        // a sent balloon in Db?
+        List<SentBalloon> sentBalloonListInDb = sentBalloonDao.queryForAll();
+        if (sentBalloonListInDb.size() > 0 && sentBalloonListInDb != null) {
+            for (int i = 0; i < sentBalloonListInDb.size(); i++) {
+                card = createCard(sentBalloonListInDb.get(i));
+                cards.add(card);
+            }
+        }
+
+        // a sent balloon in holder?
+        SentBalloon balloon = Global.balloonHolder.getBalloon();
+        if (balloon != null) {
+            card = createCard(balloon);
             cards.add(card);
 
             // to hash map
-            hashMapForUpdates.put(balloonHolder.getBalloon(), card);
+            hashMapForUpdates.put(balloon, card);
         }
 
-        //reset balloon object in singleton class
-        balloonHolder.setBalloon(null);
+        //reset balloon object in holder
+        Global.balloonHolder.setBalloon(null);
         return cards;
     }
 
@@ -144,7 +172,7 @@ public class SentMailsFragment extends Fragment {
 
         CardExpand cardExpand = new CustomSentExpandCard(balloon, getActivity().getBaseContext(), savedInstanceState);
         card.addCardExpand(cardExpand);
-        card.setId(balloon.getSent_date().toString());
+        card.setId(balloon.getSent_at().toString());
         card.setCardElevation(getResources().getDimension(R.dimen.card_shadow_elevation));
 
         return card;
@@ -159,6 +187,8 @@ public class SentMailsFragment extends Fragment {
     @Override
     public void onPause() {
         super.onPause();
+        Log.d(MailsTabbedActivity.class.getSimpleName(), "onPause saving");
+        saveSentBalloonsToDatabase(sentBalloonList);
     }
 
     interface SentBalloonsListener {
@@ -169,66 +199,82 @@ public class SentMailsFragment extends Fragment {
         mListener = listener;
     }
 
-    private void loadSentBalloons(String last_date) throws ParseException {
-        loading = true;
-        Retrofit retrofit = Global.getRetrofit(getActivity());
-        RInterface rInterface = retrofit.create(RInterface.class);
-        if (!cards.isEmpty()) {
-            Call<List<SendBalloonRespond>> call = rInterface.requestSentBalloonListWithDate(BALLOON_LIMIT, dateFormat.parse(last_date));
-            call.enqueue(new Callback<List<SendBalloonRespond>>() {
-                @Override
-                public void onResponse(Call<List<SendBalloonRespond>> call, Response<List<SendBalloonRespond>> response) {
-                    loading = false;
-                    if (response != null) {
-                        List<SendBalloonRespond> list = response.body();
-                        for (int i = 0; i < list.size(); i++) {
-                            SentBalloon sentBalloon = new SentBalloon(list.get(i).getText(), list.get(i).getBalloon_id(), list.get(i).getReach(),
-                                    list.get(i).getCreeps(), list.get(i).getRefills(), list.get(i).getSentiment(),
-                                    list.get(i).getSent_at());
-                            mCardArrayAdapter.add(createCard(sentBalloon));
-                        }
-                    } else {
-                        loading = true;
-                        Log.d(SentMailsFragment.class.getSimpleName(), "Response is null");
-                    }
-                }
+    private void saveSentBalloonsToDatabase(List<SentBalloon> balloonList) {
+        if (balloonList.size() > 0 && balloonList != null) {
 
-                @Override
-                public void onFailure(Call<List<SendBalloonRespond>> call, Throwable t) {
-                    if (t.getMessage() != null) {
-                        Log.d(SentMailsFragment.class.getSimpleName(),
-                                "Server failure:" + t.getMessage());
-                    }
+            // save balloon onto db
+            for (int i = 0; i < balloonList.size(); i++) {
+                try {
+                    sentBalloonDao.create(balloonList.get(i));
+                } catch (SQLException e) {
+                    e.printStackTrace();
                 }
-            });
-        } else {
-            Call<List<SendBalloonRespond>> call = rInterface.requestSentBalloonList(BALLOON_LIMIT);
-            call.enqueue(new Callback<List<SendBalloonRespond>>() {
-                @Override
-                public void onResponse(Call<List<SendBalloonRespond>> call, Response<List<SendBalloonRespond>> response) {
-                    loading = false;
-                    if (response != null) {
-                        List<SendBalloonRespond> list = response.body();
-                        for (int i = 0; i < list.size(); i++) {
-                            SentBalloon sentBalloon = new SentBalloon(list.get(i).getText(), list.get(i).getBalloon_id(), list.get(i).getReach(),
-                                    list.get(i).getCreeps(), list.get(i).getRefills(), list.get(i).getSentiment(),
-                                    list.get(i).getSent_at());
-                            mCardArrayAdapter.add(createCard(sentBalloon));
-
-                        }
-                    } else {
-                        loading = true;
-                        Toast.makeText(getContext(), "Response is null", Toast.LENGTH_LONG).show();
-                    }
-                }
-
-                @Override
-                public void onFailure(Call<List<SendBalloonRespond>> call, Throwable t) {
-                    if (t.getMessage() != null) {
-                        Toast.makeText(getContext(), "Server failure:" + t.getMessage(), Toast.LENGTH_LONG).show();
-                    }
-                }
-            });
+            }
+            OpenHelperManager.releaseHelper();
         }
     }
+
+    private void loadSentBalloons() throws ExecutionException, InterruptedException {
+        mProgressDialog = new ProgressDialog(getContext());
+        mProgressDialog.setIndeterminate(true);
+        mProgressDialog.setMessage("Getting your updated balloons..");
+       // mProgressDialog.show();
+        new fetchSentBalloonsFromServer().execute().get();
+    }
+
+    private class fetchSentBalloonsFromServer extends AsyncTask<Object, Void, Void> {
+        URL url;
+        HttpURLConnection connection;
+        String line;
+
+        @Override
+        protected Void doInBackground(Object... params) {
+            //String dateParameter = "last_at=" + params[0];
+            try {
+                url = new URL(Global.SERVER_URL + "/balloons/sent");
+                connection = (HttpURLConnection) url.openConnection();
+                connection.setRequestMethod("GET");
+                //connection.setReadTimeout(READ_TIMEOUT);
+                //connection.setConnectTimeout(CONNECTION_TIMEOUT);
+                connection.connect();
+                getResponse();
+
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        private void getResponse() throws IOException, JSONException, ParseException {
+            InputStreamReader streamReader = new InputStreamReader(connection.getInputStream());
+            BufferedReader reader = new BufferedReader(streamReader);
+            StringBuilder stringBuilder = new StringBuilder();
+            while ((line = reader.readLine()) != null) {
+                stringBuilder.append(line);
+            }
+            reader.close();
+            streamReader.close();
+            if (mProgressDialog.isShowing())
+                mProgressDialog.dismiss();
+            JSONObject jsonObject = new JSONObject(stringBuilder.toString());
+            JSONArray jsonArray = jsonObject.getJSONArray("balloons");
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject object = jsonArray.getJSONObject(i);
+                SentBalloon balloon = new SentBalloon(object.getString("text"), object.getInt("balloon_id"),
+                        object.getDouble("reach"), object.getInt("creeps"), object.getInt("refills"), object.getDouble("sentiment"),
+                        dateFormat.parse(object.getString("sent_at")));
+                mCardArrayAdapter.add(createCard(balloon));
+            }
+
+
+        }
+    }
+
+
 }

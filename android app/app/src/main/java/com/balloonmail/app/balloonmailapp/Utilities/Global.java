@@ -31,6 +31,8 @@ public class Global {
     public static final String PREF_USER_EMAIL = "user_email";
     public static final String PREF_USER_API_TOKEN = "api_token";
     public static final String PREF_USER_IS_CREATED = "created";
+    public static final String PREF_INTERNET_CONN = "internet_connection";
+    public static BalloonHolder balloonHolder = BalloonHolder.getInstance();;
     public static Retrofit retrofitNoClient = new Retrofit.Builder()
             .baseUrl(SERVER_URL)
             .addConverterFactory(GsonConverterFactory.create())
@@ -38,9 +40,11 @@ public class Global {
     private static Retrofit retrofit = retrofitNoClient;
 
     public static Retrofit getRetrofit(final Context context) {
+
         //get the shared preference file
         final SharedPreferences sharedPreferences =
                 context.getSharedPreferences(Global.USER_INFO_PREF_FILE, context.MODE_PRIVATE);
+
         //get the api token from shared preferences
         final String key = sharedPreferences.getString(Global.PREF_USER_API_TOKEN, "");
 

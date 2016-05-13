@@ -1,15 +1,10 @@
 #
-# generated on 2016/05/10 03:38:27
+# generated on 2016/05/13 07:59:24
 #
 # --table-start--
 dataClass=com.balloonmail.app.balloonmailapp.models.ReceivedBalloon
 tableName=receivedballoon
 # --table-fields-start--
-# --field-start--
-fieldName=local_balloon_id
-generatedId=true
-unique=true
-# --field-end--
 # --field-start--
 fieldName=balloon_id
 # --field-end--
@@ -24,6 +19,12 @@ fieldName=creeps
 # --field-end--
 # --field-start--
 fieldName=reach
+# --field-end--
+# --field-start--
+fieldName=latSource
+# --field-end--
+# --field-start--
+fieldName=lngSource
 # --field-end--
 # --field-start--
 fieldName=sentiment
@@ -39,11 +40,6 @@ dataClass=com.balloonmail.app.balloonmailapp.models.SentBalloon
 tableName=sentballoon
 # --table-fields-start--
 # --field-start--
-fieldName=local_balloon_id
-generatedId=true
-unique=true
-# --field-end--
-# --field-start--
 fieldName=balloon_id
 # --field-end--
 # --field-start--
@@ -57,6 +53,12 @@ fieldName=creeps
 # --field-end--
 # --field-start--
 fieldName=reach
+# --field-end--
+# --field-start--
+fieldName=latSource
+# --field-end--
+# --field-start--
+fieldName=lngSource
 # --field-end--
 # --field-start--
 fieldName=sentiment
@@ -72,11 +74,6 @@ dataClass=com.balloonmail.app.balloonmailapp.models.LikedBalloon
 tableName=likedballoon
 # --table-fields-start--
 # --field-start--
-fieldName=local_balloon_id
-generatedId=true
-unique=true
-# --field-end--
-# --field-start--
 fieldName=balloon_id
 # --field-end--
 # --field-start--
@@ -90,6 +87,12 @@ fieldName=creeps
 # --field-end--
 # --field-start--
 fieldName=reach
+# --field-end--
+# --field-start--
+fieldName=latSource
+# --field-end--
+# --field-start--
+fieldName=lngSource
 # --field-end--
 # --field-start--
 fieldName=sentiment

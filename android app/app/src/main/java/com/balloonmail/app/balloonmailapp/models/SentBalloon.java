@@ -21,13 +21,13 @@ public class SentBalloon extends Balloon {
         super(text, noOfRefills, noOfCreeps, reach);
     }
 
-    public SentBalloon(String text, String balloon_id, double reach, int creep, int refill, double sentiment, Date sent_date) {
+    public SentBalloon(String text, int balloon_id, double reach, int creep, int refill, double sentiment, Date sent_date) {
         this.text = text;
         this.balloon_id = balloon_id;
         this.reach = reach;
-        this.creep = creep;
-        this.refill = refill;
+        this.creeps = creep;
+        this.refills = refill;
         this.sentiment = sentiment;
-        this.sent_date = sent_date;
+        this.sent_at = sent_date;
     }
 }

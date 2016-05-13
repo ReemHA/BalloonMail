@@ -27,7 +27,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MailsTabbedActivity extends AppCompatActivity implements SentMailsFragment.SentBalloonsListener{
+public class MailsTabbedActivity extends AppCompatActivity implements SentMailsFragment.SentBalloonsListener {
 
     private Toolbar toolbar;
     private TabLayout tabLayout;
@@ -50,7 +50,7 @@ public class MailsTabbedActivity extends AppCompatActivity implements SentMailsF
         setContentView(R.layout.activity_mails_tabbed);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
+        //SentBalloon balloon = intent.getBundleExtra("sent_balloon");
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -147,74 +147,77 @@ public class MailsTabbedActivity extends AppCompatActivity implements SentMailsF
     @Override
     protected void onPause() {
         super.onPause();
-        Log.d(MailsTabbedActivity.class.getSimpleName(), "onPause saving");
-        saveSentBalloonsToDatabase(sentBalloonList);
-        saveReceivedBalloonsToDatabase(receivedBalloonList);
-        saveLikedBalloonsToDatabase(likedBalloonList);
+
+        //saveReceivedBalloonsToDatabase(receivedBalloonList);
+        //saveLikedBalloonsToDatabase(likedBalloonList);
 
     }
 
     private void saveSentBalloonsToDatabase(List<SentBalloon> balloonList) {
-        dbHelper = OpenHelperManager.getHelper(this, DatabaseHelper.class);
-        Dao<SentBalloon, Integer> sentBalloonDao = null;
-        try {
-            sentBalloonDao = dbHelper.getSentBalloonDao();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        // save balloon onto db
-        for (int i = 0; i < balloonList.size(); i++) {
+        if (balloonList.size() > 0 && balloonList != null) {
+            dbHelper = OpenHelperManager.getHelper(this, DatabaseHelper.class);
+            Dao<SentBalloon, Integer> sentBalloonDao = null;
             try {
-                sentBalloonDao.create(balloonList.get(i));
+                sentBalloonDao = dbHelper.getSentBalloonDao();
             } catch (SQLException e) {
                 e.printStackTrace();
             }
-        }
-        OpenHelperManager.releaseHelper();
 
+            // save balloon onto db
+            for (int i = 0; i < balloonList.size(); i++) {
+                try {
+                    sentBalloonDao.create(balloonList.get(i));
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+            OpenHelperManager.releaseHelper();
+        }
     }
 
     private void saveReceivedBalloonsToDatabase(List<ReceivedBalloon> balloonList) {
-        dbHelper = OpenHelperManager.getHelper(this, DatabaseHelper.class);
-        Dao<ReceivedBalloon, Integer> receivedBalloonDao = null;
-        try {
-            receivedBalloonDao = dbHelper.getReceivedBalloonDao();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        // save balloon onto db
-        for (int i = 0; i < balloonList.size(); i++) {
+        if (balloonList.size() > 0 && balloonList != null) {
+            dbHelper = OpenHelperManager.getHelper(this, DatabaseHelper.class);
+            Dao<ReceivedBalloon, Integer> receivedBalloonDao = null;
             try {
-                receivedBalloonDao.create(balloonList.get(i));
+                receivedBalloonDao = dbHelper.getReceivedBalloonDao();
             } catch (SQLException e) {
                 e.printStackTrace();
             }
-        }
-        OpenHelperManager.releaseHelper();
 
+            // save balloon onto db
+            for (int i = 0; i < balloonList.size(); i++) {
+                try {
+                    receivedBalloonDao.create(balloonList.get(i));
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+            OpenHelperManager.releaseHelper();
+        }
     }
 
-    private void saveLikedBalloonsToDatabase(List<LikedBalloon> balloonList){
-        dbHelper = OpenHelperManager.getHelper(this, DatabaseHelper.class);
-        Dao<LikedBalloon, Integer> likedBalloonDao = null;
-        try {
-            likedBalloonDao = dbHelper.getLikedBalloonDao();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        // save balloon onto db
-        for (int i = 0; i < balloonList.size(); i++) {
+    private void saveLikedBalloonsToDatabase(List<LikedBalloon> balloonList) {
+        if (balloonList.size() > 0 && balloonList != null) {
+            dbHelper = OpenHelperManager.getHelper(this, DatabaseHelper.class);
+            Dao<LikedBalloon, Integer> likedBalloonDao = null;
             try {
-                likedBalloonDao.create(balloonList.get(i));
+                likedBalloonDao = dbHelper.getLikedBalloonDao();
             } catch (SQLException e) {
                 e.printStackTrace();
             }
-        }
-        OpenHelperManager.releaseHelper();
 
+            // save balloon onto db
+            for (int i = 0; i < balloonList.size(); i++) {
+                try {
+                    likedBalloonDao.create(balloonList.get(i));
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+            OpenHelperManager.releaseHelper();
+
+        }
     }
 
 }

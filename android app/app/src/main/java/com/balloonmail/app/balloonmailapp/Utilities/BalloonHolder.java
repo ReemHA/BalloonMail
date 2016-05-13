@@ -7,7 +7,7 @@ import com.balloonmail.app.balloonmailapp.models.SentBalloon;
  */
 public class BalloonHolder {
     private SentBalloon balloon;
-    private static final BalloonHolder holder = new BalloonHolder();
+    private static BalloonHolder holder = new BalloonHolder();
 
     public static BalloonHolder getInstance() {
         return holder;

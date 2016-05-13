@@ -43,11 +43,14 @@ public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiC
     private GoogleApiClient googleApiClient;
     private int i = 0;
     DatabaseUtilities databaseUtilities;
+    SharedPreferences sharedPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login_tabbed);
+        sharedPreferences = LoginTabbedActivity.this.getSharedPreferences(Global.USER_INFO_PREF_FILE, MODE_PRIVATE);
+
 
         databaseUtilities = new DatabaseUtilities();
 
@@ -163,8 +166,11 @@ public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiC
         // get an instance of the current active network
         NetworkInfo info = manager.getActiveNetworkInfo();
         if (info != null && info.isConnected()) {
+            sharedPreferences.edit().putBoolean(Global.PREF_INTERNET_CONN, true).commit();
             return true;
+
         }
+        sharedPreferences.edit().putBoolean(Global.PREF_INTERNET_CONN, false).commit();
         return false;
     }
 

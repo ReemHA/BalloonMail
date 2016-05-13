@@ -2,6 +2,7 @@ package com.balloonmail.app.balloonmailapp;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.TextInputEditText;
@@ -12,28 +13,33 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
 
-import com.balloonmail.app.balloonmailapp.Utilities.BalloonHolder;
 import com.balloonmail.app.balloonmailapp.Utilities.Global;
 import com.balloonmail.app.balloonmailapp.models.SentBalloon;
-import com.balloonmail.app.balloonmailapp.rest.RInterface;
-import com.balloonmail.app.balloonmailapp.rest.model.SendBalloonRequest;
-import com.balloonmail.app.balloonmailapp.rest.model.SendBalloonRespond;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Locale;
 
 public class WriteMailActivity extends AppCompatActivity {
 
     EditText mailText;
     Button spread;
-    EditText editText;
     private static final String CONFIRMATION_TO_SENT_MAIL = "Mail is successsfully sent to server.";
     private static final String FAILURE_TO_SENT_MAIL = "Mail is not sent to server.";
-
+    private DateFormat dateFormat;
+    private ProgressDialog mProgressDialog;
     //TextWatcher
     private TextWatcher textWatcher = new TextWatcher() {
         @Override
@@ -65,6 +71,7 @@ public class WriteMailActivity extends AppCompatActivity {
         setContentView(R.layout.activity_write_mail);
         mailText = (TextInputEditText) findViewById(R.id.mail_text);
         spread = (Button) findViewById(R.id.spread);
+        dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss", Locale.ENGLISH);
 
         enableOrDisableEditText();
         mailText.addTextChangedListener(textWatcher);
@@ -85,57 +92,126 @@ public class WriteMailActivity extends AppCompatActivity {
         return true;
     }
 
-    private void moveToIntent() {
-        Intent intent = new Intent(getApplicationContext(), MailsTabbedActivity.class);
-        startActivity(intent);
-        finish();
-    }
-
-
-    class SendingBalloonsToServer extends AsyncTask<>
-
-    /*private void sendBalloonToServer(String mailText) {
-        SendBalloonRequest body = new SendBalloonRequest(mailText);
-        Retrofit retrofit = Global.getRetrofit(this);
-        RInterface rInterface = retrofit.create(RInterface.class);
-        Call<SendBalloonRespond> call = rInterface.postSentBalloon(body);
-        final ProgressDialog mProgressDialog = new ProgressDialog(WriteMailActivity.this);
+    private void sendBalloonToServer(String text) {
+        mProgressDialog = new ProgressDialog(WriteMailActivity.this);
         mProgressDialog.setIndeterminate(true);
         mProgressDialog.setMessage("Sending...");
         mProgressDialog.show();
-        call.enqueue(new Callback<SendBalloonRespond>() {
-                         @Override
-                         public void onResponse(Call<SendBalloonRespond> call, Response<SendBalloonRespond> response) {
-                             if (response.isSuccessful()) {
-                                 Log.d(WriteMailActivity.class.getSimpleName(), response.body().toString());
-                                 if (mProgressDialog.isShowing())
-                                     mProgressDialog.dismiss();
-                                 SendBalloonRespond balloon = response.body();
-                                 if (balloon.getError() == null) {
-                                     Log.d(WriteMailActivity.class.getSimpleName(), balloon.toString());
-                                     BalloonHolder balloonHolder = BalloonHolder.getInstance();
-                                     SentBalloon sentBalloon = new SentBalloon(balloon.getText(),
-                                             balloon.getBalloon_id(), balloon.getReach(), balloon.getCreeps(), balloon.getRefills(),
-                                             balloon.getSentiment(), balloon.getSent_at());
-                                     balloonHolder.setBalloon(sentBalloon);
-                                     Toast.makeText(getApplicationContext(), CONFIRMATION_TO_SENT_MAIL, Toast.LENGTH_SHORT).show();
-                                     moveToIntent();
-                                 } else {
-                                     Log.d(WriteMailActivity.class.getSimpleName(), "Server error response:" + response.body().getError());
-                                 }
-                             }
-                         }
+        new SendingBalloonsToServer().execute(text);
+    }
 
-                         @Override
-                         public void onFailure(Call<SendBalloonRespond> call, Throwable t) {
-                             if (mProgressDialog.isShowing())
-                                 mProgressDialog.dismiss();
-                             if (t.getMessage() != null) {
-                                 Log.d("Error", t.getMessage());
-                             }
-                         }
-                     }
+    class SendingBalloonsToServer extends AsyncTask<String, Void, Void> {
+        URL url;
+        HttpURLConnection connection;
+        SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences(Global.USER_INFO_PREF_FILE,
+                getApplicationContext().MODE_PRIVATE);
 
-        );
-    }*/
+        String api_token = sharedPreferences.getString(Global.PREF_USER_API_TOKEN, "");
+
+
+        @Override
+        protected Void doInBackground(String... strings) {
+            try {
+                url = new URL(Global.SERVER_URL + "/balloons/create");
+                connection = (HttpURLConnection) url.openConnection();
+
+                // set connection to allow output
+                connection.setDoOutput(true);
+
+                // set connection to allow input
+                connection.setDoInput(true);
+
+                // set the request method to POST
+                connection.setRequestMethod("POST");
+
+                // set content-type property
+                connection.setRequestProperty("Content-Type", "application/json");
+
+                // set charset property to utf-8
+                connection.setRequestProperty("charset", "utf-8");
+
+                connection.setRequestProperty("authorization", "Bearer " + api_token);
+                // set accept property
+                connection.setRequestProperty("Accept", "application/json");
+
+                // put user name and id token in a JSONObject
+                JSONObject jsonBody = new JSONObject();
+                jsonBody.put("text", strings[0]);
+
+                // connect to server
+                connection.connect();
+
+                DataOutputStream outputStream = new DataOutputStream(connection.getOutputStream());
+
+                // write JSON body to the output stream
+                outputStream.write(jsonBody.toString().getBytes("utf-8"));
+
+                // flush to ensure all data in the stream is sent
+                outputStream.flush();
+
+                // close stream
+                outputStream.close();
+
+                // receive the response from server
+                getResponseFromServer();
+
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            return null;
+
+        }
+
+        private void getResponseFromServer() throws IOException, JSONException {
+            // create StringBuilder object to append the input stream in
+            StringBuilder sb = new StringBuilder();
+            String line;
+
+            // get input stream
+            BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+
+            // append stream in a the StringBuilder object
+            while ((line = reader.readLine()) != null) {
+                sb.append(line + "\n");
+            }
+            reader.close();
+
+            // convert StringBuilder object to string and store it in a variable
+            String JSONResponse = sb.toString();
+            Log.d(WriteMailActivity.class.getSimpleName(), JSONResponse);
+
+            // convert response to JSONObject
+            JSONObject response = new JSONObject(JSONResponse);
+
+            // checks if an error is in the response
+            if (!response.has("error")) {
+
+                // get balloon attributes from the response
+                SentBalloon balloon = null;
+                try {
+                    balloon = new SentBalloon(response.getString("text"), response.getInt("balloon_id"), response.getDouble("reach"),
+                            response.getInt("creeps"), response.getInt("refills"), response.getDouble("sentiment"), dateFormat.parse(response.getString("sent_at")));
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+                Global.balloonHolder.setBalloon(balloon);
+                Log.d(WriteMailActivity.class.getSimpleName(), Global.balloonHolder.getBalloon().toString());
+
+                if (mProgressDialog.isShowing())
+                    mProgressDialog.dismiss();
+                // move from this activity
+                Intent intent = new Intent(getApplicationContext(), MailsTabbedActivity.class);
+                startActivity(intent);
+                finish();
+            } else {
+                Log.d("Response from Server: ", response.getString("error"));
+            }
+
+            return;
+        }
+    }
 }

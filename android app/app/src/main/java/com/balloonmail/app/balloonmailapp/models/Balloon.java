@@ -14,16 +14,16 @@ import java.util.HashMap;
 public abstract class Balloon implements Serializable {
 
     @DatabaseField
-    String balloon_id;
+    int balloon_id;
 
     @DatabaseField
     String text;
 
     @DatabaseField
-    int refill;
+    int refills;
 
     @DatabaseField
-    int creep;
+    int creeps;
 
     @DatabaseField
     double reach;
@@ -39,16 +39,16 @@ public abstract class Balloon implements Serializable {
     double sentiment;
 
     @DatabaseField
-    Date sent_date;
+    Date sent_at;
 
     public Balloon() {
     }
 
     public Balloon(String text, int noOfRefills, int noOfCreeps, double reach){
         this.text = text;
-        this.sent_date = new Date(System.currentTimeMillis());
-        this.refill = noOfRefills;
-        this.creep = noOfCreeps;
+        this.sent_at = new Date(System.currentTimeMillis());
+        this.refills = noOfRefills;
+        this.creeps = noOfCreeps;
         this.reach = reach;
 
         // TODO will be replaced with the attributes of the balloon when received from the server
@@ -88,27 +88,27 @@ public abstract class Balloon implements Serializable {
         this.text = text;
     }
 
-    public void setRefill(int refill) {
-        this.refill = refill;
+    public void setRefills(int refills) {
+        this.refills = refills;
     }
 
-    public void setBalloon_id(String balloon_id) {
+    public void setBalloon_id(int balloon_id) {
         this.balloon_id = balloon_id;
     }
 
-    public void setCreep(int creep) {
-        this.creep = creep;
+    public void setCreeps(int creeps) {
+        this.creeps = creeps;
     }
 
     public void setSentiment(double sentiment) {
         this.sentiment = sentiment;
     }
 
-    public void setSent_date(Date sent_date) {
-        this.sent_date = sent_date;
+    public void setSent_at(Date sent_at) {
+        this.sent_at = sent_at;
     }
 
-    public String getBalloon_id() {
+    public int getBalloon_id() {
         return balloon_id;
     }
 
@@ -116,16 +116,16 @@ public abstract class Balloon implements Serializable {
         return sentiment;
     }
 
-    public int getCreep() {
-        return creep;
+    public int getCreeps() {
+        return creeps;
     }
 
-    public int getRefill() {
-        return refill;
+    public int getRefills() {
+        return refills;
     }
 
-    public Date getSent_date() {
-        return sent_date;
+    public Date getSent_at() {
+        return sent_at;
     }
 
     public HashMap<LatLng, ArrayList<LatLng>> getDestinationsHashMap() {
@@ -150,11 +150,11 @@ public abstract class Balloon implements Serializable {
         return "Balloon{" +
                 "balloon_id='" + balloon_id + '\'' +
                 ", text='" + text + '\'' +
-                ", refill=" + refill +
-                ", creep=" + creep +
+                ", refills=" + refills +
+                ", creeps=" + creeps +
                 ", reach=" + reach +
                 ", sentiment=" + sentiment +
-                ", sent_date=" + sent_date +
+                ", sent_at=" + sent_at +
                 '}';
     }
 }
