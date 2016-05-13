@@ -1,10 +1,10 @@
 package com.balloonmail.app.balloonmailapp;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -13,11 +13,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
-import com.balloonmail.app.balloonmailapp.Utilities.Global;
 import com.balloonmail.app.balloonmailapp.Utilities.DatabaseUtilities;
-import com.balloonmail.app.balloonmailapp.rest.RInterface;
-import com.balloonmail.app.balloonmailapp.rest.model.LoginServerRequest;
-import com.balloonmail.app.balloonmailapp.rest.model.LoginServerResponse;
+import com.balloonmail.app.balloonmailapp.Utilities.Global;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -29,11 +26,15 @@ import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 
 import org.json.JSONException;
+import org.json.JSONObject;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks {
 
@@ -44,6 +45,7 @@ public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiC
     private int i = 0;
     DatabaseUtilities databaseUtilities;
     SharedPreferences sharedPreferences;
+    private ProgressDialog mProgressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -145,7 +147,7 @@ public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiC
     private void signIn() {
 
         // check whether a network connection is available or not
-        if (checkNetworkConnection()) {
+        if (Global.isConnected(this)) {
 
             // send an intent with the request to get the user's data
             Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(googleApiClient);
@@ -155,23 +157,6 @@ public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiC
             // show a toast if no network connection is available
             Toast.makeText(getApplicationContext(), NETWORK_CONNECTION_MSG, Toast.LENGTH_LONG).show();
         }
-    }
-
-    // check network connection
-    private boolean checkNetworkConnection() {
-
-        // check the state of network connectivity
-        ConnectivityManager manager = (ConnectivityManager) getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
-
-        // get an instance of the current active network
-        NetworkInfo info = manager.getActiveNetworkInfo();
-        if (info != null && info.isConnected()) {
-            sharedPreferences.edit().putBoolean(Global.PREF_INTERNET_CONN, true).commit();
-            return true;
-
-        }
-        sharedPreferences.edit().putBoolean(Global.PREF_INTERNET_CONN, false).commit();
-        return false;
     }
 
     // handle the data returned from onActivityResult
@@ -185,9 +170,11 @@ public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiC
 
             // get the user name
             String userName = account.getDisplayName();
+            sharedPreferences.edit().putString(Global.PREF_USER_NAME, userName).commit();
 
             // get the user email
             String userEmail = account.getEmail();
+            sharedPreferences.edit().putString(Global.PREF_USER_EMAIL, userEmail).commit();
 
             Log.d(SIGN_IN_ERROR_TAG, "GoogleSignInResult succeeded");
 
@@ -200,61 +187,115 @@ public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiC
 
 
     private void sendDataToServer(String idToken, final String userName, final String userEmail) {
-        LoginServerRequest body = new LoginServerRequest(userName, idToken);
-        Retrofit retrofit = Global.getRetrofit(this);
-        RInterface request = retrofit.create(RInterface.class);
-        Call<LoginServerResponse> call = request.postData(body);
-        call.enqueue(new Callback<LoginServerResponse>() {
-                         @Override
-                         public void onResponse(Call<LoginServerResponse> call, Response<LoginServerResponse> response) {
-                             LoginServerResponse jsonResponse = response.body();
-                             Log.d(LoginTabbedActivity.class.getSimpleName(), jsonResponse.toString());
-                             if (jsonResponse != null) {
-                                 // checks if an error is in the response
-                                 if (!jsonResponse.toString().contains("error")) {
-                                     String api_token;
-                                     Log.d(LoginTabbedActivity.class.getSimpleName(), jsonResponse.toString());
+        mProgressDialog = new ProgressDialog(LoginTabbedActivity.this);
+        mProgressDialog.setIndeterminate(true);
+        mProgressDialog.setMessage("Logging...");
+        mProgressDialog.show();
+        new loginInfoToServer().execute(userName, idToken);
+    }
 
-                                     // get api_token of the user from the response
-                                     api_token = jsonResponse.getApi_token();
+    private class loginInfoToServer extends AsyncTask<String, Void, Void> {
+        URL url;
+        HttpURLConnection connection;
 
-                                     // add api_token to SharedPreferences
-                                     SharedPreferences sharedPreferences = LoginTabbedActivity.this.getSharedPreferences(Global.USER_INFO_PREF_FILE, MODE_PRIVATE);
-                                     if (sharedPreferences.edit().putString(Global.PREF_USER_API_TOKEN, api_token).commit() &&
-                                             sharedPreferences.edit().putString(Global.PREF_USER_NAME, userName).commit() &&
-                                             sharedPreferences.edit().putString(Global.PREF_USER_EMAIL, userEmail).commit()) {
-                                         Log.d(LoginTabbedActivity.class.getSimpleName(), "api_token: " + api_token + "\\n" +
-                                                 "user name: " + userName + "\\n" + "user email: " + userEmail + " are saved into shared pref.");
-                                     }
+        @Override
+        protected Void doInBackground(String... strings) {
+            try {
+                url = new URL(Global.SERVER_URL + "/token/google");
+                connection = (HttpURLConnection) url.openConnection();
 
-                                     // checks if he is a new user
-                                     if (jsonResponse.isCreated()) {
-                                         sharedPreferences.edit().putBoolean(Global.PREF_USER_IS_CREATED, true).commit();
-                                         Log.d(LoginTabbedActivity.class.getSimpleName(), "user is new user.");
-                                     } else {
-                                         sharedPreferences.edit().putBoolean(Global.PREF_USER_IS_CREATED, false).commit();
-                                         Log.d(LoginTabbedActivity.class.getSimpleName(), "user is an old user.");
-                                     }
+                // set connection to allow output
+                connection.setDoOutput(true);
 
-                                     Intent intent = new Intent(LoginTabbedActivity.this, HomeActivity.class);
-                                     startActivity(intent);
-                                     LoginTabbedActivity.this.finish();
-                                 }
-                             } else {
-                                 Log.d("Response from Server: ", jsonResponse.getError());
-                             }
-                         }
+                // set connection to allow input
+                connection.setDoInput(true);
 
-                         @Override
-                         public void onFailure(Call<LoginServerResponse> call, Throwable t) {
-                             if (t.getMessage() != null) {
-                                 Log.d("Error", t.getMessage());
-                             }
-                         }
-                     }
+                // set the request method to POST
+                connection.setRequestMethod("POST");
 
-        );
+                // set content-type property
+                connection.setRequestProperty("Content-Type", "application/json");
 
+                // set charset property to utf-8
+                connection.setRequestProperty("charset", "utf-8");
+
+                // put user name and id token in a JSONObject
+                JSONObject jsonBody = new JSONObject();
+                jsonBody.put("user_name", strings[0]);
+                jsonBody.put("access_token", strings[1]);
+
+                // connect to server
+                connection.connect();
+
+                DataOutputStream outputStream = new DataOutputStream(connection.getOutputStream());
+
+                // write JSON body to the output stream
+                outputStream.write(jsonBody.toString().getBytes("utf-8"));
+
+                // flush to ensure all data in the stream is sent
+                outputStream.flush();
+
+                // close stream
+                outputStream.close();
+
+                // receive the response from server
+                getResponseFromServer();
+
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        private void getResponseFromServer() throws IOException, JSONException {
+            // create StringBuilder object to append the input stream in
+            StringBuilder sb = new StringBuilder();
+            String line;
+
+            // get input stream
+            BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+
+            // append stream in a the StringBuilder object
+            while ((line = reader.readLine()) != null) {
+                sb.append(line + "\n");
+            }
+            reader.close();
+
+            // convert StringBuilder object to string and store it in a variable
+            String JSONResponse = sb.toString();
+            Log.d(WriteMailActivity.class.getSimpleName(), JSONResponse);
+
+            // convert response to JSONObject
+            JSONObject response = new JSONObject(JSONResponse);
+
+            // checks if an error is in the response
+            if (!response.has("error")) {
+
+                String api_token = response.getString("api_token");
+                boolean created = response.getBoolean("created");
+
+                // add api_token to SharedPreferences
+                SharedPreferences sharedPreferences = LoginTabbedActivity.this.getSharedPreferences(Global.USER_INFO_PREF_FILE, MODE_PRIVATE);
+                sharedPreferences.edit().putString(Global.PREF_USER_API_TOKEN, api_token).commit();
+
+                if (mProgressDialog.isShowing()) {
+                    mProgressDialog.dismiss();
+                }
+
+                Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
+                startActivity(intent);
+                finish();
+            } else {
+                Log.d("Response from Server: ", response.getString("error"));
+                Toast.makeText(getApplicationContext(), "Error signing in", Toast.LENGTH_LONG).show();
+            }
+
+            return;
+        }
     }
 
 

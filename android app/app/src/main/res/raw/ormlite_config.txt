@@ -1,10 +1,19 @@
 #
-# generated on 2016/05/13 07:59:24
+# generated on 2016/05/13 02:14:35
 #
 # --table-start--
 dataClass=com.balloonmail.app.balloonmailapp.models.ReceivedBalloon
 tableName=receivedballoon
 # --table-fields-start--
+# --field-start--
+fieldName=is_refilled
+# --field-end--
+# --field-start--
+fieldName=is_liked
+# --field-end--
+# --field-start--
+fieldName=is_creeped
+# --field-end--
 # --field-start--
 fieldName=balloon_id
 # --field-end--
@@ -73,6 +82,15 @@ fieldName=sent_at
 dataClass=com.balloonmail.app.balloonmailapp.models.LikedBalloon
 tableName=likedballoon
 # --table-fields-start--
+# --field-start--
+fieldName=is_refilled
+# --field-end--
+# --field-start--
+fieldName=is_liked
+# --field-end--
+# --field-start--
+fieldName=is_creeped
+# --field-end--
 # --field-start--
 fieldName=balloon_id
 # --field-end--

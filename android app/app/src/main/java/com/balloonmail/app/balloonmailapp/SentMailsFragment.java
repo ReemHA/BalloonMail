@@ -49,17 +49,13 @@ public class SentMailsFragment extends Fragment {
 
     private ArrayList<Card> cards;
     private LinearLayoutManager mLayoutManager;
-    private HashMap<SentBalloon, Card> hashMapForUpdates;
+    private HashMap<SentBalloon, Card> balloonsMap;
     private SentBalloonsListener mListener;
-    private static boolean loading = false;
-    private final static int BALLOON_LIMIT = 4;
     private static List<SentBalloon> sentBalloonList;
     private DatabaseHelper dbHelper;
     private Dao<SentBalloon, Integer> sentBalloonDao;
-    private static boolean adapterIsEmpty;
     private DateFormat dateFormat;
     private ProgressDialog mProgressDialog;
-    private boolean isConnected;
     View rootView;
     Bundle savedInstanceState;
     CardArrayRecyclerViewAdapter mCardArrayAdapter;
@@ -77,8 +73,7 @@ public class SentMailsFragment extends Fragment {
         this.savedInstanceState = savedInstanceState;
         dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss", Locale.ENGLISH);
         sharedPreferences = getContext().getSharedPreferences(Global.USER_INFO_PREF_FILE, Context.MODE_PRIVATE);
-        hashMapForUpdates = new HashMap<>();
-        isConnected = sharedPreferences.getBoolean(Global.PREF_INTERNET_CONN, false);
+        balloonsMap = new HashMap<>();
         cards = new ArrayList<>();
         sentBalloonList = new ArrayList<>();
 
@@ -92,7 +87,7 @@ public class SentMailsFragment extends Fragment {
         }
         mCardArrayAdapter = new CardArrayRecyclerViewAdapter(getActivity(), cards);
 
-        if (isConnected) {
+        if (Global.isConnected(getContext())) {
             try {
                 loadSentBalloons();
             } catch (ExecutionException e) {
@@ -108,6 +103,7 @@ public class SentMailsFragment extends Fragment {
                 e.printStackTrace();
             }
 
+
         //Staggered grid view
         CardRecyclerView mRecyclerView = (CardRecyclerView) rootView.findViewById(R.id.cvCardRecyclerView);
         mRecyclerView.setHasFixedSize(false);
@@ -120,7 +116,7 @@ public class SentMailsFragment extends Fragment {
             mRecyclerView.setAdapter(mCardArrayAdapter);
         }
 
-        sentBalloonList.addAll(hashMapForUpdates.keySet());
+
         return rootView;
     }
 
@@ -144,7 +140,7 @@ public class SentMailsFragment extends Fragment {
             cards.add(card);
 
             // to hash map
-            hashMapForUpdates.put(balloon, card);
+            balloonsMap.put(balloon, card);
         }
 
         //reset balloon object in holder
@@ -186,6 +182,7 @@ public class SentMailsFragment extends Fragment {
     public void onPause() {
         super.onPause();
         Log.d(MailsTabbedActivity.class.getSimpleName(), "onPause saving");
+        sentBalloonList.addAll(balloonsMap.keySet());
         saveSentBalloonsToDatabase(sentBalloonList);
     }
 
@@ -198,6 +195,7 @@ public class SentMailsFragment extends Fragment {
     }
 
     private void saveSentBalloonsToDatabase(List<SentBalloon> balloonList) {
+
         if (balloonList.size() > 0 && balloonList != null) {
 
             // save balloon onto db
@@ -227,7 +225,6 @@ public class SentMailsFragment extends Fragment {
 
         @Override
         protected Void doInBackground(Object... params) {
-            //String dateParameter = "last_at=" + params[0];
             try {
                 url = new URL(Global.SERVER_URL + "/balloons/sent");
                 connection = (HttpURLConnection) url.openConnection();
@@ -269,7 +266,9 @@ public class SentMailsFragment extends Fragment {
                 SentBalloon balloon = new SentBalloon(object.getString("text"), object.getInt("balloon_id"),
                         object.getDouble("reach"), object.getInt("creeps"), object.getInt("refills"), object.getDouble("sentiment"),
                         dateFormat.parse(object.getString("sent_at")));
-                cards.add(createCard(balloon));
+                Card card = createCard(balloon);
+                cards.add(card);
+                balloonsMap.put(balloon, card);
             }
             return;
         }
