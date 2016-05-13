@@ -5,12 +5,12 @@ import java.io.Serializable;
 /**
  * Created by Reem Hamdy on 5/2/2016.
  */
-public class ServerResponse implements Serializable{
+public class LoginServerResponse implements Serializable{
     private String api_token;
     private boolean created;
     private String error;
 
-    ServerResponse(String apiToken, boolean created) {
+    LoginServerResponse(String apiToken, boolean created) {
         this.api_token = apiToken;
         this.created = created;
     }
@@ -29,7 +29,7 @@ public class ServerResponse implements Serializable{
 
     @Override
     public String toString() {
-        return "ServerResponse{" +
+        return "LoginServerResponse{" +
                 "created=" + created +
                 ", api_token='" + api_token + '\'' +
                 '}';

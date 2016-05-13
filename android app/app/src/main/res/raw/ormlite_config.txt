@@ -1,52 +1,45 @@
 #
-# generated on 2016/05/03 10:45:39
+# generated on 2016/05/13 02:14:35
 #
-# --table-start--
-dataClass=com.balloonmail.app.balloonmailapp.models.User
-tableName=user
-# --table-fields-start--
-# --field-start--
-fieldName=user_name
-# --field-end--
-# --field-start--
-fieldName=user_email
-unique=true
-# --field-end--
-# --field-start--
-fieldName=api_token
-# --field-end--
-# --field-start--
-fieldName=login_date
-# --field-end--
-# --table-fields-end--
-# --table-end--
-#################################
 # --table-start--
 dataClass=com.balloonmail.app.balloonmailapp.models.ReceivedBalloon
 tableName=receivedballoon
 # --table-fields-start--
 # --field-start--
-fieldName=balloonId
-generatedId=true
-unique=true
+fieldName=is_refilled
+# --field-end--
+# --field-start--
+fieldName=is_liked
+# --field-end--
+# --field-start--
+fieldName=is_creeped
+# --field-end--
+# --field-start--
+fieldName=balloon_id
 # --field-end--
 # --field-start--
 fieldName=text
 # --field-end--
 # --field-start--
-fieldName=noOfRefills
+fieldName=refills
 # --field-end--
 # --field-start--
-fieldName=noOfCreeps
-# --field-end--
-# --field-start--
-fieldName=distance
+fieldName=creeps
 # --field-end--
 # --field-start--
 fieldName=reach
 # --field-end--
 # --field-start--
-fieldName=sentDate
+fieldName=latSource
+# --field-end--
+# --field-start--
+fieldName=lngSource
+# --field-end--
+# --field-start--
+fieldName=sentiment
+# --field-end--
+# --field-start--
+fieldName=sent_at
 # --field-end--
 # --table-fields-end--
 # --table-end--
@@ -56,27 +49,31 @@ dataClass=com.balloonmail.app.balloonmailapp.models.SentBalloon
 tableName=sentballoon
 # --table-fields-start--
 # --field-start--
-fieldName=balloonId
-generatedId=true
-unique=true
+fieldName=balloon_id
 # --field-end--
 # --field-start--
 fieldName=text
 # --field-end--
 # --field-start--
-fieldName=noOfRefills
+fieldName=refills
 # --field-end--
 # --field-start--
-fieldName=noOfCreeps
-# --field-end--
-# --field-start--
-fieldName=distance
+fieldName=creeps
 # --field-end--
 # --field-start--
 fieldName=reach
 # --field-end--
 # --field-start--
-fieldName=sentDate
+fieldName=latSource
+# --field-end--
+# --field-start--
+fieldName=lngSource
+# --field-end--
+# --field-start--
+fieldName=sentiment
+# --field-end--
+# --field-start--
+fieldName=sent_at
 # --field-end--
 # --table-fields-end--
 # --table-end--
@@ -86,27 +83,40 @@ dataClass=com.balloonmail.app.balloonmailapp.models.LikedBalloon
 tableName=likedballoon
 # --table-fields-start--
 # --field-start--
-fieldName=balloonId
-generatedId=true
-unique=true
+fieldName=is_refilled
+# --field-end--
+# --field-start--
+fieldName=is_liked
+# --field-end--
+# --field-start--
+fieldName=is_creeped
+# --field-end--
+# --field-start--
+fieldName=balloon_id
 # --field-end--
 # --field-start--
 fieldName=text
 # --field-end--
 # --field-start--
-fieldName=noOfRefills
+fieldName=refills
 # --field-end--
 # --field-start--
-fieldName=noOfCreeps
-# --field-end--
-# --field-start--
-fieldName=distance
+fieldName=creeps
 # --field-end--
 # --field-start--
 fieldName=reach
 # --field-end--
 # --field-start--
-fieldName=sentDate
+fieldName=latSource
+# --field-end--
+# --field-start--
+fieldName=lngSource
+# --field-end--
+# --field-start--
+fieldName=sentiment
+# --field-end--
+# --field-start--
+fieldName=sent_at
 # --field-end--
 # --table-fields-end--
 # --table-end--

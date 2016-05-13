@@ -19,12 +19,10 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
     private static final String DATABASE_NAME = "balloonmail.db";
     private static final int DATABASE_VERSION = 1;
 
-    private Dao<User, String> userDao = null;
     private Dao<ReceivedBalloon, Integer> receivedBalloonDao = null;
     private Dao<SentBalloon, Integer> sentBalloonDao = null;
     private Dao<LikedBalloon, Integer> likedBalloonDao = null;
 
-    private RuntimeExceptionDao<User, String> userRuntimeExceptionDao = null;
     private RuntimeExceptionDao<ReceivedBalloon, Integer> receivedBalloonRuntimeExceptionDao = null;
     private RuntimeExceptionDao<SentBalloon, Integer> sentBalloonRuntimeExceptionDao = null;
     private RuntimeExceptionDao<LikedBalloon, Integer> likedBalloonRuntimeExceptionDao = null;
@@ -38,7 +36,6 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 
         // create tables
         try {
-            TableUtils.createTable(connectionSource, User.class);
             TableUtils.createTable(connectionSource, LikedBalloon.class);
             TableUtils.createTable(connectionSource, ReceivedBalloon.class);
             TableUtils.createTable(connectionSource, SentBalloon.class);
@@ -52,7 +49,6 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, ConnectionSource connectionSource, int i, int i1) {
         try {
             // drop tables
-            TableUtils.dropTable(connectionSource, User.class, true);
             TableUtils.dropTable(connectionSource, LikedBalloon.class, true);
             TableUtils.dropTable(connectionSource, ReceivedBalloon.class, true);
             TableUtils.dropTable(connectionSource, SentBalloon.class, true);
@@ -62,22 +58,6 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-    }
-
-    public Dao<User, String> getUserDao() throws SQLException {
-        if (userDao == null){
-            userDao = getDao(User.class);
-        }
-
-        return userDao;
-    }
-
-    public RuntimeExceptionDao<User, String> getUserRuntimeExceptionDao() throws SQLException {
-        if (userRuntimeExceptionDao == null){
-            userRuntimeExceptionDao = getDao(User.class);
-        }
-
-        return userRuntimeExceptionDao;
     }
 
     public Dao<ReceivedBalloon, Integer> getReceivedBalloonDao() throws SQLException {
@@ -104,10 +84,11 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 
     public RuntimeExceptionDao<SentBalloon, Integer> getSentBalloonRuntimeExceptionDao() throws SQLException{
         if (sentBalloonRuntimeExceptionDao == null){
-            sentBalloonRuntimeExceptionDao = getDao(SentBalloon.class);
+            sentBalloonRuntimeExceptionDao = (RuntimeExceptionDao<SentBalloon, Integer>)
+                    new RuntimeExceptionDao<>(getDao(SentBalloon.class));
         }
 
-        return (RuntimeExceptionDao) sentBalloonRuntimeExceptionDao;
+        return sentBalloonRuntimeExceptionDao;
     }
     public Dao<LikedBalloon, Integer> getLikedBalloonDao() throws SQLException{
         if (likedBalloonDao == null){

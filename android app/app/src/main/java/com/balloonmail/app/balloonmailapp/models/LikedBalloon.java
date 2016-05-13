@@ -2,9 +2,12 @@ package com.balloonmail.app.balloonmailapp.models;
 
 import com.j256.ormlite.field.DatabaseField;
 
+import com.j256.ormlite.table.DatabaseTable;
+
 /**
  * Created by Reem Hamdy on 4/26/2016.
  */
+@DatabaseTable(tableName="likedballoon")
 public class LikedBalloon extends Balloon {
 
 
