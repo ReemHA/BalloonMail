@@ -6,6 +6,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 
 import com.balloonmail.app.balloonmailapp.models.Balloon;
 import com.balloonmail.app.balloonmailapp.models.ReceivedBalloon;
@@ -50,6 +51,13 @@ public class ReceivedMailsFragment extends Fragment {
         //Set the empty view
         if (mRecyclerView != null) {
             mRecyclerView.setAdapter(mCardArrayAdapter);
+        }
+
+        ImageView image = (ImageView) rootView.findViewById(R.id.emptyStateImage);
+        if(cards.size() == 0){
+            image.setBackgroundResource(R.drawable.empty_state);
+        }else{
+            image.setBackgroundResource(0);
         }
 
         return rootView;
