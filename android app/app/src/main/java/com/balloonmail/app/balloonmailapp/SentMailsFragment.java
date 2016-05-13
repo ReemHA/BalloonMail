@@ -217,7 +217,7 @@ public class SentMailsFragment extends Fragment {
         mProgressDialog.setIndeterminate(true);
         mProgressDialog.setMessage("Getting your updated balloons..");
         mProgressDialog.show();
-        new fetchSentBalloonsFromServer().execute().get();
+        new fetchSentBalloonsFromServer().execute();
     }
 
     private class fetchSentBalloonsFromServer extends AsyncTask<Object, Void, Void> {
@@ -263,12 +263,12 @@ public class SentMailsFragment extends Fragment {
                 mProgressDialog.dismiss();
             JSONObject jsonObject = new JSONObject(stringBuilder.toString());
             JSONArray jsonArray = jsonObject.getJSONArray("balloons");
+            cards = new ArrayList<>();
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject object = jsonArray.getJSONObject(i);
                 SentBalloon balloon = new SentBalloon(object.getString("text"), object.getInt("balloon_id"),
                         object.getDouble("reach"), object.getInt("creeps"), object.getInt("refills"), object.getDouble("sentiment"),
                         dateFormat.parse(object.getString("sent_at")));
-                cards = new ArrayList<>();
                 cards.add(createCard(balloon));
             }
             return;
