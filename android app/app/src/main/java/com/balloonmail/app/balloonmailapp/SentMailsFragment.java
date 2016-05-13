@@ -90,8 +90,9 @@ public class SentMailsFragment extends Fragment {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        mCardArrayAdapter = new CardArrayRecyclerViewAdapter(getActivity(), cards);
 
-        if (false) {
+        if (isConnected) {
             try {
                 loadSentBalloons();
             } catch (ExecutionException e) {
@@ -102,12 +103,10 @@ public class SentMailsFragment extends Fragment {
         } else
             try {
                 cards = initCardsFromLocalDb();
+                mCardArrayAdapter.setCards(cards);
             } catch (SQLException e) {
                 e.printStackTrace();
             }
-
-
-        mCardArrayAdapter = new CardArrayRecyclerViewAdapter(getActivity(), cards);
 
         //Staggered grid view
         CardRecyclerView mRecyclerView = (CardRecyclerView) rootView.findViewById(R.id.cvCardRecyclerView);
@@ -122,7 +121,6 @@ public class SentMailsFragment extends Fragment {
         }
 
         sentBalloonList.addAll(hashMapForUpdates.keySet());
-        mListener.getSentBalloons(sentBalloonList);
         return rootView;
     }
 
@@ -218,7 +216,7 @@ public class SentMailsFragment extends Fragment {
         mProgressDialog = new ProgressDialog(getContext());
         mProgressDialog.setIndeterminate(true);
         mProgressDialog.setMessage("Getting your updated balloons..");
-       // mProgressDialog.show();
+        mProgressDialog.show();
         new fetchSentBalloonsFromServer().execute().get();
     }
 
@@ -234,8 +232,9 @@ public class SentMailsFragment extends Fragment {
                 url = new URL(Global.SERVER_URL + "/balloons/sent");
                 connection = (HttpURLConnection) url.openConnection();
                 connection.setRequestMethod("GET");
-                //connection.setReadTimeout(READ_TIMEOUT);
-                //connection.setConnectTimeout(CONNECTION_TIMEOUT);
+                connection.setRequestProperty("authorization", "Bearer "+sharedPreferences.getString(Global.PREF_USER_API_TOKEN, ""));
+                connection.setRequestProperty("Content-Type", "application/json");
+                connection.setRequestProperty("charset", "utf-8");
                 connection.connect();
                 getResponse();
 
@@ -269,10 +268,17 @@ public class SentMailsFragment extends Fragment {
                 SentBalloon balloon = new SentBalloon(object.getString("text"), object.getInt("balloon_id"),
                         object.getDouble("reach"), object.getInt("creeps"), object.getInt("refills"), object.getDouble("sentiment"),
                         dateFormat.parse(object.getString("sent_at")));
-                mCardArrayAdapter.add(createCard(balloon));
+                cards = new ArrayList<>();
+                cards.add(createCard(balloon));
             }
+            return;
+        }
 
-
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            mCardArrayAdapter.setCards(cards);
+            mCardArrayAdapter.notifyDataSetChanged();
         }
     }
 
