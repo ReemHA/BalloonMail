@@ -66,6 +66,7 @@ public class CardReceived extends Card {
             holder.refillBtn = (ImageButton) view.findViewById(R.id.refillActionBtn_received);
             holder.likeBtn = (ImageButton) view.findViewById(R.id.likeActionBtn_received);
             holder.creepBtn = (ImageButton) view.findViewById(R.id.creepActionBtn_received);
+            holder.sentimentIndication = view.findViewById(R.id.sentiment_indication);
 
             holder.likeBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -90,6 +91,8 @@ public class CardReceived extends Card {
                     changeStateOfCreepBtn();
                 }
             });
+
+            changeColorOfSentimentIndication(balloon.getSentiment());
         }
     }
 
@@ -129,6 +132,16 @@ public class CardReceived extends Card {
 
     }
 
+    private void changeColorOfSentimentIndication(double sentiment){
+        if(sentiment < 0){
+            holder.sentimentIndication.setBackgroundResource(R.color.red);
+        }else if(sentiment > 0){
+            holder.sentimentIndication.setBackgroundResource(R.color.green);
+        }else{
+            holder.sentimentIndication.setBackgroundResource(R.color.colorPrimary);
+        }
+    }
+
     private void setMapLocation(GoogleMap map) {
 
         LatLng sourceBalloon = balloon.getSourceBalloon();
@@ -157,6 +170,7 @@ public class CardReceived extends Card {
 
         GoogleMap map;
         ImageButton refillBtn; ImageButton likeBtn; ImageButton creepBtn;
+        View sentimentIndication;
 
         @Override
         public void onMapReady(GoogleMap googleMap) {

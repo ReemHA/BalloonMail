@@ -31,9 +31,10 @@ public class CustomSentExpandCard extends CardExpand{
 
     Balloon balloon;
 
-    private GoogleMap mMap;
     private Context context;
     private Bundle savedInstanceState;
+
+    SentExpandCardViewHolder holder;
 
     //Use your resource ID for your inner layout
     public CustomSentExpandCard(Context context) {
@@ -45,18 +46,16 @@ public class CustomSentExpandCard extends CardExpand{
         this.balloon = balloon;
         this.context = context;
         this.savedInstanceState = savedInstanceState;
-
     }
 
     @Override
     public void setupInnerViewElements(ViewGroup parent, View view){
         View row = view;
-        SentExpandCardViewHolder holder;
 
         if (row == null){ return; }
 
         holder = new SentExpandCardViewHolder();
-        //holder.title = (TextView) view.findViewById(R.id.e_textView);
+
         holder.mapView = (MapView) view.findViewById(R.id.row_map);
 
         holder.initializeMapView();
@@ -64,6 +63,20 @@ public class CustomSentExpandCard extends CardExpand{
         if (holder.map != null) {
             // The map is already ready to be used
             setMapLocation(holder.map);
+        }
+
+        holder.sentimentIndication = view.findViewById(R.id.sentiment_indication);
+
+        changeColorOfSentimentIndication(balloon.getSentiment());
+    }
+
+    private void changeColorOfSentimentIndication(double sentiment){
+        if(sentiment < 0){
+            holder.sentimentIndication.setBackgroundResource(R.color.red);
+        }else if(sentiment > 0){
+            holder.sentimentIndication.setBackgroundResource(R.color.green);
+        }else{
+            holder.sentimentIndication.setBackgroundResource(R.color.colorPrimary);
         }
     }
 
@@ -123,6 +136,7 @@ public class CustomSentExpandCard extends CardExpand{
         MapView mapView;
 
         GoogleMap map;
+        View sentimentIndication;
 
         @Override
         public void onMapReady(GoogleMap googleMap) {

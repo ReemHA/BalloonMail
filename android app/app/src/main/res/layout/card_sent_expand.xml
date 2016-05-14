@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:map="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
+    android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/map_layout">
@@ -11,7 +11,11 @@
             android:id="@+id/map"
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>-->
-
+        <View
+            android:layout_width="10dp"
+            android:layout_height="match_parent"
+            android:id="@+id/sentiment_indication">
+        </View>
         <com.google.android.gms.maps.MapView
             android:id="@+id/row_map"
             android:layout_width="wrap_content"
