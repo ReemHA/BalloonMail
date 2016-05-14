@@ -58,8 +58,8 @@ public class MailDetailsAndMapActivityFragment extends Fragment implements OnMap
             TextView refill = (TextView)rootView.findViewById(R.id.refillTv_details);
             refill.setText(String.valueOf(balloon.getRefills()) + " refills");
 
-            TextView reach = (TextView)rootView.findViewById(R.id.reachTv_details);
-            reach.setText(String.valueOf(balloon.getReach()) + " reach");
+            //TextView reach = (TextView)rootView.findViewById(R.id.reachTv_details);
+            //reach.setText(String.valueOf(balloon.getReach()) + " reach");
 
             TextView creep = (TextView)rootView.findViewById(R.id.creepTv_details);
             creep.setText(String.valueOf(balloon.getCreeps()) + " creeps");

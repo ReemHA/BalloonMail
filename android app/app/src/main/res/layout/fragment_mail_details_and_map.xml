@@ -53,7 +53,7 @@
                     tools:text=" refills"/>
             </RelativeLayout>
 
-            <RelativeLayout
+            <!-- <RelativeLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/reachRelativeLayout_details"
@@ -74,7 +74,7 @@
                     android:layout_marginLeft="@dimen/actions_padding_left"
                     android:layout_toRightOf="@id/reachImageButton_details"
                     tools:text=" reach"/>
-            </RelativeLayout>
+            </RelativeLayout> -->
 
             <RelativeLayout
                 android:layout_width="wrap_content"

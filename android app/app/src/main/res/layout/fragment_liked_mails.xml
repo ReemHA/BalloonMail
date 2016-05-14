@@ -1,8 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<it.gmariotti.cardslib.library.recyclerview.view.CardRecyclerView
-    xmlns:card="http://schemas.android.com/apk/res-auto"
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    card:list_card_layout_resourceID="@layout/native_recyclerview_card_layout"
-    android:id="@+id/cvLikesCardRecyclerView" />
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:card="http://schemas.android.com/tools"
+android:orientation="horizontal"
+android:layout_width="match_parent"
+android:layout_height="match_parent"
+style="@style/card.shadow_image">
+
+<ImageView
+    android:layout_width="571px"
+    android:layout_height="396px"
+    android:layout_centerHorizontal="true"
+    android:layout_centerVertical="true"
+    android:id="@+id/emptyStateImage"
+    />
+    <it.gmariotti.cardslib.library.recyclerview.view.CardRecyclerView
+        xmlns:card="http://schemas.android.com/apk/res-auto"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        card:list_card_layout_resourceID="@layout/native_recyclerview_card_layout"
+        android:id="@+id/cvLikesCardRecyclerView" />
+
+</RelativeLayout>
