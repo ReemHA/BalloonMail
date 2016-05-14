@@ -83,10 +83,15 @@ public class CardReceived extends Card {
             holder.creepBtn = (ImageButton) view.findViewById(R.id.creepActionBtn_received);
             holder.sentimentIndication = view.findViewById(R.id.sentiment_indication);
 
+            changeStateOfLikeBtn();
+            changeStateOfRefillBtn();
+            changeStateOfCreepBtn();
+
             holder.likeBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     requestLikeToServer(balloon);
+                    changeStateOfLikeBtn();
                 }
             });
 

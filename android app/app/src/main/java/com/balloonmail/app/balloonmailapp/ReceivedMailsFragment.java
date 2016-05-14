@@ -56,6 +56,8 @@ public class ReceivedMailsFragment extends Fragment {
     Bundle savedInstanceState;
     CardArrayRecyclerViewAdapter mCardArrayAdapter;
 
+    ImageView emptyStateImage;
+
     public ReceivedMailsFragment() {
         // Required empty public constructor
     }
@@ -108,12 +110,7 @@ public class ReceivedMailsFragment extends Fragment {
             mRecyclerView.setAdapter(mCardArrayAdapter);
         }
 
-        ImageView image = (ImageView) rootView.findViewById(R.id.emptyStateImage);
-        if(cards.size() == 0){
-            image.setBackgroundResource(R.drawable.empty_state);
-        }else{
-            image.setBackgroundResource(0);
-        }
+        emptyStateImage = (ImageView) rootView.findViewById(R.id.emptyStateImage);
 
         return rootView;
     }
@@ -229,6 +226,12 @@ public class ReceivedMailsFragment extends Fragment {
                 Card card = createCard(balloon);
                 cards.add(card);
                 balloonsMap.put(balloon, card);
+            }
+            //empty state
+            if(jsonArray.length() == 0){
+                emptyStateImage.setBackgroundResource(R.drawable.empty_state);
+            }else{
+                emptyStateImage.setBackgroundResource(0);
             }
             return;
         }
