@@ -3,7 +3,6 @@ package com.balloonmail.app.balloonmailapp;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
@@ -290,7 +289,6 @@ public class CardReceived extends Card {
 
             // convert StringBuilder object to string and store it in a variable
             String JSONResponse = sb.toString();
-            Log.d(CardLikes.class.getSimpleName(), JSONResponse);
 
             // convert response to JSONObject
             JSONObject response = new JSONObject(JSONResponse);
@@ -301,7 +299,6 @@ public class CardReceived extends Card {
                 return isLiked;
             } else {
                 ((ReceivedBalloon) balloon).setIs_liked(0);
-                Log.d("Response from Server: ", response.getString("error"));
                 return 0;
             }
         }
@@ -397,7 +394,6 @@ public class CardReceived extends Card {
 
             // convert StringBuilder object to string and store it in a variable
             String JSONResponse = sb.toString();
-            Log.d(CardLikes.class.getSimpleName(), JSONResponse);
 
             // convert response to JSONObject
             JSONObject response = new JSONObject(JSONResponse);
@@ -414,7 +410,6 @@ public class CardReceived extends Card {
                 }
             } else {
                 ((ReceivedBalloon) balloon).setIs_refilled(0);
-                Log.d("Response from Server: ", response.getString("error"));
             }
 
 
@@ -497,7 +492,6 @@ public class CardReceived extends Card {
 
             // convert StringBuilder object to string and store it in a variable
             String JSONResponse = sb.toString();
-            Log.d(CardLikes.class.getSimpleName(), JSONResponse);
 
             // convert response to JSONObject
             JSONObject response = new JSONObject(JSONResponse);
@@ -514,7 +508,6 @@ public class CardReceived extends Card {
                 }
             } else {
                 ((ReceivedBalloon) balloon).setIs_creeped(0);
-                Log.d("Response from Server: ", response.getString("error"));
             }
 
 

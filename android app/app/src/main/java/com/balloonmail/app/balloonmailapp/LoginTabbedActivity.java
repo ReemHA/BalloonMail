@@ -71,7 +71,6 @@ public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiC
         databaseUtilities = new DatabaseUtilities();
 
         // get api_token from the shared preference
-        // Log.d(LoginTabbedActivity.class.getSimpleName(), Global.USER_API_TOKEN);
         if (!isSignedOut() && api_token != "") {
             Intent intent = new Intent(LoginTabbedActivity.this, HomeActivity.class);
             startActivity(intent);
@@ -118,7 +117,6 @@ public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiC
     protected void onStart() {
         super.onStart();
         googleApiClient.connect();
-        Log.d(Global.LOG_TAG, "onStart");
         if (isSignedOut()) {
             logOutFromGoogleAccount();
         }
@@ -178,27 +176,22 @@ public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiC
             // get the idToken of the user
             GoogleSignInAccount account = result.getSignInAccount();
             String idToken = account.getIdToken();
-            Log.d(LoginTabbedActivity.class.getSimpleName(), "id: " + idToken);
 
 
             // get the user name
             String userName = account.getDisplayName();
             Global.USER_NAME = userName;
-            Log.d(LoginTabbedActivity.class.getSimpleName(), "name: " + Global.USER_NAME);
             sharedPreferences.edit().putString(Global.PREF_USER_NAME, userName).commit();
 
             // get the user email
             String userEmail = account.getEmail();
             Global.USER_EMAIL = userEmail;
-            Log.d(LoginTabbedActivity.class.getSimpleName(), "email: " + Global.USER_EMAIL);
             sharedPreferences.edit().putString(Global.PREF_USER_EMAIL, userEmail).commit();
 
-            Log.d(SIGN_IN_ERROR_TAG, "GoogleSignInResult succeeded");
 
             // send the idToken and username to the app server
             sendDataToServer(idToken, userName, userEmail);
         } else {
-            Log.d(SIGN_IN_ERROR_TAG, "GoogleSignInResult failed");
         }
     }
 
@@ -313,7 +306,6 @@ public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiC
                 startActivity(intent);
                 finish();
             } else {
-                Log.d("Response from Server: ", response.getString("error"));
                 // Toast.makeText(getApplicationContext(), "Error signing in", Toast.LENGTH_LONG).show();
             }
 
@@ -336,15 +328,12 @@ public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiC
         } else {
             isSignedOut = false;
         }
-        Log.d(Global.LOG_TAG, "isSignedOut:" + isSignedOut);
-
         return isSignedOut;
     }
 
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
-        Log.d(Global.LOG_TAG, "onConnected:" + isSignedOut());
         if (isSignedOut() && i < 1) {
             logOutFromGoogleAccount();
             i++;
@@ -354,7 +343,6 @@ public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiC
     private void logOutFromGoogleAccount() {
         if (googleApiClient.isConnected()) {
             googleApiClient.clearDefaultAccountAndReconnect();
-            Log.d(Global.LOG_TAG, "logOutFromGoogleAccount: account cleared");
             googleApiClient.connect();
             signOut();
         }
@@ -374,16 +362,12 @@ public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiC
                 SharedPreferences sharedPref = LoginTabbedActivity.this.getSharedPreferences(Global.USER_INFO_PREF_FILE,
                         Context.MODE_PRIVATE);
 
-                if (sharedPref.edit().clear().commit()) {
-                    Log.d(LoginTabbedActivity.class.getSimpleName(), "User info is removed from shared pref.");
-                }
 
                 // delete associated local database
                 DatabaseUtilities databaseUtilities = new DatabaseUtilities();
                 databaseUtilities.resetDatabase(LoginTabbedActivity.this);
 
 
-                Log.d(Global.LOG_TAG, "signOut status:" + status.isSuccess());
             }
         });
     }
@@ -403,7 +387,6 @@ public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiC
             Log.d("location", "Latitude:" + mLastLocation.getLatitude() + ", Longitude:" + mLastLocation.getLongitude());
             if (sharedPreferences.edit().putFloat(Global.PREF_USER_LAT, (float) mLastLocation.getLatitude()).commit() &&
                     sharedPreferences.edit().putFloat(Global.PREF_USER_LNG, (float) mLastLocation.getLongitude()).commit()) {
-                Log.d(LoginTabbedActivity.class.getSimpleName(), "LAT/LON is added");
             }
         }
     }

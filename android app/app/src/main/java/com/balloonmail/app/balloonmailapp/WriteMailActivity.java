@@ -200,7 +200,6 @@ public class WriteMailActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
                 Global.balloonHolder.setBalloon(balloon);
-                Log.d(WriteMailActivity.class.getSimpleName(), Global.balloonHolder.getBalloon().toString());
 
                 if (mProgressDialog.isShowing())
                     mProgressDialog.dismiss();
@@ -209,7 +208,6 @@ public class WriteMailActivity extends AppCompatActivity {
                 startActivity(intent);
                 finish();
             } else {
-                Log.d("Response from Server: ", response.getString("error"));
             }
 
             return;

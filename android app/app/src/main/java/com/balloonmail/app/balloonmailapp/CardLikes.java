@@ -3,7 +3,6 @@ package com.balloonmail.app.balloonmailapp;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
@@ -300,7 +299,6 @@ public class CardLikes extends Card {
 
             // convert StringBuilder object to string and store it in a variable
             String JSONResponse = sb.toString();
-            Log.d(CardLikes.class.getSimpleName(), JSONResponse);
 
             // convert response to JSONObject
             JSONObject response = new JSONObject(JSONResponse);
@@ -310,7 +308,6 @@ public class CardLikes extends Card {
                 ((LikedBalloon) balloon).setIs_liked(1);
             } else {
                 ((LikedBalloon) balloon).setIs_liked(0);
-                Log.d("Response from Server: ", response.getString("error"));
             }
         }
     }
