@@ -1,13 +1,18 @@
 package com.balloonmail.app.balloonmailapp;
 
+import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -24,6 +29,9 @@ import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -36,7 +44,8 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks {
+public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener,
+        GoogleApiClient.ConnectionCallbacks, LocationListener {
 
     private static final int RC_SIGN_IN = 9001;
     private static final String SIGN_IN_ERROR_TAG = "handle sign in";
@@ -46,21 +55,23 @@ public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiC
     DatabaseUtilities databaseUtilities;
     SharedPreferences sharedPreferences;
     private ProgressDialog mProgressDialog;
+    public final int MY_PERMISSIONS_REQUEST_FINE_LOCATION = 0;
+    private Location mLastLocation;
+    private LocationRequest request;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login_tabbed);
-        sharedPreferences = LoginTabbedActivity.this.getSharedPreferences(Global.USER_INFO_PREF_FILE, MODE_PRIVATE);
 
+        // get api_token from the shared preference
+        sharedPreferences = this.getSharedPreferences(Global.USER_INFO_PREF_FILE, MODE_PRIVATE);
+        String api_token = sharedPreferences.getString(Global.PREF_USER_API_TOKEN, "");
 
         databaseUtilities = new DatabaseUtilities();
 
         // get api_token from the shared preference
-        SharedPreferences sharedPreferences = this.getSharedPreferences(Global.USER_INFO_PREF_FILE, Context.MODE_PRIVATE);
-        String api_token = sharedPreferences.getString(Global.PREF_USER_API_TOKEN, "");
-        Log.d(LoginTabbedActivity.class.getSimpleName(), api_token);
-
+        // Log.d(LoginTabbedActivity.class.getSimpleName(), Global.USER_API_TOKEN);
         if (!isSignedOut() && api_token != "") {
             Intent intent = new Intent(LoginTabbedActivity.this, HomeActivity.class);
             startActivity(intent);
@@ -161,6 +172,7 @@ public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiC
 
     // handle the data returned from onActivityResult
     private void handleSignIntent(GoogleSignInResult result) throws JSONException {
+
         if (result.isSuccess()) {
 
             // get the idToken of the user
@@ -168,12 +180,17 @@ public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiC
             String idToken = account.getIdToken();
             Log.d(LoginTabbedActivity.class.getSimpleName(), "id: " + idToken);
 
+
             // get the user name
             String userName = account.getDisplayName();
+            Global.USER_NAME = userName;
+            Log.d(LoginTabbedActivity.class.getSimpleName(), "name: " + Global.USER_NAME);
             sharedPreferences.edit().putString(Global.PREF_USER_NAME, userName).commit();
 
             // get the user email
             String userEmail = account.getEmail();
+            Global.USER_EMAIL = userEmail;
+            Log.d(LoginTabbedActivity.class.getSimpleName(), "email: " + Global.USER_EMAIL);
             sharedPreferences.edit().putString(Global.PREF_USER_EMAIL, userEmail).commit();
 
             Log.d(SIGN_IN_ERROR_TAG, "GoogleSignInResult succeeded");
@@ -223,6 +240,9 @@ public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiC
                 JSONObject jsonBody = new JSONObject();
                 jsonBody.put("user_name", strings[0]);
                 jsonBody.put("access_token", strings[1]);
+                jsonBody.put("lat", 0);
+                jsonBody.put("lng", 0);
+                jsonBody.put("gcm_id", 1);
 
                 // connect to server
                 connection.connect();
@@ -277,10 +297,13 @@ public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiC
 
                 String api_token = response.getString("api_token");
                 boolean created = response.getBoolean("created");
-
                 // add api_token to SharedPreferences
                 SharedPreferences sharedPreferences = LoginTabbedActivity.this.getSharedPreferences(Global.USER_INFO_PREF_FILE, MODE_PRIVATE);
                 sharedPreferences.edit().putString(Global.PREF_USER_API_TOKEN, api_token).commit();
+
+
+                Global.USER_API_TOKEN = api_token;
+                Global.USER_IS_CREATED = created;
 
                 if (mProgressDialog.isShowing()) {
                     mProgressDialog.dismiss();
@@ -291,7 +314,7 @@ public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiC
                 finish();
             } else {
                 Log.d("Response from Server: ", response.getString("error"));
-                Toast.makeText(getApplicationContext(), "Error signing in", Toast.LENGTH_LONG).show();
+                // Toast.makeText(getApplicationContext(), "Error signing in", Toast.LENGTH_LONG).show();
             }
 
             return;
@@ -342,17 +365,23 @@ public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiC
             @Override
             public void onResult(@NonNull Status status) {
 
-                //delete user info from the shared preferences
+                //delete user info from Global
+                Global.USER_API_TOKEN = null;
+                Global.USER_EMAIL = null;
+                Global.USER_NAME = null;
+                Global.USER_IS_CREATED = false;
+
                 SharedPreferences sharedPref = LoginTabbedActivity.this.getSharedPreferences(Global.USER_INFO_PREF_FILE,
                         Context.MODE_PRIVATE);
+
+                if (sharedPref.edit().clear().commit()) {
+                    Log.d(LoginTabbedActivity.class.getSimpleName(), "User info is removed from shared pref.");
+                }
 
                 // delete associated local database
                 DatabaseUtilities databaseUtilities = new DatabaseUtilities();
                 databaseUtilities.resetDatabase(LoginTabbedActivity.this);
 
-                if (sharedPref.edit().clear().commit()) {
-                    Log.d(LoginTabbedActivity.class.getSimpleName(), "User info is removed from shared pref.");
-                }
 
                 Log.d(Global.LOG_TAG, "signOut status:" + status.isSuccess());
             }
@@ -364,4 +393,53 @@ public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiC
         googleApiClient.connect();
 
     }
+
+
+    //This method is invoked after requestLocationUpdates
+    @Override
+    public void onLocationChanged(Location location) {
+        mLastLocation = location;
+        if (mLastLocation != null) {
+            Log.d("location", "Latitude:" + mLastLocation.getLatitude() + ", Longitude:" + mLastLocation.getLongitude());
+            if (sharedPreferences.edit().putFloat(Global.PREF_USER_LAT, (float) mLastLocation.getLatitude()).commit() &&
+                    sharedPreferences.edit().putFloat(Global.PREF_USER_LNG, (float) mLastLocation.getLongitude()).commit()) {
+                Log.d(LoginTabbedActivity.class.getSimpleName(), "LAT/LON is added");
+            }
+        }
+    }
+
+    //Create Location requests to periodically request a location update
+    protected void createLocationRequest() {
+        request = new LocationRequest();
+        request.setInterval(20000);
+        request.setFastestInterval(5000);
+        request.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+    }
+
+    protected void startLocationUpdates() {
+
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    MY_PERMISSIONS_REQUEST_FINE_LOCATION);
+        } else {
+            LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, request, this);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+            case MY_PERMISSIONS_REQUEST_FINE_LOCATION: {
+                //The application granted the permission
+                startLocationUpdates();
+            }
+
+        }
+    }
+
 }

@@ -1,9 +1,7 @@
 package com.balloonmail.app.balloonmailapp;
 
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -60,7 +58,6 @@ public class SentMailsFragment extends Fragment {
     View rootView;
     Bundle savedInstanceState;
     CardArrayRecyclerViewAdapter mCardArrayAdapter;
-    SharedPreferences sharedPreferences;
 
     public SentMailsFragment() {
         // Required empty public constructor
@@ -73,7 +70,6 @@ public class SentMailsFragment extends Fragment {
         dbHelper = OpenHelperManager.getHelper(getContext(), DatabaseHelper.class);
         this.savedInstanceState = savedInstanceState;
         dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss", Locale.ENGLISH);
-        sharedPreferences = getContext().getSharedPreferences(Global.USER_INFO_PREF_FILE, Context.MODE_PRIVATE);
         balloonsMap = new HashMap<>();
         cards = new ArrayList<>();
         sentBalloonList = new ArrayList<>();
@@ -96,14 +92,14 @@ public class SentMailsFragment extends Fragment {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-        } else
+        } else {
             try {
                 cards = initCardsFromLocalDb();
                 mCardArrayAdapter.setCards(cards);
             } catch (SQLException e) {
                 e.printStackTrace();
             }
-
+        }
 
         //Staggered grid view
         CardRecyclerView mRecyclerView = (CardRecyclerView) rootView.findViewById(R.id.cvCardRecyclerView);
@@ -236,7 +232,7 @@ public class SentMailsFragment extends Fragment {
                 url = new URL(Global.SERVER_URL + "/balloons/sent");
                 connection = (HttpURLConnection) url.openConnection();
                 connection.setRequestMethod("GET");
-                connection.setRequestProperty("authorization", "Bearer "+sharedPreferences.getString(Global.PREF_USER_API_TOKEN, ""));
+                connection.setRequestProperty("authorization", "Bearer "+Global.USER_API_TOKEN);
                 connection.setRequestProperty("Content-Type", "application/json");
                 connection.setRequestProperty("charset", "utf-8");
                 connection.connect();

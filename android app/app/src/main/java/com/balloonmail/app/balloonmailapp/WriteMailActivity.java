@@ -106,7 +106,7 @@ public class WriteMailActivity extends AppCompatActivity {
         SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences(Global.USER_INFO_PREF_FILE,
                 getApplicationContext().MODE_PRIVATE);
 
-        String api_token = sharedPreferences.getString(Global.PREF_USER_API_TOKEN, "");
+        String api_token = Global.USER_API_TOKEN;
 
 
         @Override
@@ -137,6 +137,7 @@ public class WriteMailActivity extends AppCompatActivity {
                 // put user name and id token in a JSONObject
                 JSONObject jsonBody = new JSONObject();
                 jsonBody.put("text", strings[0]);
+
 
                 // connect to server
                 connection.connect();
