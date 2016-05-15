@@ -30,7 +30,6 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.LocationListener;
-import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
 import org.json.JSONException;
@@ -57,7 +56,6 @@ public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiC
     private ProgressDialog mProgressDialog;
     public final int MY_PERMISSIONS_REQUEST_FINE_LOCATION = 0;
     private Location mLastLocation;
-    private LocationRequest request;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,17 +69,6 @@ public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiC
 
         databaseUtilities = new DatabaseUtilities();
 
-        // get api_token from the shared preference
-        if (!isSignedOut() && api_token != "") {
-            Intent intent = new Intent(LoginTabbedActivity.this, HomeActivity.class);
-            startActivity(intent);
-            LoginTabbedActivity.this.finish();
-        }
-
-        // create a new blank database for the new signed in user
-        if (isSignedOut()) {
-            databaseUtilities.createDatabase(LoginTabbedActivity.this);
-        }
         // Configure sign in to request the user's id token
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(Global.SERVER_CLIENT_ID)
@@ -94,7 +81,23 @@ public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiC
                 .enableAutoManage(this, this)
                 .addConnectionCallbacks(this)
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
+                .addApi(LocationServices.API)
                 .build();
+
+        // get api_token from the shared preference
+        if (!isSignedOut() && api_token != "") {
+            getLocation();
+            Intent intent = new Intent(LoginTabbedActivity.this, HomeActivity.class);
+            startActivity(intent);
+            LoginTabbedActivity.this.finish();
+        }
+
+        // create a new blank database for the new signed in user
+        if (isSignedOut()) {
+            databaseUtilities.createDatabase(LoginTabbedActivity.this);
+        }
+
+        getLocation();
 
         SignInButton google_sign_in = (SignInButton) findViewById(R.id.login_google_button);
         google_sign_in.setSize(SignInButton.SIZE_WIDE);
@@ -187,20 +190,23 @@ public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiC
             String userEmail = account.getEmail();
             sharedPreferences.edit().putString(Global.PREF_USER_EMAIL, userEmail).commit();
 
+            String lat = String.valueOf(mLastLocation.getLatitude());
+
+            String lng = String.valueOf(mLastLocation.getLongitude());
 
             // send the idToken and username to the app server
-            sendDataToServer(idToken, userName, userEmail);
+            sendDataToServer(idToken, userName, userEmail, lat, lng);
         } else {
         }
     }
 
 
-    private void sendDataToServer(String idToken, final String userName, final String userEmail) {
+    private void sendDataToServer(String idToken, final String userName, final String userEmail, String lat, String lng) {
         mProgressDialog = new ProgressDialog(LoginTabbedActivity.this);
         mProgressDialog.setIndeterminate(true);
         mProgressDialog.setMessage("Logging...");
         mProgressDialog.show();
-        new loginInfoToServer().execute(userName, idToken);
+        new loginInfoToServer().execute(userName, idToken, lat, lng);
     }
 
     private class loginInfoToServer extends AsyncTask<String, Void, Void> {
@@ -232,8 +238,8 @@ public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiC
                 JSONObject jsonBody = new JSONObject();
                 jsonBody.put("user_name", strings[0]);
                 jsonBody.put("access_token", strings[1]);
-                jsonBody.put("lat", 0);
-                jsonBody.put("lng", 0);
+                jsonBody.put("lat", Double.parseDouble(strings[2]));
+                jsonBody.put("lng", Double.parseDouble(strings[3]));
                 jsonBody.put("gcm_id", 1);
 
                 // connect to server
@@ -330,6 +336,7 @@ public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiC
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
+        getLocation();
         if (isSignedOut() && i < 1) {
             logOutFromGoogleAccount();
             i++;
@@ -383,16 +390,7 @@ public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiC
         }
     }
 
-    //Create Location requests to periodically request a location update
-    protected void createLocationRequest() {
-        request = new LocationRequest();
-        request.setInterval(20000);
-        request.setFastestInterval(5000);
-        request.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-    }
-
-    protected void startLocationUpdates() {
-
+    protected void getLocation(){
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -401,7 +399,8 @@ public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiC
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                     MY_PERMISSIONS_REQUEST_FINE_LOCATION);
         } else {
-            LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, request, this);
+            mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
+                    googleApiClient);
         }
     }
 
@@ -411,7 +410,7 @@ public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiC
         switch (requestCode) {
             case MY_PERMISSIONS_REQUEST_FINE_LOCATION: {
                 //The application granted the permission
-                startLocationUpdates();
+                getLocation();
             }
 
         }
