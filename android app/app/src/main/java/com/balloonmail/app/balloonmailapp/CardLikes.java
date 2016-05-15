@@ -1,6 +1,7 @@
 package com.balloonmail.app.balloonmailapp;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
@@ -43,6 +44,8 @@ public class CardLikes extends Card {
     Balloon balloon;
     private Context context;
     private Bundle savedInstanceState;
+    private SharedPreferences sharedPreferences;
+    private static String api_token;
     LikedCardViewHolder holder;
     boolean isLiked;
     boolean isCreeped;
@@ -53,6 +56,7 @@ public class CardLikes extends Card {
         this.balloon = balloon;
         this.context = context;
         this.savedInstanceState = savedInstanceState;
+        sharedPreferences = context.getSharedPreferences(Global.USER_INFO_PREF_FILE, Context.MODE_PRIVATE);
 
     }
 
@@ -83,6 +87,8 @@ public class CardLikes extends Card {
                 // The map is already ready to be used
                 setMapLocation(holder.map);
             }
+
+            api_token = sharedPreferences.getString(Global.PREF_USER_API_TOKEN, "");
 
             holder.refillBtn = (ImageButton) view.findViewById(R.id.refillActionBtn_liked);
             holder.likeBtn = (ImageButton) view.findViewById(R.id.likeActionBtn_liked);
@@ -226,7 +232,6 @@ public class CardLikes extends Card {
     private static class CreateALikeRequest extends AsyncTask<Balloon, Void, Void> {
         URL url;
         HttpURLConnection connection;
-
         @Override
         protected Void doInBackground(Balloon... params) {
             try {
@@ -247,7 +252,7 @@ public class CardLikes extends Card {
                 // set charset property to utf-8
                 connection.setRequestProperty("charset", "utf-8");
 
-                connection.setRequestProperty("authorization", "Bearer " + Global.USER_API_TOKEN);
+                connection.setRequestProperty("authorization", "Bearer " + api_token);
 
                 // set accept property
                 connection.setRequestProperty("Accept", "application/json");

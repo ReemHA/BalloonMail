@@ -2,6 +2,7 @@ package com.balloonmail.app.balloonmailapp;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,9 +36,14 @@ import it.gmariotti.cardslib.library.internal.ViewToClickToExpand;
 public class CardSent extends Card {
     Balloon balloon;
     private ProgressDialog mProgressDialog;
+    private SharedPreferences sharedPreferences;
+    private static String api_token;
+
     public CardSent(Balloon balloon, Context context) {
         super(context, R.layout.card_sent_item);
         this.balloon = balloon;
+        sharedPreferences = context.getSharedPreferences(Global.USER_INFO_PREF_FILE, Context.MODE_PRIVATE);
+
     }
 
     @Override
@@ -61,6 +67,8 @@ public class CardSent extends Card {
 
             //TextView reach = (TextView)view.findViewById(R.id.reachTv);
             //reach.setText(String.valueOf(balloon.getReach()) + " reach");
+
+            api_token = sharedPreferences.getString(Global.PREF_USER_API_TOKEN, "");
 
             TextView creep = (TextView) view.findViewById(R.id.creepTv);
             creep.setText(String.valueOf(balloon.getCreeps()) + " creeps");
@@ -95,7 +103,7 @@ public class CardSent extends Card {
                 url = new URL(Global.SERVER_URL + "/balloons/received");
                 connection = (HttpURLConnection) url.openConnection();
                 connection.setRequestMethod("GET");
-                connection.setRequestProperty("authorization", "Bearer " + Global.USER_API_TOKEN);
+                connection.setRequestProperty("authorization", "Bearer " + api_token);
                 connection.setRequestProperty("Content-Type", "application/json");
                 connection.setRequestProperty("charset", "utf-8");
                 try {

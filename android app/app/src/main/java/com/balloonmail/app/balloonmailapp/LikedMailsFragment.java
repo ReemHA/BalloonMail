@@ -2,6 +2,8 @@ package com.balloonmail.app.balloonmailapp;
 
 
 import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -55,7 +57,8 @@ public class LikedMailsFragment extends Fragment {
     Bundle savedInstanceState;
     private ProgressDialog mProgressDialog;
     CardArrayRecyclerViewAdapter mCardArrayAdapter;
-
+    private SharedPreferences sharedPreferences;
+    private static String api_token;
     ImageView emptyStateImage;
 
     public LikedMailsFragment() {
@@ -74,7 +77,8 @@ public class LikedMailsFragment extends Fragment {
         balloonsMap = new HashMap<>();
         cards = new ArrayList<>();
         likedBalloonList = new ArrayList<>();
-
+        sharedPreferences = getContext().getSharedPreferences(Global.USER_INFO_PREF_FILE, Context.MODE_PRIVATE);
+        api_token = sharedPreferences.getString(Global.PREF_USER_API_TOKEN, "");
 
 
         // Doa of Liked table
@@ -188,7 +192,7 @@ public class LikedMailsFragment extends Fragment {
                 url = new URL(Global.SERVER_URL + "/balloons/liked");
                 connection = (HttpURLConnection) url.openConnection();
                 connection.setRequestMethod("GET");
-                connection.setRequestProperty("authorization", "Bearer "+Global.USER_API_TOKEN);
+                connection.setRequestProperty("authorization", "Bearer "+ api_token);
                 connection.setRequestProperty("Content-Type", "application/json");
                 connection.setRequestProperty("charset", "utf-8");
                 connection.connect();

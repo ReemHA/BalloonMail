@@ -1,6 +1,7 @@
 package com.balloonmail.app.balloonmailapp;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
@@ -42,6 +43,8 @@ public class CardReceived extends Card {
     Balloon balloon;
     private Context context;
     private Bundle savedInstanceState;
+    private SharedPreferences sharedPreferences;
+    private static String api_token;
 
     static ReceivedCardViewHolder holder;
 
@@ -50,6 +53,8 @@ public class CardReceived extends Card {
         this.balloon = balloon;
         this.context = context;
         this.savedInstanceState = savedInstanceState;
+        sharedPreferences = context.getSharedPreferences(Global.USER_INFO_PREF_FILE, Context.MODE_PRIVATE);
+
     }
 
     @Override
@@ -78,6 +83,7 @@ public class CardReceived extends Card {
                 setMapLocation(holder.map);
             }
 
+            api_token = sharedPreferences.getString(Global.PREF_USER_API_TOKEN, "");
             holder.refillBtn = (ImageButton) view.findViewById(R.id.refillActionBtn_received);
             holder.likeBtn = (ImageButton) view.findViewById(R.id.likeActionBtn_received);
             holder.creepBtn = (ImageButton) view.findViewById(R.id.creepActionBtn_received);
@@ -242,7 +248,7 @@ public class CardReceived extends Card {
                 // set charset property to utf-8
                 connection.setRequestProperty("charset", "utf-8");
 
-                connection.setRequestProperty("authorization", "Bearer " + Global.USER_API_TOKEN);
+                connection.setRequestProperty("authorization", "Bearer " + api_token);
 
                 // set accept property
                 connection.setRequestProperty("Accept", "application/json");
@@ -347,7 +353,7 @@ public class CardReceived extends Card {
                 // set charset property to utf-8
                 connection.setRequestProperty("charset", "utf-8");
 
-                connection.setRequestProperty("authorization", "Bearer " + Global.USER_API_TOKEN);
+                connection.setRequestProperty("authorization", "Bearer " + api_token);
 
                 // set accept property
                 connection.setRequestProperty("Accept", "application/json");
@@ -445,7 +451,7 @@ public class CardReceived extends Card {
                 // set charset property to utf-8
                 connection.setRequestProperty("charset", "utf-8");
 
-                connection.setRequestProperty("authorization", "Bearer " + Global.USER_API_TOKEN);
+                connection.setRequestProperty("authorization", "Bearer " + api_token);
 
                 // set accept property
                 connection.setRequestProperty("Accept", "application/json");

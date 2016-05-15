@@ -1,7 +1,9 @@
 package com.balloonmail.app.balloonmailapp;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -59,6 +61,8 @@ public class SentMailsFragment extends Fragment {
     Bundle savedInstanceState;
     CardArrayRecyclerViewAdapter mCardArrayAdapter;
     ImageView emptyStateImage;
+    private SharedPreferences sharedPreferences;
+    private static String api_token;
 
     public SentMailsFragment() {
         // Required empty public constructor
@@ -75,7 +79,8 @@ public class SentMailsFragment extends Fragment {
         cards = new ArrayList<>();
         sentBalloonList = new ArrayList<>();
 
-
+        sharedPreferences = getContext().getSharedPreferences(Global.USER_INFO_PREF_FILE, Context.MODE_PRIVATE);
+        api_token = sharedPreferences.getString(Global.PREF_USER_API_TOKEN, "");
         // Doa of SentBalloon table
         sentBalloonDao = null;
         try {
@@ -228,7 +233,7 @@ public class SentMailsFragment extends Fragment {
                 url = new URL(Global.SERVER_URL + "/balloons/sent");
                 connection = (HttpURLConnection) url.openConnection();
                 connection.setRequestMethod("GET");
-                connection.setRequestProperty("authorization", "Bearer "+Global.USER_API_TOKEN);
+                connection.setRequestProperty("authorization", "Bearer "+ api_token);
                 connection.setRequestProperty("Content-Type", "application/json");
                 connection.setRequestProperty("charset", "utf-8");
                 connection.connect();

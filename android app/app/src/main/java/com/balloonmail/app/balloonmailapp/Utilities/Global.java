@@ -19,16 +19,11 @@ public class Global {
     public static final int LIKES_TABBED_PAGE = 2;
     public static final String LOG_TAG = "DOWN";
     public static final String USER_INFO_PREF_FILE = "PersonalInfo";
-    public static  String USER_NAME;
-    public static  String USER_EMAIL;
-    public static  String USER_API_TOKEN;
-    public static  final String PREF_USER_NAME = "user_name";
-    public static  final String PREF_USER_EMAIL = "user_email";
-    public static  final String PREF_USER_API_TOKEN = "api_token";
-    public static  final String PREF_USER_LAT = "lat";
-    public static  final String PREF_USER_LNG = "lon";
-
-    public static  boolean USER_IS_CREATED;
+    public static final String PREF_USER_NAME = "user_name";
+    public static final String PREF_USER_EMAIL = "user_email";
+    public static final String PREF_USER_API_TOKEN = "api_token";
+    public static final String PREF_USER_LAT = "lat";
+    public static final String PREF_USER_LNG = "lon";
 
     public static boolean isConnected(Context context) {
         // check the state of network connectivity

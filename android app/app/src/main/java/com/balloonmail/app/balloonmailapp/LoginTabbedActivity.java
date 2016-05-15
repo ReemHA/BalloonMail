@@ -67,6 +67,7 @@ public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiC
         // get api_token from the shared preference
         sharedPreferences = this.getSharedPreferences(Global.USER_INFO_PREF_FILE, MODE_PRIVATE);
         String api_token = sharedPreferences.getString(Global.PREF_USER_API_TOKEN, "");
+        Log.d(LoginTabbedActivity.class.getSimpleName(), api_token);
 
         databaseUtilities = new DatabaseUtilities();
 
@@ -180,12 +181,10 @@ public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiC
 
             // get the user name
             String userName = account.getDisplayName();
-            Global.USER_NAME = userName;
             sharedPreferences.edit().putString(Global.PREF_USER_NAME, userName).commit();
 
             // get the user email
             String userEmail = account.getEmail();
-            Global.USER_EMAIL = userEmail;
             sharedPreferences.edit().putString(Global.PREF_USER_EMAIL, userEmail).commit();
 
 
@@ -295,9 +294,6 @@ public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiC
                 sharedPreferences.edit().putString(Global.PREF_USER_API_TOKEN, api_token).commit();
 
 
-                Global.USER_API_TOKEN = api_token;
-                Global.USER_IS_CREATED = created;
-
                 if (mProgressDialog.isShowing()) {
                     mProgressDialog.dismiss();
                 }
@@ -353,15 +349,11 @@ public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiC
             @Override
             public void onResult(@NonNull Status status) {
 
-                //delete user info from Global
-                Global.USER_API_TOKEN = null;
-                Global.USER_EMAIL = null;
-                Global.USER_NAME = null;
-                Global.USER_IS_CREATED = false;
-
                 SharedPreferences sharedPref = LoginTabbedActivity.this.getSharedPreferences(Global.USER_INFO_PREF_FILE,
                         Context.MODE_PRIVATE);
 
+                // delete all info from the shared
+                sharedPref.edit().clear().commit();
 
                 // delete associated local database
                 DatabaseUtilities databaseUtilities = new DatabaseUtilities();
