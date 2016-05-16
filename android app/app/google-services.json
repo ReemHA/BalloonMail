@@ -13,6 +13,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "113808451021-cui63s2ecvtcvnesgbh0dgc5k80i1bt1.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.balloonmail.app.balloonmailapp",
+            "certificate_hash": "62673070F71DB1E4DB4583B61611C5C80B654008"
+          }
+        },
+        {
           "client_id": "113808451021-b12q7o12qh601o36imfivifg4tssjats.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
