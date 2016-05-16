@@ -60,7 +60,9 @@ public class SentMailsFragment extends Fragment {
     View rootView;
     Bundle savedInstanceState;
     CardArrayRecyclerViewAdapter mCardArrayAdapter;
-    SharedPreferences sharedPreferences;
+    ImageView emptyStateImage;
+    private SharedPreferences sharedPreferences;
+    private static String api_token;
 
     public SentMailsFragment() {
         // Required empty public constructor
@@ -73,12 +75,12 @@ public class SentMailsFragment extends Fragment {
         dbHelper = OpenHelperManager.getHelper(getContext(), DatabaseHelper.class);
         this.savedInstanceState = savedInstanceState;
         dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss", Locale.ENGLISH);
-        sharedPreferences = getContext().getSharedPreferences(Global.USER_INFO_PREF_FILE, Context.MODE_PRIVATE);
         balloonsMap = new HashMap<>();
         cards = new ArrayList<>();
         sentBalloonList = new ArrayList<>();
 
-
+        sharedPreferences = getContext().getSharedPreferences(Global.USER_INFO_PREF_FILE, Context.MODE_PRIVATE);
+        api_token = sharedPreferences.getString(Global.PREF_USER_API_TOKEN, "");
         // Doa of SentBalloon table
         sentBalloonDao = null;
         try {
@@ -96,14 +98,14 @@ public class SentMailsFragment extends Fragment {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-        } else
+        } else {
             try {
                 cards = initCardsFromLocalDb();
                 mCardArrayAdapter.setCards(cards);
             } catch (SQLException e) {
                 e.printStackTrace();
             }
-
+        }
 
         //Staggered grid view
         CardRecyclerView mRecyclerView = (CardRecyclerView) rootView.findViewById(R.id.cvCardRecyclerView);
@@ -117,12 +119,7 @@ public class SentMailsFragment extends Fragment {
             mRecyclerView.setAdapter(mCardArrayAdapter);
         }
 
-        ImageView image = (ImageView) rootView.findViewById(R.id.emptyStateImage);
-        if(cards.size() == 0){
-            image.setBackgroundResource(R.drawable.empty_state);
-        }else{
-            image.setBackgroundResource(0);
-        }
+        emptyStateImage = (ImageView) rootView.findViewById(R.id.emptyStateImage);
 
         return rootView;
     }
@@ -236,7 +233,7 @@ public class SentMailsFragment extends Fragment {
                 url = new URL(Global.SERVER_URL + "/balloons/sent");
                 connection = (HttpURLConnection) url.openConnection();
                 connection.setRequestMethod("GET");
-                connection.setRequestProperty("authorization", "Bearer "+sharedPreferences.getString(Global.PREF_USER_API_TOKEN, ""));
+                connection.setRequestProperty("authorization", "Bearer "+ api_token);
                 connection.setRequestProperty("Content-Type", "application/json");
                 connection.setRequestProperty("charset", "utf-8");
                 connection.connect();
@@ -277,6 +274,12 @@ public class SentMailsFragment extends Fragment {
                 cards.add(card);
                 balloonsMap.put(balloon, card);
             }
+            if(jsonArray.length() == 0){
+                emptyStateImage.setBackgroundResource(R.drawable.empty_state);
+            }else{
+                emptyStateImage.setBackgroundResource(0);
+            }
+
             return;
         }
 

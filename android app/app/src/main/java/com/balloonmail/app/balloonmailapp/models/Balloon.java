@@ -52,10 +52,8 @@ public abstract class Balloon implements Serializable {
         this.reach = reach;
 
         // TODO will be replaced with the attributes of the balloon when received from the server
-        this.latSource = 30.065136;
-        this.lngSource = 31.278821;
-        this.sentiment = 0.2;
-        initializeHashMap(); //only for testing purposes
+        //this.latSource = 30.065136;
+        //this.lngSource = 31.278821;
     }
 
     private void initializeHashMap(){

@@ -81,32 +81,6 @@ public class MailDetailsAndMapActivityFragment extends Fragment implements OnMap
         LatLng sourceBalloon = balloon.getSourceBalloon();
         HashMap<LatLng, ArrayList<LatLng>> destinationsHashMap = balloon.getDestinationsHashMap();
 
-        // TODO static data will be removed
-        LatLng d1 = new LatLng(-37.81319, 144.96298);
-        LatLng d2 = new LatLng(-33.87365, 151.20689);
-        LatLng d3 = new LatLng(-34.92873, 138.59995);
-        LatLng d4 = new LatLng(-31.95285, 115.85734);
-        LatLng d5 = new LatLng(51.471547, -0.460052);
-        LatLng d6 = new LatLng(33.936524, -118.377686);
-        LatLng d7 = new LatLng(40.641051, -73.777485);
-        LatLng d8 = new LatLng(-37.006254, 174.783018);
-
-        destinationsHashMap = new HashMap<>();
-        ArrayList<LatLng> destinationsArrayList = new ArrayList<>();
-        //destinationsArrayList.add(d1);
-        destinationsArrayList.add(d2);
-        destinationsArrayList.add(d3);
-        destinationsArrayList.add(d4);
-        destinationsArrayList.add(d5);
-        destinationsArrayList.add(d6);
-        destinationsArrayList.add(d7);
-        destinationsArrayList.add(d8);
-
-        ArrayList<LatLng> destinationsRefilledArrayList = new ArrayList<>();
-        destinationsRefilledArrayList.add(d1);
-        destinationsHashMap.put(sourceBalloon, destinationsArrayList);
-        destinationsHashMap.put(d7, destinationsRefilledArrayList);
-        //end of static data
 
         if(sourceBalloon != null){
             map.addMarker(new MarkerOptions()

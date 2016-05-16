@@ -1,21 +1,33 @@
 {
   "project_info": {
-    "project_id": "balloonmailapp-1293",
     "project_number": "113808451021",
-    "name": "BalloonMailApp"
+    "project_id": "balloonmailapp-1293"
   },
   "client": [
     {
       "client_info": {
         "mobilesdk_app_id": "1:113808451021:android:150ff9fabdd91916",
-        "client_id": "android:com.balloonmail.app.balloonmailapp",
-        "client_type": 1,
         "android_client_info": {
-          "package_name": "com.balloonmail.app.balloonmailapp",
-          "certificate_hash": []
+          "package_name": "com.balloonmail.app.balloonmailapp"
         }
       },
       "oauth_client": [
+        {
+          "client_id": "113808451021-cui63s2ecvtcvnesgbh0dgc5k80i1bt1.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.balloonmail.app.balloonmailapp",
+            "certificate_hash": "62673070F71DB1E4DB4583B61611C5C80B654008"
+          }
+        },
+        {
+          "client_id": "113808451021-b12q7o12qh601o36imfivifg4tssjats.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.balloonmail.app.balloonmailapp",
+            "certificate_hash": "284A467C60465C093ED117E5EE21FB845CCE32A9"
+          }
+        },
         {
           "client_id": "113808451021-im0he0rlcbmtf37q1n2a4aootpvmk2lt.apps.googleusercontent.com",
           "client_type": 1,
@@ -29,14 +41,14 @@
           "client_type": 3
         }
       ],
-      "api_key": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC6qeyCbfRtqTs1Rehh66aZ46504NvovOE"
+        }
+      ],
       "services": {
         "analytics_service": {
           "status": 1
-        },
-        "cloud_messaging_service": {
-          "status": 2,
-          "apns_config": []
         },
         "appinvite_service": {
           "status": 2,
@@ -47,15 +59,11 @@
             }
           ]
         },
-        "google_signin_service": {
-          "status": 2
-        },
         "ads_service": {
           "status": 1
         }
       }
     }
   ],
-  "client_info": [],
-  "ARTIFACT_VERSION": "1"
+  "configuration_version": "1"
 }

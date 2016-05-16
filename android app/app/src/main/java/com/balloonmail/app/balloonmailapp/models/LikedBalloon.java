@@ -4,6 +4,8 @@ import com.j256.ormlite.field.DatabaseField;
 
 import com.j256.ormlite.table.DatabaseTable;
 
+import java.util.Date;
+
 /**
  * Created by Reem Hamdy on 4/26/2016.
  */
@@ -25,7 +27,7 @@ public class LikedBalloon extends Balloon {
     }
     public LikedBalloon (String text, int noOfRefills, int noOfCreeps, double reach) {
         super(text, noOfRefills, noOfCreeps, reach);
-        is_refilled = 0; is_liked = 1; is_creeped = 0;
+        is_liked = 1;
     }
 
     public int getIs_creeped() {
@@ -50,5 +52,12 @@ public class LikedBalloon extends Balloon {
 
     public void setIs_refilled(int is_refilled) {
         this.is_refilled = is_refilled;
+    }
+
+    public LikedBalloon(String text, int balloon_id, double sentiment, Date sent_date) {
+        this.text = text;
+        this.balloon_id = balloon_id;
+        this.sentiment = sentiment;
+        this.sent_at = sent_date;
     }
 }

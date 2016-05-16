@@ -1,12 +1,15 @@
 package com.balloonmail.app.balloonmailapp;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import com.balloonmail.app.balloonmailapp.Utilities.Global;
 import com.balloonmail.app.balloonmailapp.models.Balloon;
 import com.balloonmail.app.balloonmailapp.models.ReceivedBalloon;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -19,6 +22,17 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+
 import it.gmariotti.cardslib.library.internal.Card;
 
 /**
@@ -29,14 +43,18 @@ public class CardReceived extends Card {
     Balloon balloon;
     private Context context;
     private Bundle savedInstanceState;
+    private SharedPreferences sharedPreferences;
+    private static String api_token;
 
-    ReceivedCardViewHolder holder;
+    static ReceivedCardViewHolder holder;
 
     public CardReceived(Balloon balloon, Context context, Bundle savedInstanceState) {
-        super(context,R.layout.card_received_item);
+        super(context, R.layout.card_received_item);
         this.balloon = balloon;
         this.context = context;
         this.savedInstanceState = savedInstanceState;
+        sharedPreferences = context.getSharedPreferences(Global.USER_INFO_PREF_FILE, Context.MODE_PRIVATE);
+
     }
 
     @Override
@@ -45,13 +63,15 @@ public class CardReceived extends Card {
         if (view != null) {
             TextView mTitleView = (TextView) view.findViewById(R.id.receivedBalloonTextTv);
 
-            if (mTitleView != null){
+            if (mTitleView != null) {
                 mTitleView.setText(balloon.getText());
             }
 
             View row = view;
 
-            if (row == null){ return; }
+            if (row == null) {
+                return;
+            }
 
             holder = new ReceivedCardViewHolder();
             holder.mapView = (MapView) view.findViewById(R.id.row_map);
@@ -63,15 +83,20 @@ public class CardReceived extends Card {
                 setMapLocation(holder.map);
             }
 
+            api_token = sharedPreferences.getString(Global.PREF_USER_API_TOKEN, "");
             holder.refillBtn = (ImageButton) view.findViewById(R.id.refillActionBtn_received);
             holder.likeBtn = (ImageButton) view.findViewById(R.id.likeActionBtn_received);
             holder.creepBtn = (ImageButton) view.findViewById(R.id.creepActionBtn_received);
             holder.sentimentIndication = view.findViewById(R.id.sentiment_indication);
 
+            changeStateOfLikeBtn();
+            changeStateOfRefillBtn();
+            changeStateOfCreepBtn();
+
             holder.likeBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    requestLikeToServer();
+                    requestLikeToServer(balloon);
                     changeStateOfLikeBtn();
                 }
             });
@@ -79,7 +104,7 @@ public class CardReceived extends Card {
             holder.refillBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    requestRefillToServer();
+                    requestRefillToServer(balloon);
                     changeStateOfRefillBtn();
                 }
             });
@@ -87,7 +112,7 @@ public class CardReceived extends Card {
             holder.creepBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    requestCreepToServer();
+                    requestCreepToServer(balloon);
                     changeStateOfCreepBtn();
                 }
             });
@@ -96,40 +121,43 @@ public class CardReceived extends Card {
         }
     }
 
-    private void changeStateOfLikeBtn(){
-        if(((ReceivedBalloon)balloon).getIs_liked() == 0){
+    private void changeStateOfLikeBtn() {
+        if (((ReceivedBalloon) balloon).getIs_liked() == 0) {
             holder.likeBtn.setImageResource(R.drawable.ic_like_grey_24px);
-        }else{
+        } else {
             holder.likeBtn.setImageResource(R.drawable.ic_like_clicked_24px);
         }
     }
 
-    private void requestLikeToServer(){
+    private void requestLikeToServer(Balloon likedBalloon) {
+        new CreateALikeRequest().execute(likedBalloon);
 
     }
 
-    private void changeStateOfRefillBtn(){
-        if(((ReceivedBalloon)balloon).getIs_refilled() == 0){
+    private void requestRefillToServer(Balloon refilledBalloon) {
+        new CreateARefillRequest().execute(refilledBalloon);
+    }
+
+    private void requestCreepToServer(Balloon creepedBalloon) {
+        new CreateACreepRequest().execute(creepedBalloon);
+
+    }
+
+    private void changeStateOfRefillBtn() {
+        if (((ReceivedBalloon) balloon).getIs_refilled() == 0) {
             holder.refillBtn.setImageResource(R.drawable.ic_refill_grey_24px);
-        }else{
+        } else {
             holder.refillBtn.setImageResource(R.drawable.ic_refill_primary_24px);
         }
     }
 
-    private void requestRefillToServer(){
 
-    }
-
-    private void changeStateOfCreepBtn(){
-        if(((ReceivedBalloon)balloon).getIs_creeped() == 0){
+    private void changeStateOfCreepBtn() {
+        if (((ReceivedBalloon) balloon).getIs_creeped() == 0) {
             holder.creepBtn.setImageResource(R.drawable.ic_creepy_grey_24px);
-        }else{
+        } else {
             holder.creepBtn.setImageResource(R.drawable.ic_creepy_clicked_24px);
         }
-    }
-
-    private void requestCreepToServer(){
-
     }
 
     private void changeColorOfSentimentIndication(double sentiment){
@@ -146,7 +174,7 @@ public class CardReceived extends Card {
 
         LatLng sourceBalloon = balloon.getSourceBalloon();
 
-        if(sourceBalloon != null){
+        if (sourceBalloon != null) {
             map.addMarker(new MarkerOptions()
                     .position(sourceBalloon)
                     .icon(BitmapDescriptorFactory.fromResource(R.drawable.marker_source_balloon)));
@@ -169,6 +197,7 @@ public class CardReceived extends Card {
         MapView mapView;
 
         GoogleMap map;
+        
         ImageButton refillBtn; ImageButton likeBtn; ImageButton creepBtn;
         View sentimentIndication;
 
@@ -194,4 +223,306 @@ public class CardReceived extends Card {
         }
 
     }
+
+    private class CreateALikeRequest extends AsyncTask<Balloon, Void, Integer> {
+        URL url;
+        HttpURLConnection connection;
+
+        @Override
+        protected Integer doInBackground(Balloon... params) {
+            try {
+                url = new URL(Global.SERVER_URL + "/balloons/like");
+                connection = (HttpURLConnection) url.openConnection();
+                // set connection to allow output
+                connection.setDoOutput(true);
+
+                // set connection to allow input
+                connection.setDoInput(true);
+
+                // set the request method to POST
+                connection.setRequestMethod("POST");
+
+                // set content-type property
+                connection.setRequestProperty("Content-Type", "application/json");
+
+                // set charset property to utf-8
+                connection.setRequestProperty("charset", "utf-8");
+
+                connection.setRequestProperty("authorization", "Bearer " + api_token);
+
+                // set accept property
+                connection.setRequestProperty("Accept", "application/json");
+
+                // put user name and id token in a JSONObject
+                JSONObject jsonBody = new JSONObject();
+                jsonBody.put("balloon_id", params[0].getBalloon_id());
+
+                // connect to server
+                connection.connect();
+
+                DataOutputStream outputStream = new DataOutputStream(connection.getOutputStream());
+
+                // write JSON body to the output stream
+                outputStream.write(jsonBody.toString().getBytes("utf-8"));
+
+                // flush to ensure all data in the stream is sent
+                outputStream.flush();
+
+                // close stream
+                outputStream.close();
+
+                // receive the response from server
+                return setIsLikedAttrInBalloon(params[0]);
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+
+        private Integer setIsLikedAttrInBalloon(Balloon balloon) throws IOException, JSONException {
+            // create StringBuilder object to append the input stream in
+            StringBuilder sb = new StringBuilder();
+            String line;
+
+            // get input stream
+            BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+
+            // append stream in a the StringBuilder object
+            while ((line = reader.readLine()) != null) {
+                sb.append(line + "\n");
+            }
+            reader.close();
+
+            // convert StringBuilder object to string and store it in a variable
+            String JSONResponse = sb.toString();
+
+            // convert response to JSONObject
+            JSONObject response = new JSONObject(JSONResponse);
+
+            // checks if an error is in the response
+            if (!response.has("error")) {
+                int isLiked = ((ReceivedBalloon) balloon).getIs_liked();
+                return isLiked;
+            } else {
+                ((ReceivedBalloon) balloon).setIs_liked(0);
+                return 0;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(Integer isLiked) {
+            super.onPostExecute(isLiked);
+            if (isLiked == 0) {
+                ((ReceivedBalloon) balloon).setIs_liked(1);
+                changeStateOfLikeBtn();
+
+            }else {
+                ((ReceivedBalloon) balloon).setIs_liked(0);
+                changeStateOfLikeBtn();
+            }
+        }
+    }
+
+
+    private class CreateARefillRequest extends AsyncTask<Balloon, Void, Void> {
+        URL url;
+        HttpURLConnection connection;
+
+        @Override
+        protected Void doInBackground(Balloon... params) {
+            try {
+                url = new URL(Global.SERVER_URL + "/balloons/refill");
+                connection = (HttpURLConnection) url.openConnection();
+                // set connection to allow output
+                connection.setDoOutput(true);
+
+                // set connection to allow input
+                connection.setDoInput(true);
+
+                // set the request method to POST
+                connection.setRequestMethod("POST");
+
+                // set content-type property
+                connection.setRequestProperty("Content-Type", "application/json");
+
+                // set charset property to utf-8
+                connection.setRequestProperty("charset", "utf-8");
+
+                connection.setRequestProperty("authorization", "Bearer " + api_token);
+
+                // set accept property
+                connection.setRequestProperty("Accept", "application/json");
+
+                // put user name and id token in a JSONObject
+                JSONObject jsonBody = new JSONObject();
+                jsonBody.put("balloon_id", params[0].getBalloon_id());
+
+                // connect to server
+                connection.connect();
+
+                DataOutputStream outputStream = new DataOutputStream(connection.getOutputStream());
+
+                // write JSON body to the output stream
+                outputStream.write(jsonBody.toString().getBytes("utf-8"));
+
+                // flush to ensure all data in the stream is sent
+                outputStream.flush();
+
+                // close stream
+                outputStream.close();
+
+                // receive the response from server
+                setIsRefillAttrInBalloon(params[0]);
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+
+        private void setIsRefillAttrInBalloon(Balloon balloon) throws IOException, JSONException {
+            // create StringBuilder object to append the input stream in
+            StringBuilder sb = new StringBuilder();
+            String line;
+
+            // get input stream
+            BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+
+            // append stream in a the StringBuilder object
+            while ((line = reader.readLine()) != null) {
+                sb.append(line + "\n");
+            }
+            reader.close();
+
+            // convert StringBuilder object to string and store it in a variable
+            String JSONResponse = sb.toString();
+
+            // convert response to JSONObject
+            JSONObject response = new JSONObject(JSONResponse);
+
+            // checks if an error is in the response
+            if (!response.has("error")) {
+                int isRefilled = ((ReceivedBalloon) balloon).getIs_refilled();
+                if (isRefilled == 0) {
+                    ((ReceivedBalloon) balloon).setIs_refilled(1);
+                    changeStateOfRefillBtn();
+                } else {
+                    ((ReceivedBalloon) balloon).setIs_refilled(0);
+                    changeStateOfRefillBtn();
+                }
+            } else {
+                ((ReceivedBalloon) balloon).setIs_refilled(0);
+            }
+
+
+        }
+    }
+
+    private class CreateACreepRequest extends AsyncTask<Balloon, Void, Void> {
+        URL url;
+        HttpURLConnection connection;
+
+        @Override
+        protected Void doInBackground(Balloon... params) {
+            try {
+                url = new URL(Global.SERVER_URL + "/balloons/creep");
+                connection = (HttpURLConnection) url.openConnection();
+                // set connection to allow output
+                connection.setDoOutput(true);
+
+                // set connection to allow input
+                connection.setDoInput(true);
+
+                // set the request method to POST
+                connection.setRequestMethod("POST");
+
+                // set content-type property
+                connection.setRequestProperty("Content-Type", "application/json");
+
+                // set charset property to utf-8
+                connection.setRequestProperty("charset", "utf-8");
+
+                connection.setRequestProperty("authorization", "Bearer " + api_token);
+
+                // set accept property
+                connection.setRequestProperty("Accept", "application/json");
+
+                // put user name and id token in a JSONObject
+                JSONObject jsonBody = new JSONObject();
+                jsonBody.put("balloon_id", params[0].getBalloon_id());
+
+                // connect to server
+                connection.connect();
+
+                DataOutputStream outputStream = new DataOutputStream(connection.getOutputStream());
+
+                // write JSON body to the output stream
+                outputStream.write(jsonBody.toString().getBytes("utf-8"));
+
+                // flush to ensure all data in the stream is sent
+                outputStream.flush();
+
+                // close stream
+                outputStream.close();
+
+                // receive the response from server
+                setIsCreepAttrInBalloon(params[0]);
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+
+        private void setIsCreepAttrInBalloon(Balloon balloon) throws IOException, JSONException {
+            // create StringBuilder object to append the input stream in
+            StringBuilder sb = new StringBuilder();
+            String line;
+
+            // get input stream
+            BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+
+            // append stream in a the StringBuilder object
+            while ((line = reader.readLine()) != null) {
+                sb.append(line + "\n");
+            }
+            reader.close();
+
+            // convert StringBuilder object to string and store it in a variable
+            String JSONResponse = sb.toString();
+
+            // convert response to JSONObject
+            JSONObject response = new JSONObject(JSONResponse);
+
+            // checks if an error is in the response
+            if (!response.has("error")) {
+                int isCreeped = ((ReceivedBalloon) balloon).getIs_creeped();
+                if (isCreeped == 0) {
+                    ((ReceivedBalloon) balloon).setIs_creeped(1);
+                    changeStateOfCreepBtn();
+                } else {
+                    ((ReceivedBalloon) balloon).setIs_creeped(0);
+                    changeStateOfCreepBtn();
+                }
+            } else {
+                ((ReceivedBalloon) balloon).setIs_creeped(0);
+            }
+
+
+        }
+    }
+
 }
