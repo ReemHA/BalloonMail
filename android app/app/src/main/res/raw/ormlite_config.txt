@@ -1,5 +1,5 @@
 #
-# generated on 2016/05/13 02:14:35
+# generated on 2016/05/18 11:14:54
 #
 # --table-start--
 dataClass=com.balloonmail.app.balloonmailapp.models.ReceivedBalloon
@@ -16,6 +16,7 @@ fieldName=is_creeped
 # --field-end--
 # --field-start--
 fieldName=balloon_id
+unique=true
 # --field-end--
 # --field-start--
 fieldName=text
@@ -50,6 +51,7 @@ tableName=sentballoon
 # --table-fields-start--
 # --field-start--
 fieldName=balloon_id
+unique=true
 # --field-end--
 # --field-start--
 fieldName=text
@@ -93,6 +95,7 @@ fieldName=is_creeped
 # --field-end--
 # --field-start--
 fieldName=balloon_id
+unique=true
 # --field-end--
 # --field-start--
 fieldName=text
