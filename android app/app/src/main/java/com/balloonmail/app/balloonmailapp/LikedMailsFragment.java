@@ -36,6 +36,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -95,6 +96,7 @@ public class LikedMailsFragment extends Fragment {
         if (!Global.isConnected(getContext())) {
             try {
                 cards = initCardsFromLocalDb();
+                Collections.reverse(cards);
                 mCardArrayAdapter.setCards(cards);
             } catch (SQLException e) {
                 e.printStackTrace();
@@ -269,6 +271,7 @@ public class LikedMailsFragment extends Fragment {
                 }
             }
 
+            Collections.reverse(cards);
             mCardArrayAdapter.setCards(cards);
             mCardArrayAdapter.notifyDataSetChanged();
         }

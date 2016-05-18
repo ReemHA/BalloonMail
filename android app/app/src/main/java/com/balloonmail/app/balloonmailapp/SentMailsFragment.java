@@ -93,6 +93,7 @@ public class SentMailsFragment extends Fragment {
         if (!Global.isConnected(getContext())) {
             try {
                 cards = initCardsFromLocalDb();
+                Collections.reverse(cards);
                 mCardArrayAdapter.setCards(cards);
             } catch (SQLException e) {
                 e.printStackTrace();
