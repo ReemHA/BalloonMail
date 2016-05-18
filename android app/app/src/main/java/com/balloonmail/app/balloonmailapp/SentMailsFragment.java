@@ -37,6 +37,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -299,6 +300,7 @@ public class SentMailsFragment extends Fragment {
                     emptyStateImage.setBackgroundResource(0);
                 }
             }
+            Collections.reverse(cards);
             mCardArrayAdapter.setCards(cards);
             mCardArrayAdapter.notifyDataSetChanged();
         }
