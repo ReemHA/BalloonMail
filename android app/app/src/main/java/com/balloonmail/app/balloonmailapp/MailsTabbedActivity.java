@@ -26,14 +26,15 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MailsTabbedActivity extends AppCompatActivity implements SentMailsFragment.SentBalloonsListener {
+public class MailsTabbedActivity extends AppCompatActivity {
 
     private Toolbar toolbar;
     private TabLayout tabLayout;
     private ViewPager viewPager;
     private DatabaseHelper dbHelper;
+    private ReceivedMailsFragment receivedMailsFragment;
+    private LikedMailsFragment likedMailsFragment;
     private SentMailsFragment sentMailsFragment;
-
     private int[] tabIcons = {
             R.drawable.ic_sent_white_48px, //Sent
             R.drawable.ic_received_white_48px, //Received
@@ -49,7 +50,10 @@ public class MailsTabbedActivity extends AppCompatActivity implements SentMailsF
         setContentView(R.layout.activity_mails_tabbed);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        //SentBalloon balloon = intent.getBundleExtra("sent_balloon");
+        receivedMailsFragment = new ReceivedMailsFragment();
+        sentMailsFragment = new SentMailsFragment();
+        likedMailsFragment = new LikedMailsFragment();
+
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -65,7 +69,6 @@ public class MailsTabbedActivity extends AppCompatActivity implements SentMailsF
         int defaultValue = 0;
         int page = getIntent().getIntExtra(Global.ARG_MAILS_TABBED_TAG, defaultValue);
         viewPager.setCurrentItem(page);
-
         tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
         setupTabIcons();
@@ -79,20 +82,10 @@ public class MailsTabbedActivity extends AppCompatActivity implements SentMailsF
 
     private void setupViewPager(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
-        sentMailsFragment = new SentMailsFragment();
         adapter.addFragment(sentMailsFragment, "Sent");
-
-        // register activity as listener
-        sentMailsFragment.setListener(this);
-
-        adapter.addFragment(new ReceivedMailsFragment(), "Received");
-        adapter.addFragment(new LikedMailsFragment(), "Likes");
+        adapter.addFragment(receivedMailsFragment, "Received");
+        adapter.addFragment(likedMailsFragment, "Likes");
         viewPager.setAdapter(adapter);
-    }
-
-    @Override
-    public void getSentBalloons(List<SentBalloon> balloonList) {
-        sentBalloonList = balloonList;
     }
 
     class ViewPagerAdapter extends FragmentPagerAdapter {
@@ -122,6 +115,7 @@ public class MailsTabbedActivity extends AppCompatActivity implements SentMailsF
         public CharSequence getPageTitle(int position) {
             return mFragmentTitleList.get(position);
         }
+
     }
 
     @Override

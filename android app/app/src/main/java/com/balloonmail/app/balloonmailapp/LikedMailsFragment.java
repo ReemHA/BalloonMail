@@ -60,6 +60,8 @@ public class LikedMailsFragment extends Fragment {
     private SharedPreferences sharedPreferences;
     private static String api_token;
     ImageView emptyStateImage;
+    public LikedBalloonsListener listener;
+
 
     public LikedMailsFragment() {
         // Required empty public constructor
@@ -90,15 +92,7 @@ public class LikedMailsFragment extends Fragment {
         }
         mCardArrayAdapter = new CardArrayRecyclerViewAdapter(getActivity(), cards);
 
-        if (Global.isConnected(getContext())) {
-            try {
-                loadLikedBalloons();
-            } catch (ExecutionException e) {
-                e.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        } else {
+        if (!Global.isConnected(getContext())) {
             try {
                 cards = initCardsFromLocalDb();
                 mCardArrayAdapter.setCards(cards);
@@ -118,7 +112,7 @@ public class LikedMailsFragment extends Fragment {
         }
 
         emptyStateImage = (ImageView) rootView.findViewById(R.id.emptyStateImage);
-        
+
         return rootView;
     }
 
@@ -138,7 +132,7 @@ public class LikedMailsFragment extends Fragment {
         return cards;
     }
 
-    private Card createCard(Balloon balloon){
+    private Card createCard(Balloon balloon) {
         Card card = new CardLikes(getActivity().getBaseContext(), balloon);
         card.setCardElevation(getResources().getDimension(R.dimen.card_shadow_elevation));
         return card;
@@ -172,14 +166,24 @@ public class LikedMailsFragment extends Fragment {
         }
     }
 
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        if (isVisibleToUser && Global.isConnected(getContext())){
+            try {
+                loadLikedBalloons();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
     private void loadLikedBalloons() throws ExecutionException, InterruptedException {
-        mProgressDialog = new ProgressDialog(getContext());
-        mProgressDialog.setIndeterminate(true);
-        mProgressDialog.setMessage("Getting your updated balloons..");
-        mProgressDialog.show();
         new fetchLikedBalloonsFromServer().execute();
     }
+
 
     private class fetchLikedBalloonsFromServer extends AsyncTask<Object, Void, Void> {
         URL url;
@@ -187,12 +191,22 @@ public class LikedMailsFragment extends Fragment {
         String line;
 
         @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            mProgressDialog = new ProgressDialog(getContext());
+            mProgressDialog.setIndeterminate(true);
+            mProgressDialog.setMessage("Getting your liked balloons..");
+            mProgressDialog.setCancelable(false);
+            mProgressDialog.show();
+        }
+
+        @Override
         protected Void doInBackground(Object... params) {
             try {
                 url = new URL(Global.SERVER_URL + "/balloons/liked");
                 connection = (HttpURLConnection) url.openConnection();
                 connection.setRequestMethod("GET");
-                connection.setRequestProperty("authorization", "Bearer "+ api_token);
+                connection.setRequestProperty("authorization", "Bearer " + api_token);
                 connection.setRequestProperty("Content-Type", "application/json");
                 connection.setRequestProperty("charset", "utf-8");
                 connection.connect();
@@ -226,15 +240,15 @@ public class LikedMailsFragment extends Fragment {
             cards = new ArrayList<>();
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject object = jsonArray.getJSONObject(i);
-                LikedBalloon balloon = new LikedBalloon(object.getString("text"), object.getInt("balloon_id"),object.getDouble("sentiment"),
+                LikedBalloon balloon = new LikedBalloon(object.getString("text"), object.getInt("balloon_id"), object.getDouble("sentiment"),
                         dateFormat.parse(object.getString("sent_at")));
                 Card card = createCard(balloon);
                 cards.add(card);
                 balloonsMap.put(balloon, card);
             }
-            if(jsonArray.length() == 0){
+            if (jsonArray.length() == 0) {
                 emptyStateImage.setBackgroundResource(R.drawable.empty_state);
-            }else{
+            } else {
                 emptyStateImage.setBackgroundResource(0);
             }
             return;
@@ -243,9 +257,19 @@ public class LikedMailsFragment extends Fragment {
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
+            if (mProgressDialog.isShowing()) {
+                mProgressDialog.dismiss();
+            }
             mCardArrayAdapter.setCards(cards);
             mCardArrayAdapter.notifyDataSetChanged();
         }
     }
 
+    interface LikedBalloonsListener {
+        void fetchLikedBalloons();
+    }
+
+    public void setListener(LikedBalloonsListener listener) {
+        this.listener = listener;
+    }
 }

@@ -60,7 +60,6 @@ public class ReceivedMailsFragment extends Fragment {
     private SharedPreferences sharedPreferences;
     private static String api_token;
     ImageView emptyStateImage;
-
     public ReceivedMailsFragment() {
         // Required empty public constructor
     }
@@ -88,16 +87,7 @@ public class ReceivedMailsFragment extends Fragment {
             e.printStackTrace();
         }
         mCardArrayAdapter = new CardArrayRecyclerViewAdapter(getActivity(), cards);
-
-        if (Global.isConnected(getContext())) {
-            try {
-                loadReceivedBalloons();
-            } catch (ExecutionException e) {
-                e.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        } else {
+        if (!Global.isConnected(getContext())) {
             try {
                 cards = initCardsFromLocalDb();
                 mCardArrayAdapter.setCards(cards);
@@ -137,7 +127,7 @@ public class ReceivedMailsFragment extends Fragment {
         return cards;
     }
 
-    private Card createCard(Balloon balloon){
+    private Card createCard(Balloon balloon) {
         Card card = new CardReceived(balloon, getActivity().getBaseContext(), savedInstanceState);
         card.setCardElevation(getResources().getDimension(R.dimen.card_shadow_elevation));
         return card;
@@ -172,12 +162,30 @@ public class ReceivedMailsFragment extends Fragment {
         }
     }
 
+//    @Override
+//    public void onAttach(Context context) {
+//        super.onAttach(context);
+//        if (context instanceof Activity){
+//            mActivity = (Activity) context;
+//        }
+//
+//    }
+
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        if (isVisibleToUser && Global.isConnected(getContext())){
+            try {
+                loadReceivedBalloons();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
     private void loadReceivedBalloons() throws ExecutionException, InterruptedException {
-        mProgressDialog = new ProgressDialog(getContext());
-        mProgressDialog.setIndeterminate(true);
-        mProgressDialog.setMessage("Getting your received balloons..");
-        mProgressDialog.show();
         new fetchReceivedBalloonsFromServer().execute();
     }
 
@@ -187,12 +195,22 @@ public class ReceivedMailsFragment extends Fragment {
         String line;
 
         @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            mProgressDialog = new ProgressDialog(getActivity());
+            mProgressDialog.setIndeterminate(true);
+            mProgressDialog.setMessage("Getting your received balloons..");
+            mProgressDialog.setCancelable(false);
+            mProgressDialog.show();
+        }
+
+        @Override
         protected Void doInBackground(Object... params) {
             try {
                 url = new URL(Global.SERVER_URL + "/balloons/received");
                 connection = (HttpURLConnection) url.openConnection();
                 connection.setRequestMethod("GET");
-                connection.setRequestProperty("authorization", "Bearer "+api_token);
+                connection.setRequestProperty("authorization", "Bearer " + api_token);
                 connection.setRequestProperty("Content-Type", "application/json");
                 connection.setRequestProperty("charset", "utf-8");
                 connection.connect();
@@ -219,8 +237,6 @@ public class ReceivedMailsFragment extends Fragment {
             }
             reader.close();
             streamReader.close();
-            if (mProgressDialog.isShowing())
-                mProgressDialog.dismiss();
             JSONObject jsonObject = new JSONObject(stringBuilder.toString());
             JSONArray jsonArray = jsonObject.getJSONArray("balloons");
             cards = new ArrayList<>();
@@ -234,9 +250,9 @@ public class ReceivedMailsFragment extends Fragment {
                 balloonsMap.put(balloon, card);
             }
             //empty state
-            if(jsonArray.length() == 0){
+            if (jsonArray.length() == 0) {
                 emptyStateImage.setBackgroundResource(R.drawable.empty_state);
-            }else{
+            } else {
                 emptyStateImage.setBackgroundResource(0);
             }
             return;
@@ -245,8 +261,12 @@ public class ReceivedMailsFragment extends Fragment {
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
+            if (mProgressDialog.isShowing()) {
+                mProgressDialog.dismiss();
+            }
             mCardArrayAdapter.setCards(cards);
             mCardArrayAdapter.notifyDataSetChanged();
+
         }
     }
 
