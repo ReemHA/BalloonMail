@@ -13,7 +13,7 @@ import java.util.HashMap;
  */
 public abstract class Balloon implements Serializable {
 
-    @DatabaseField
+    @DatabaseField(unique = true)
     int balloon_id;
 
     @DatabaseField
