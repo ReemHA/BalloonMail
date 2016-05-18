@@ -29,9 +29,10 @@ public abstract class Balloon implements Serializable {
     double reach;
 
     @DatabaseField
-    private double latSource;
+    private double lat;
+
     @DatabaseField
-    private double lngSource;
+    private double lng;
 
     private HashMap<LatLng, ArrayList<LatLng>> destinationsHashMap;
 
@@ -52,8 +53,8 @@ public abstract class Balloon implements Serializable {
         this.reach = reach;
 
         // TODO will be replaced with the attributes of the balloon when received from the server
-        //this.latSource = 30.065136;
-        //this.lngSource = 31.278821;
+        //this.lat = 30.065136;
+        //this.lng = 31.278821;
     }
 
     private void initializeHashMap(){
@@ -67,7 +68,7 @@ public abstract class Balloon implements Serializable {
         destinationsArrayList.add(new LatLng(33.936524, -118.377686));
         destinationsArrayList.add(new LatLng(40.641051, -73.777485));
         destinationsArrayList.add(new LatLng(-37.006254, 174.783018));
-        this.destinationsHashMap.put(new LatLng(latSource, lngSource), destinationsArrayList);
+        this.destinationsHashMap.put(new LatLng(lat, lng), destinationsArrayList);
     }
 
 
@@ -136,12 +137,12 @@ public abstract class Balloon implements Serializable {
     }
 
     public LatLng getSourceBalloon() {
-        return new LatLng(latSource, lngSource);
+        return new LatLng(lat, lng);
     }
 
     public void setSourceBalloon(double lat, double lng) {
-        this.latSource = lat;
-        this.lngSource = lng;
+        this.lat = lat;
+        this.lng = lng;
     }
 
     @Override

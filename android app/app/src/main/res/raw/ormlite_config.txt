@@ -1,5 +1,5 @@
 #
-# generated on 2016/05/18 11:14:54
+# generated on 2016/05/18 12:22:31
 #
 # --table-start--
 dataClass=com.balloonmail.app.balloonmailapp.models.ReceivedBalloon
@@ -31,10 +31,10 @@ fieldName=creeps
 fieldName=reach
 # --field-end--
 # --field-start--
-fieldName=latSource
+fieldName=lat
 # --field-end--
 # --field-start--
-fieldName=lngSource
+fieldName=lng
 # --field-end--
 # --field-start--
 fieldName=sentiment
@@ -66,10 +66,10 @@ fieldName=creeps
 fieldName=reach
 # --field-end--
 # --field-start--
-fieldName=latSource
+fieldName=lat
 # --field-end--
 # --field-start--
-fieldName=lngSource
+fieldName=lng
 # --field-end--
 # --field-start--
 fieldName=sentiment
@@ -110,10 +110,10 @@ fieldName=creeps
 fieldName=reach
 # --field-end--
 # --field-start--
-fieldName=latSource
+fieldName=lat
 # --field-end--
 # --field-start--
-fieldName=lngSource
+fieldName=lng
 # --field-end--
 # --field-start--
 fieldName=sentiment

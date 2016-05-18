@@ -243,7 +243,7 @@ public class ReceivedMailsFragment extends Fragment {
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject object = jsonArray.getJSONObject(i);
                 ReceivedBalloon balloon = new ReceivedBalloon(object.getString("text"), object.getInt("balloon_id"),
-                        object.getDouble("sentiment"),
+                        object.getDouble("sentiment"), object.getDouble("lat"), object.getDouble("lng"),
                         dateFormat.parse(object.getString("sent_at")));
                 Card card = createCard(balloon);
                 cards.add(card);

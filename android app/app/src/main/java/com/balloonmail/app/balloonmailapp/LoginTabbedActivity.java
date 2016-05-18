@@ -30,6 +30,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
 import org.json.JSONException;
@@ -56,6 +57,7 @@ public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiC
     private ProgressDialog mProgressDialog;
     public final int MY_PERMISSIONS_REQUEST_FINE_LOCATION = 0;
     private Location mLastLocation;
+    private LocationRequest mLocationRequest;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -401,6 +403,7 @@ public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiC
         } else {
             mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
                     googleApiClient);
+
         }
     }
 

@@ -8,6 +8,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -240,7 +241,9 @@ public class LikedMailsFragment extends Fragment {
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject object = jsonArray.getJSONObject(i);
                 LikedBalloon balloon = new LikedBalloon(object.getString("text"), object.getInt("balloon_id"), object.getDouble("sentiment"),
-                        dateFormat.parse(object.getString("sent_at")));
+                        object.getDouble("lat"), object.getDouble("lng"), dateFormat.parse(object.getString("sent_at")));
+                Log.d(LikedMailsFragment.class.getSimpleName(), "lat: "+object.getDouble("lat"));
+                Log.d(LikedMailsFragment.class.getSimpleName(), "lng: "+object.getDouble("lng"));
                 Card card = createCard(balloon);
                 cards.add(card);
                 balloonsMap.put(balloon, card);
