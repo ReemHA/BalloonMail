@@ -39,5 +39,5 @@ public class Global {
     }
 
     public static BalloonHolder balloonHolder = BalloonHolder.getInstance();
-    ;
+
 }

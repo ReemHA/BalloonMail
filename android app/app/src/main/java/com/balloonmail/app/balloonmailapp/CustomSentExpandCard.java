@@ -48,6 +48,12 @@ public class CustomSentExpandCard extends CardExpand{
         this.savedInstanceState = savedInstanceState;
     }
 
+
+    public void setPathsOnMap(Balloon balloon){
+        this.balloon = balloon;
+        createMapOfExpandCard();
+    }
+
     @Override
     public void setupInnerViewElements(ViewGroup parent, View view){
         View row = view;
@@ -58,16 +64,20 @@ public class CustomSentExpandCard extends CardExpand{
 
         holder.mapView = (MapView) view.findViewById(R.id.row_map);
 
+        //createMapOfExpandCard();
+
+        holder.sentimentIndication = view.findViewById(R.id.sentiment_indication);
+
+        changeColorOfSentimentIndication(balloon.getSentiment());
+    }
+
+    public void createMapOfExpandCard(){
         holder.initializeMapView();
 
         if (holder.map != null) {
             // The map is already ready to be used
             setMapLocation(holder.map);
         }
-
-        holder.sentimentIndication = view.findViewById(R.id.sentiment_indication);
-
-        changeColorOfSentimentIndication(balloon.getSentiment());
     }
 
     private void changeColorOfSentimentIndication(double sentiment){
@@ -123,9 +133,9 @@ public class CustomSentExpandCard extends CardExpand{
             public void onMapClick(LatLng latLng) {
                 Intent intent = new Intent(context, MailDetailsAndMapActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                Bundle bundle = new Bundle();
-                bundle.putSerializable("balloon", balloon);
-                intent.putExtras(bundle);
+                //Bundle bundle = new Bundle();
+                //bundle.putSerializable("balloon", balloon);
+                //intent.putExtras(bundle);
                 context.startActivity(intent);
             }
         });
@@ -163,6 +173,15 @@ public class CustomSentExpandCard extends CardExpand{
             }
         }
 
+    }
+
+
+    public Balloon getBalloon() {
+        return balloon;
+    }
+
+    public void setBalloon(Balloon balloon) {
+        this.balloon = balloon;
     }
 
 }
