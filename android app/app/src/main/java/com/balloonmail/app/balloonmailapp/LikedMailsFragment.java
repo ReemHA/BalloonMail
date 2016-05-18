@@ -60,7 +60,6 @@ public class LikedMailsFragment extends Fragment {
     private SharedPreferences sharedPreferences;
     private static String api_token;
     ImageView emptyStateImage;
-    public LikedBalloonsListener listener;
 
 
     public LikedMailsFragment() {
@@ -185,7 +184,7 @@ public class LikedMailsFragment extends Fragment {
     }
 
 
-    private class fetchLikedBalloonsFromServer extends AsyncTask<Object, Void, Void> {
+    private class fetchLikedBalloonsFromServer extends AsyncTask<Object, Void, Integer> {
         URL url;
         HttpURLConnection connection;
         String line;
@@ -201,7 +200,7 @@ public class LikedMailsFragment extends Fragment {
         }
 
         @Override
-        protected Void doInBackground(Object... params) {
+        protected Integer doInBackground(Object... params) {
             try {
                 url = new URL(Global.SERVER_URL + "/balloons/liked");
                 connection = (HttpURLConnection) url.openConnection();
@@ -210,7 +209,7 @@ public class LikedMailsFragment extends Fragment {
                 connection.setRequestProperty("Content-Type", "application/json");
                 connection.setRequestProperty("charset", "utf-8");
                 connection.connect();
-                getResponse();
+                return getResponse();
 
             } catch (MalformedURLException e) {
                 e.printStackTrace();
@@ -224,7 +223,7 @@ public class LikedMailsFragment extends Fragment {
             return null;
         }
 
-        private void getResponse() throws IOException, JSONException, ParseException {
+        private int getResponse() throws IOException, JSONException, ParseException {
             InputStreamReader streamReader = new InputStreamReader(connection.getInputStream());
             BufferedReader reader = new BufferedReader(streamReader);
             StringBuilder stringBuilder = new StringBuilder();
@@ -246,30 +245,25 @@ public class LikedMailsFragment extends Fragment {
                 cards.add(card);
                 balloonsMap.put(balloon, card);
             }
-            if (jsonArray.length() == 0) {
-                emptyStateImage.setBackgroundResource(R.drawable.empty_state);
-            } else {
-                emptyStateImage.setBackgroundResource(0);
-            }
-            return;
+            return jsonArray.length();
         }
 
         @Override
-        protected void onPostExecute(Void aVoid) {
+        protected void onPostExecute(Integer aVoid) {
             super.onPostExecute(aVoid);
             if (mProgressDialog.isShowing()) {
                 mProgressDialog.dismiss();
             }
+            if (aVoid != null) {
+                if (aVoid == 0) {
+                    emptyStateImage.setBackgroundResource(R.drawable.empty_state);
+                } else {
+                    emptyStateImage.setBackgroundResource(0);
+                }
+            }
+
             mCardArrayAdapter.setCards(cards);
             mCardArrayAdapter.notifyDataSetChanged();
         }
-    }
-
-    interface LikedBalloonsListener {
-        void fetchLikedBalloons();
-    }
-
-    public void setListener(LikedBalloonsListener listener) {
-        this.listener = listener;
     }
 }

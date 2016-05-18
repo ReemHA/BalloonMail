@@ -181,10 +181,11 @@ public class SentMailsFragment extends Fragment {
         sentBalloonList.addAll(balloonsMap.keySet());
         saveSentBalloonsToDatabase(sentBalloonList);
     }
+
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
-        if (isVisibleToUser && Global.isConnected(getContext())){
+        if (isVisibleToUser && Global.isConnected(getContext())) {
             try {
                 loadSentBalloons();
             } catch (ExecutionException e) {
@@ -195,7 +196,7 @@ public class SentMailsFragment extends Fragment {
         }
     }
 
-    private void loadSentBalloons()throws ExecutionException, InterruptedException {
+    private void loadSentBalloons() throws ExecutionException, InterruptedException {
         new fetchReceivedBalloonsFromServer().execute();
     }
 
