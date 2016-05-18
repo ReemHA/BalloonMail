@@ -329,12 +329,12 @@ public class CardReceived extends Card {
     }
 
 
-    private class CreateARefillRequest extends AsyncTask<Balloon, Void, Void> {
+    private class CreateARefillRequest extends AsyncTask<Balloon, Void, JSONObject> {
         URL url;
         HttpURLConnection connection;
 
         @Override
-        protected Void doInBackground(Balloon... params) {
+        protected JSONObject doInBackground(Balloon... params) {
             try {
                 url = new URL(Global.SERVER_URL + "/balloons/refill");
                 connection = (HttpURLConnection) url.openConnection();
@@ -377,7 +377,7 @@ public class CardReceived extends Card {
                 outputStream.close();
 
                 // receive the response from server
-                setIsRefillAttrInBalloon(params[0]);
+                return setIsRefillAttrInBalloon(params[0]);
             } catch (MalformedURLException e) {
                 e.printStackTrace();
             } catch (IOException e) {
@@ -389,7 +389,7 @@ public class CardReceived extends Card {
             return null;
         }
 
-        private void setIsRefillAttrInBalloon(Balloon balloon) throws IOException, JSONException {
+        private JSONObject setIsRefillAttrInBalloon(Balloon balloon) throws IOException, JSONException {
             // create StringBuilder object to append the input stream in
             StringBuilder sb = new StringBuilder();
             String line;
@@ -409,8 +409,17 @@ public class CardReceived extends Card {
             // convert response to JSONObject
             JSONObject response = new JSONObject(JSONResponse);
 
+            return response;
+
+
+        }
+
+        @Override
+        protected void onPostExecute(JSONObject jsonObject) {
+            super.onPostExecute(jsonObject);
+
             // checks if an error is in the response
-            if (!response.has("error")) {
+            if (!jsonObject.has("error")) {
                 int isRefilled = ((ReceivedBalloon) balloon).getIs_refilled();
                 if (isRefilled == 0) {
                     ((ReceivedBalloon) balloon).setIs_refilled(1);
@@ -422,17 +431,15 @@ public class CardReceived extends Card {
             } else {
                 ((ReceivedBalloon) balloon).setIs_refilled(0);
             }
-
-
         }
     }
 
-    private class CreateACreepRequest extends AsyncTask<Balloon, Void, Void> {
+    private class CreateACreepRequest extends AsyncTask<Balloon, Void, JSONObject> {
         URL url;
         HttpURLConnection connection;
 
         @Override
-        protected Void doInBackground(Balloon... params) {
+        protected JSONObject doInBackground(Balloon... params) {
             try {
                 url = new URL(Global.SERVER_URL + "/balloons/creep");
                 connection = (HttpURLConnection) url.openConnection();
@@ -475,7 +482,7 @@ public class CardReceived extends Card {
                 outputStream.close();
 
                 // receive the response from server
-                setIsCreepAttrInBalloon(params[0]);
+                return setIsCreepAttrInBalloon(params[0]);
             } catch (MalformedURLException e) {
                 e.printStackTrace();
             } catch (IOException e) {
@@ -487,7 +494,7 @@ public class CardReceived extends Card {
             return null;
         }
 
-        private void setIsCreepAttrInBalloon(Balloon balloon) throws IOException, JSONException {
+        private JSONObject setIsCreepAttrInBalloon(Balloon balloon) throws IOException, JSONException {
             // create StringBuilder object to append the input stream in
             StringBuilder sb = new StringBuilder();
             String line;
@@ -507,8 +514,15 @@ public class CardReceived extends Card {
             // convert response to JSONObject
             JSONObject response = new JSONObject(JSONResponse);
 
+            return response;
+        }
+
+        @Override
+        protected void onPostExecute(JSONObject jsonObject) {
+            super.onPostExecute(jsonObject);
+
             // checks if an error is in the response
-            if (!response.has("error")) {
+            if (!jsonObject.has("error")) {
                 int isCreeped = ((ReceivedBalloon) balloon).getIs_creeped();
                 if (isCreeped == 0) {
                     ((ReceivedBalloon) balloon).setIs_creeped(1);
@@ -520,8 +534,6 @@ public class CardReceived extends Card {
             } else {
                 ((ReceivedBalloon) balloon).setIs_creeped(0);
             }
-
-
         }
     }
 

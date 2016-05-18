@@ -229,11 +229,11 @@ public class CardLikes extends Card {
 
     }
 
-    private static class CreateALikeRequest extends AsyncTask<Balloon, Void, Void> {
+    private class CreateALikeRequest extends AsyncTask<Balloon, Void, JSONObject> {
         URL url;
         HttpURLConnection connection;
         @Override
-        protected Void doInBackground(Balloon... params) {
+        protected JSONObject doInBackground(Balloon... params) {
             try {
                 url = new URL(Global.SERVER_URL + "/balloons/like");
                 connection = (HttpURLConnection) url.openConnection();
@@ -276,7 +276,7 @@ public class CardLikes extends Card {
                 outputStream.close();
 
                 // receive the response from server
-                setIsLikedAttrInBalloon(params[0]);
+                return setIsLikedAttrInBalloon(params[0]);
             } catch (MalformedURLException e) {
                 e.printStackTrace();
             } catch (IOException e) {
@@ -288,7 +288,7 @@ public class CardLikes extends Card {
             return null;
         }
 
-        private void setIsLikedAttrInBalloon(Balloon  balloon) throws IOException, JSONException {
+        private JSONObject setIsLikedAttrInBalloon(Balloon  balloon) throws IOException, JSONException {
             // create StringBuilder object to append the input stream in
             StringBuilder sb = new StringBuilder();
             String line;
@@ -308,8 +308,14 @@ public class CardLikes extends Card {
             // convert response to JSONObject
             JSONObject response = new JSONObject(JSONResponse);
 
+            return response;
+        }
+
+        @Override
+        protected void onPostExecute(JSONObject jsonObject) {
+            super.onPostExecute(jsonObject);
             // checks if an error is in the response
-            if (!response.has("error")) {
+            if (!jsonObject.has("error")) {
                 ((LikedBalloon) balloon).setIs_liked(1);
             } else {
                 ((LikedBalloon) balloon).setIs_liked(0);
