@@ -23,7 +23,7 @@
         <ImageButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/mapImageButton"
+            android:id="@id/mapImageButton"
             android:background="@drawable/ic_map_48px"
             android:layout_alignParentTop="true"
             android:layout_alignParentRight="true"

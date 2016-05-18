@@ -160,8 +160,6 @@ public class SentMailsFragment extends Fragment {
             }
         });
 
-        CardExpand cardExpand = new CustomSentExpandCard(balloon, getActivity().getBaseContext(), savedInstanceState);
-        card.addCardExpand(cardExpand);
         card.setId(balloon.getSent_at().toString());
         card.setCardElevation(getResources().getDimension(R.dimen.card_shadow_elevation));
 

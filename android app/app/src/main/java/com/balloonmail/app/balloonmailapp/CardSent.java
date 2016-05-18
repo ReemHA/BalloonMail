@@ -1,12 +1,12 @@
 package com.balloonmail.app.balloonmailapp;
 
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.balloonmail.app.balloonmailapp.Utilities.Global;
@@ -28,22 +28,25 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import it.gmariotti.cardslib.library.internal.Card;
-import it.gmariotti.cardslib.library.internal.ViewToClickToExpand;
+import it.gmariotti.cardslib.library.internal.CardExpand;
 
 /**
  * Created by Dalia on 4/25/2016.
  */
 public class CardSent extends Card {
     Balloon balloon;
-    private ProgressDialog mProgressDialog;
+    //private ProgressDialog mProgressDialog;
     private SharedPreferences sharedPreferences;
     private static String api_token;
+    private CardExpand cardExpand;
 
     public CardSent(Balloon balloon, Context context) {
         super(context, R.layout.card_sent_item);
         this.balloon = balloon;
         sharedPreferences = context.getSharedPreferences(Global.USER_INFO_PREF_FILE, Context.MODE_PRIVATE);
 
+        cardExpand = new CustomSentExpandCard(balloon, context, null);
+        this.addCardExpand(cardExpand);
     }
 
     @Override
@@ -56,10 +59,10 @@ public class CardSent extends Card {
             if (mTitleView != null && mapBtn != null) {
                 mTitleView.setText(balloon.getText());
 
-                ViewToClickToExpand viewToClickToExpand =
-                        ViewToClickToExpand.builder()
-                                .setupView(mapBtn);
-                setViewToClickToExpand(viewToClickToExpand);
+//                ViewToClickToExpand viewToClickToExpand =
+//                        ViewToClickToExpand.builder()
+//                                .setupView(mapBtn);
+//                setViewToClickToExpand(viewToClickToExpand);
             }
 
             TextView refill = (TextView) view.findViewById(R.id.refillTv);
@@ -73,21 +76,23 @@ public class CardSent extends Card {
             TextView creep = (TextView) view.findViewById(R.id.creepTv);
             creep.setText(String.valueOf(balloon.getCreeps()) + " creeps");
 
-            ImageButton mapButton = (ImageButton) view.findViewById(R.id.mapImageButton);
-            mapButton.setOnClickListener(new View.OnClickListener() {
+            final CardSent _card = this;
+            mapBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     drawPaths();
+                    ((CustomSentExpandCard)cardExpand).setPathsOnMap(balloon);
+                    _card.doExpand();
                 }
             });
         }
     }
 
     private void drawPaths() {
-        mProgressDialog = new ProgressDialog(getContext());
-        mProgressDialog.setIndeterminate(true);
-        mProgressDialog.setMessage("Getting your updated balloons..");
-        mProgressDialog.show();
+//        mProgressDialog = new ProgressDialog(getContext());
+//        mProgressDialog.setIndeterminate(true);
+//        mProgressDialog.setMessage("Getting your updated balloons..");
+//        mProgressDialog.show();
         new GetAllPathsOfSource().execute();
     }
 
@@ -100,7 +105,7 @@ public class CardSent extends Card {
         protected Void doInBackground(Void... voids) {
 
             try {
-                url = new URL(Global.SERVER_URL + "/balloons/received");
+                url = new URL(Global.SERVER_URL + "/balloons/paths" + "?balloon_id=" + balloon.getBalloon_id());
                 connection = (HttpURLConnection) url.openConnection();
                 connection.setRequestMethod("GET");
                 connection.setRequestProperty("authorization", "Bearer " + api_token);
@@ -140,8 +145,8 @@ public class CardSent extends Card {
             }
             reader.close();
             streamReader.close();
-            if (mProgressDialog.isShowing())
-                mProgressDialog.dismiss();
+//            if (mProgressDialog.isShowing())
+//                mProgressDialog.dismiss();
             JSONObject jsonObject = new JSONObject(stringBuilder.toString());
             JSONArray jsonArray = jsonObject.getJSONArray("paths");
             for (int i = 0; i < jsonArray.length(); i++) {

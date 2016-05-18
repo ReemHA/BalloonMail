@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:map="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -18,47 +19,59 @@
         map:liteMode="true"
         map:mapType="normal"/>
 
-    <TextView
+    <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/likedBalloonTextTv"
-        android:layout_marginLeft="@dimen/actions_padding_left"
-        android:maxLines="2"/>
+        android:id="@+id/sent_text_and_actions_layout">
 
-    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:orientation="horizontal"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
-
-        <ImageButton
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/refillActionBtn_liked"
-            android:background="@drawable/ic_refill_button_selector"
-            android:layout_marginBottom="@dimen/actions_padding"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true" />
+            android:id="@+id/likedBalloonTextTv"
+            android:layout_alignParentLeft="true"
+            android:layout_toLeftOf="@+id/actions_layout"
+            android:layout_marginLeft="@dimen/actions_padding_left"
+            tools:text="This is a very long message to test the presence of text over action buttons"
+            android:maxLines="2"/>
 
-        <ImageButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/likeActionBtn_liked"
-            android:background="@drawable/ic_like_grey_24px"
-            android:layout_marginBottom="@dimen/actions_padding"
-            android:layout_below="@+id/refillActionBtn_liked"
+        <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:orientation="horizontal"
+            android:id="@id/actions_layout"
             android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true" />
+            android:layout_width="50dp"
+            android:layout_height="wrap_content">
 
-        <ImageButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/creepActionBtn_liked"
-            android:background="@drawable/ic_creepy_grey_24px"
-            android:layout_below="@+id/likeActionBtn_liked"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true" />
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/refillActionBtn_liked"
+                android:background="@drawable/ic_refill_button_selector"
+                android:layout_marginBottom="@dimen/actions_padding"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true" />
 
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/likeActionBtn_liked"
+                android:background="@drawable/ic_like_grey_24px"
+                android:layout_marginBottom="@dimen/actions_padding"
+                android:layout_below="@+id/refillActionBtn_liked"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true" />
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/creepActionBtn_liked"
+                android:background="@drawable/ic_creepy_grey_24px"
+                android:layout_below="@+id/likeActionBtn_liked"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true" />
+
+
+        </RelativeLayout>
 
     </RelativeLayout>
 
