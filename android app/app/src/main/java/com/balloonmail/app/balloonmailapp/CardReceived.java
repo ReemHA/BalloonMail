@@ -46,7 +46,7 @@ public class CardReceived extends Card {
     private SharedPreferences sharedPreferences;
     private static String api_token;
 
-    static ReceivedCardViewHolder holder;
+    ReceivedCardViewHolder holder;
 
     public CardReceived(Balloon balloon, Context context, Bundle savedInstanceState) {
         super(context, R.layout.card_received_item);

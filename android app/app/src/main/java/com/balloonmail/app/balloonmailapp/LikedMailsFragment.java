@@ -206,6 +206,8 @@ public class LikedMailsFragment extends Fragment {
                 url = new URL(Global.SERVER_URL + "/balloons/liked");
                 connection = (HttpURLConnection) url.openConnection();
                 connection.setRequestMethod("GET");
+                sharedPreferences = getContext().getSharedPreferences(Global.USER_INFO_PREF_FILE, Context.MODE_PRIVATE);
+                api_token = sharedPreferences.getString(Global.PREF_USER_API_TOKEN, "");
                 connection.setRequestProperty("authorization", "Bearer " + api_token);
                 connection.setRequestProperty("Content-Type", "application/json");
                 connection.setRequestProperty("charset", "utf-8");
@@ -244,6 +246,8 @@ public class LikedMailsFragment extends Fragment {
                         object.getDouble("lat"), object.getDouble("lng"), dateFormat.parse(object.getString("sent_at")));
                 Log.d(LikedMailsFragment.class.getSimpleName(), "lat: "+object.getDouble("lat"));
                 Log.d(LikedMailsFragment.class.getSimpleName(), "lng: "+object.getDouble("lng"));
+                balloon.setIs_creeped(object.getInt("creeped"));
+                balloon.setIs_refilled(object.getInt("refilled"));
                 Card card = createCard(balloon);
                 cards.add(card);
                 balloonsMap.put(balloon, card);
