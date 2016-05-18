@@ -246,6 +246,8 @@ public class LikedMailsFragment extends Fragment {
                         object.getDouble("lat"), object.getDouble("lng"), dateFormat.parse(object.getString("sent_at")));
                 Log.d(LikedMailsFragment.class.getSimpleName(), "lat: "+object.getDouble("lat"));
                 Log.d(LikedMailsFragment.class.getSimpleName(), "lng: "+object.getDouble("lng"));
+                balloon.setIs_creeped(object.getInt("creeped"));
+                balloon.setIs_refilled(object.getInt("refilled"));
                 Card card = createCard(balloon);
                 cards.add(card);
                 balloonsMap.put(balloon, card);
