@@ -53,10 +53,11 @@ public class ReceivedBalloon extends Balloon {
         this.is_refilled = is_refilled;
     }
 
-    public ReceivedBalloon(String text, int balloon_id,double sentiment, Date sent_date) {
+    public ReceivedBalloon(String text, int balloon_id,double sentiment, double lat, double lng,Date sent_date) {
         this.text = text;
         this.balloon_id = balloon_id;
         this.sentiment = sentiment;
+        this.setSourceBalloon(lat, lng);
         this.sent_at = sent_date;
     }
 }
