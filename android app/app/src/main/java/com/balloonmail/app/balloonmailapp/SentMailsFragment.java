@@ -18,6 +18,7 @@ import com.balloonmail.app.balloonmailapp.Utilities.Global;
 import com.balloonmail.app.balloonmailapp.models.Balloon;
 import com.balloonmail.app.balloonmailapp.models.DatabaseHelper;
 import com.balloonmail.app.balloonmailapp.models.SentBalloon;
+import com.google.android.gms.maps.model.LatLng;
 import com.j256.ormlite.android.apptools.OpenHelperManager;
 import com.j256.ormlite.dao.Dao;
 
@@ -42,7 +43,6 @@ import java.util.Locale;
 import java.util.concurrent.ExecutionException;
 
 import it.gmariotti.cardslib.library.internal.Card;
-import it.gmariotti.cardslib.library.internal.CardExpand;
 import it.gmariotti.cardslib.library.recyclerview.internal.CardArrayRecyclerViewAdapter;
 import it.gmariotti.cardslib.library.recyclerview.view.CardRecyclerView;
 
@@ -144,18 +144,19 @@ public class SentMailsFragment extends Fragment {
         return cards;
     }
 
-    private Card createCard(Balloon balloon) {
+    private Card createCard(final Balloon balloon) {
         Card card = new CardSent(balloon, getActivity().getBaseContext());
 
-        final Balloon balloon1 = balloon;
         card.setOnClickListener(new Card.OnCardClickListener() {
             @Override
             public void onClick(Card card, View view) {
+                updateBalloonWithPaths(balloon);
+                Global.balloonHolder.setBalloon((SentBalloon) balloon);
                 Intent intent = new Intent(getContext(), MailDetailsAndMapActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                Bundle bundle = new Bundle();
-                bundle.putSerializable("balloon", balloon1);
-                intent.putExtras(bundle);
+                //Bundle bundle = new Bundle();
+                //bundle.putSerializable("balloon", balloon1);
+                //intent.putExtras(bundle);
                 getContext().startActivity(intent);
             }
         });
@@ -297,6 +298,85 @@ public class SentMailsFragment extends Fragment {
             }
             mCardArrayAdapter.setCards(cards);
             mCardArrayAdapter.notifyDataSetChanged();
+        }
+    }
+
+
+    private void updateBalloonWithPaths(Balloon balloon){
+        new GetAllPathsOfSource().execute(balloon);
+    }
+
+    private class GetAllPathsOfSource extends AsyncTask<Balloon, Void, Void> {
+        URL url;
+        HttpURLConnection connection;
+        String line;
+
+        @Override
+        protected Void doInBackground(Balloon... balloons) {
+
+            try {
+                url = new URL(Global.SERVER_URL + "/balloons/paths" + "?balloon_id=" + balloons[0].getBalloon_id());
+                connection = (HttpURLConnection) url.openConnection();
+                connection.setRequestMethod("GET");
+                connection.setRequestProperty("authorization", "Bearer " + api_token);
+                connection.setRequestProperty("Content-Type", "application/json");
+                connection.setRequestProperty("charset", "utf-8");
+                try {
+                    connection.connect();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            } catch (MalformedURLException e1) {
+                e1.printStackTrace();
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
+            try {
+                getResponse(balloons[0]);
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+
+        private void getResponse(Balloon balloon) throws IOException, JSONException, ParseException {
+            HashMap<LatLng, ArrayList<LatLng>> paths = new HashMap<>();
+
+            InputStreamReader streamReader = new InputStreamReader(connection.getInputStream());
+            BufferedReader reader = new BufferedReader(streamReader);
+            StringBuilder stringBuilder = new StringBuilder();
+            while ((line = reader.readLine()) != null) {
+                stringBuilder.append(line);
+            }
+            reader.close();
+            streamReader.close();
+
+            JSONObject jsonObject = new JSONObject(stringBuilder.toString());
+            JSONArray jsonArray = jsonObject.getJSONArray("paths");
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject object = jsonArray.getJSONObject(i);
+                LatLng source = new LatLng(object.getDouble("from_lat"), object.getDouble("from_lng"));
+                ArrayList<LatLng> dests = paths.get(source);
+                if (!paths.containsKey(source)) {
+                    dests = new ArrayList<>();
+                    paths.put(source, dests);
+                }
+                dests.add(new LatLng(object.getDouble("to_lat"), object.getDouble("to_lng")));
+            }
+            balloon.setDestinationsHashMap(paths);
+            Global.balloonHolder.setBalloon((SentBalloon) balloon);
+
+            return;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
         }
     }
 }

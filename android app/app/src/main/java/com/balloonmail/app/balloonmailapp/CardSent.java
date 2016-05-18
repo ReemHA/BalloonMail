@@ -6,11 +6,11 @@ import android.os.AsyncTask;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.balloonmail.app.balloonmailapp.Utilities.Global;
 import com.balloonmail.app.balloonmailapp.models.Balloon;
+import com.balloonmail.app.balloonmailapp.models.SentBalloon;
 import com.google.android.gms.maps.model.LatLng;
 
 import org.json.JSONArray;
@@ -39,6 +39,7 @@ public class CardSent extends Card {
     private SharedPreferences sharedPreferences;
     private static String api_token;
     private CardExpand cardExpand;
+    CardSent _card;
 
     public CardSent(Balloon balloon, Context context) {
         super(context, R.layout.card_sent_item);
@@ -76,23 +77,17 @@ public class CardSent extends Card {
             TextView creep = (TextView) view.findViewById(R.id.creepTv);
             creep.setText(String.valueOf(balloon.getCreeps()) + " creeps");
 
-            final CardSent _card = this;
+            _card = this;
             mapBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     drawPaths();
-                    ((CustomSentExpandCard)cardExpand).setPathsOnMap(balloon);
-                    _card.doExpand();
                 }
             });
         }
     }
 
     private void drawPaths() {
-//        mProgressDialog = new ProgressDialog(getContext());
-//        mProgressDialog.setIndeterminate(true);
-//        mProgressDialog.setMessage("Getting your updated balloons..");
-//        mProgressDialog.show();
         new GetAllPathsOfSource().execute();
     }
 
@@ -145,8 +140,7 @@ public class CardSent extends Card {
             }
             reader.close();
             streamReader.close();
-//            if (mProgressDialog.isShowing())
-//                mProgressDialog.dismiss();
+
             JSONObject jsonObject = new JSONObject(stringBuilder.toString());
             JSONArray jsonArray = jsonObject.getJSONArray("paths");
             for (int i = 0; i < jsonArray.length(); i++) {
@@ -160,8 +154,17 @@ public class CardSent extends Card {
                 dests.add(new LatLng(object.getDouble("to_lat"), object.getDouble("to_lng")));
             }
             balloon.setDestinationsHashMap(paths);
+            Global.balloonHolder.setBalloon((SentBalloon) balloon);
 
             return;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+
+            ((CustomSentExpandCard)cardExpand).setPathsOnMap(balloon);
+            _card.doExpand();
         }
     }
 }

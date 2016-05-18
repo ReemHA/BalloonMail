@@ -1,6 +1,5 @@
 package com.balloonmail.app.balloonmailapp;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -20,22 +19,22 @@ public class MailDetailsAndMapActivity extends AppCompatActivity {
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        if(savedInstanceState == null){
+        /*if(savedInstanceState == null){
 
-            Intent intent = this.getIntent();
-            Bundle bundle = intent.getExtras();
-            balloon = (Balloon) bundle.getSerializable("balloon");
+            //Intent intent = this.getIntent();
+            //Bundle bundle = intent.getExtras();
+            //balloon = (Balloon) bundle.getSerializable("balloon");
 
 
-            Bundle arguments = new Bundle();
-            arguments.putSerializable("balloonDetailFragment", balloon);
-            MailDetailsAndMapActivityFragment mailDetailsAndMapActivityFragment = new MailDetailsAndMapActivityFragment();
-            mailDetailsAndMapActivityFragment.setArguments(arguments);
+            //Bundle arguments = new Bundle();
+            //arguments.putSerializable("balloonDetailFragment", balloon);
+            //MailDetailsAndMapActivityFragment mailDetailsAndMapActivityFragment = new MailDetailsAndMapActivityFragment();
+            //mailDetailsAndMapActivityFragment.setArguments(arguments);
 
             getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.fragment, mailDetailsAndMapActivityFragment)
+                    .add(R.id.fragment, new MailDetailsAndMapActivityFragment())
                     .commit();
-        }
+        }*/
     }
 
 

@@ -64,7 +64,7 @@ public class CustomSentExpandCard extends CardExpand{
 
         holder.mapView = (MapView) view.findViewById(R.id.row_map);
 
-        createMapOfExpandCard();
+        //createMapOfExpandCard();
 
         holder.sentimentIndication = view.findViewById(R.id.sentiment_indication);
 
@@ -133,9 +133,9 @@ public class CustomSentExpandCard extends CardExpand{
             public void onMapClick(LatLng latLng) {
                 Intent intent = new Intent(context, MailDetailsAndMapActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                Bundle bundle = new Bundle();
-                bundle.putSerializable("balloon", balloon);
-                intent.putExtras(bundle);
+                //Bundle bundle = new Bundle();
+                //bundle.putSerializable("balloon", balloon);
+                //intent.putExtras(bundle);
                 context.startActivity(intent);
             }
         });

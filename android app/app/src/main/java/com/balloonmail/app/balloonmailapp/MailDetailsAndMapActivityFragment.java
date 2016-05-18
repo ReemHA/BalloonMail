@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.balloonmail.app.balloonmailapp.Utilities.Global;
 import com.balloonmail.app.balloonmailapp.models.Balloon;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -48,9 +49,10 @@ public class MailDetailsAndMapActivityFragment extends Fragment implements OnMap
 
         rootView = inflater.inflate(R.layout.fragment_mail_details_and_map, container, false);
 
-        Bundle bundle = getArguments();
-        if(bundle != null){
-            balloon = (Balloon)bundle.getSerializable("balloonDetailFragment");
+        //Bundle bundle = getArguments();
+        //if(bundle != null){
+            //balloon = (Balloon)bundle.getSerializable("balloonDetailFragment");
+            balloon = Global.balloonHolder.getBalloon();
 
             TextView text = (TextView)rootView.findViewById(R.id.sentBalloonTextTv);
             text.setText(balloon.getText());
@@ -70,7 +72,9 @@ public class MailDetailsAndMapActivityFragment extends Fragment implements OnMap
 
             mapFragment.getMapAsync(this);
 
-        }
+            Global.balloonHolder.setBalloon(null);
+
+        //}
 
         return rootView;
     }
