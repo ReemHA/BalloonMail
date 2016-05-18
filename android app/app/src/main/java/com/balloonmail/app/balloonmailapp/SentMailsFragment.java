@@ -51,7 +51,6 @@ public class SentMailsFragment extends Fragment {
     private ArrayList<Card> cards;
     private LinearLayoutManager mLayoutManager;
     private HashMap<SentBalloon, Card> balloonsMap;
-    private SentBalloonsListener mListener;
     private static List<SentBalloon> sentBalloonList;
     private DatabaseHelper dbHelper;
     private Dao<SentBalloon, Integer> sentBalloonDao;
@@ -90,15 +89,7 @@ public class SentMailsFragment extends Fragment {
         }
         mCardArrayAdapter = new CardArrayRecyclerViewAdapter(getActivity(), cards);
 
-        if (Global.isConnected(getContext())) {
-            try {
-                loadSentBalloons();
-            } catch (ExecutionException e) {
-                e.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        } else {
+        if (!Global.isConnected(getContext())) {
             try {
                 cards = initCardsFromLocalDb();
                 mCardArrayAdapter.setCards(cards);
@@ -106,6 +97,7 @@ public class SentMailsFragment extends Fragment {
                 e.printStackTrace();
             }
         }
+
 
         //Staggered grid view
         CardRecyclerView mRecyclerView = (CardRecyclerView) rootView.findViewById(R.id.cvCardRecyclerView);
@@ -190,13 +182,24 @@ public class SentMailsFragment extends Fragment {
         saveSentBalloonsToDatabase(sentBalloonList);
     }
 
-    interface SentBalloonsListener {
-        void getSentBalloons(List<SentBalloon> balloonList);
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        if (isVisibleToUser && Global.isConnected(getContext())) {
+            try {
+                loadSentBalloons();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
-    public void setListener(SentBalloonsListener listener) {
-        mListener = listener;
+    private void loadSentBalloons() throws ExecutionException, InterruptedException {
+        new fetchReceivedBalloonsFromServer().execute();
     }
+
 
     private void saveSentBalloonsToDatabase(List<SentBalloon> balloonList) {
 
@@ -214,18 +217,20 @@ public class SentMailsFragment extends Fragment {
         }
     }
 
-    private void loadSentBalloons() throws ExecutionException, InterruptedException {
-        mProgressDialog = new ProgressDialog(getContext());
-        mProgressDialog.setIndeterminate(true);
-        mProgressDialog.setMessage("Getting your updated balloons..");
-        mProgressDialog.show();
-        new fetchSentBalloonsFromServer().execute();
-    }
-
-    private class fetchSentBalloonsFromServer extends AsyncTask<Object, Void, Void> {
+    private class fetchReceivedBalloonsFromServer extends AsyncTask<Object, Void, Void> {
         URL url;
         HttpURLConnection connection;
         String line;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            mProgressDialog = new ProgressDialog(getActivity());
+            mProgressDialog.setIndeterminate(true);
+            mProgressDialog.setMessage("Getting your sent balloons..");
+            mProgressDialog.setCancelable(false);
+            mProgressDialog.show();
+        }
 
         @Override
         protected Void doInBackground(Object... params) {
@@ -233,7 +238,7 @@ public class SentMailsFragment extends Fragment {
                 url = new URL(Global.SERVER_URL + "/balloons/sent");
                 connection = (HttpURLConnection) url.openConnection();
                 connection.setRequestMethod("GET");
-                connection.setRequestProperty("authorization", "Bearer "+ api_token);
+                connection.setRequestProperty("authorization", "Bearer " + api_token);
                 connection.setRequestProperty("Content-Type", "application/json");
                 connection.setRequestProperty("charset", "utf-8");
                 connection.connect();
@@ -274,9 +279,9 @@ public class SentMailsFragment extends Fragment {
                 cards.add(card);
                 balloonsMap.put(balloon, card);
             }
-            if(jsonArray.length() == 0){
+            if (jsonArray.length() == 0) {
                 emptyStateImage.setBackgroundResource(R.drawable.empty_state);
-            }else{
+            } else {
                 emptyStateImage.setBackgroundResource(0);
             }
 
@@ -286,10 +291,11 @@ public class SentMailsFragment extends Fragment {
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
+            if (mProgressDialog.isShowing()) {
+                mProgressDialog.dismiss();
+            }
             mCardArrayAdapter.setCards(cards);
             mCardArrayAdapter.notifyDataSetChanged();
         }
     }
-
-
 }
