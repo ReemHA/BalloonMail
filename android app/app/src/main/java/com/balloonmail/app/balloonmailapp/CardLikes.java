@@ -104,25 +104,23 @@ public class CardLikes extends Card {
                 @Override
                 public void onClick(View v) {
                     requestLikeToServer(balloon);
-                    changeStateOfLikeBtn();
+                    //changeStateOfLikeBtn();
                 }
             });
 
             holder.refillBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    //((LikedBalloon)balloon).setIs_refilled(1);
                     requestRefillToServer(balloon);
-                    changeStateOfRefillBtn();
+                    //changeStateOfRefillBtn();
                 }
             });
 
             holder.creepBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    //((LikedBalloon)balloon).setIs_creeped(1);
                     requestCreepToServer(balloon);
-                    changeStateOfCreepBtn();
+                   //changeStateOfCreepBtn();
                 }
             });
 
@@ -315,7 +313,7 @@ public class CardLikes extends Card {
         protected void onPostExecute(JSONObject jsonObject) {
             super.onPostExecute(jsonObject);
             // checks if an error is in the response
-            if (!jsonObject.has("error")) {
+            if ((jsonObject != null) && !jsonObject.has("error")) {
                 ((LikedBalloon) balloon).setIs_liked(1);
             } else {
                 ((LikedBalloon) balloon).setIs_liked(0);
@@ -409,7 +407,7 @@ public class CardLikes extends Card {
         protected void onPostExecute(JSONObject jsonObject) {
             super.onPostExecute(jsonObject);
             // checks if an error is in the response
-            if (!jsonObject.has("error")) {
+            if ((jsonObject != null) && !jsonObject.has("error")) {
                 ((LikedBalloon) balloon).setIs_refilled(1);
             } else {
                 ((LikedBalloon) balloon).setIs_refilled(0);
@@ -503,7 +501,7 @@ public class CardLikes extends Card {
         protected void onPostExecute(JSONObject jsonObject) {
             super.onPostExecute(jsonObject);
             // checks if an error is in the response
-            if (!jsonObject.has("error")) {
+            if ((jsonObject != null) && !jsonObject.has("error")) {
                 ((LikedBalloon) balloon).setIs_creeped(1);
             } else {
                 ((LikedBalloon) balloon).setIs_creeped(0);

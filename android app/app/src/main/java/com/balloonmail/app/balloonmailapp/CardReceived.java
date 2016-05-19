@@ -97,15 +97,16 @@ public class CardReceived extends Card {
                 @Override
                 public void onClick(View v) {
                     requestLikeToServer(balloon);
-                    changeStateOfLikeBtn();
+                    // changeStateOfLikeBtn();
                 }
             });
 
             holder.refillBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    requestRefillToServer(balloon);
+                    ((ReceivedBalloon) balloon).setIs_refilled(1);
                     changeStateOfRefillBtn();
+                    requestRefillToServer(balloon);
                 }
             });
 
@@ -113,7 +114,7 @@ public class CardReceived extends Card {
                 @Override
                 public void onClick(View v) {
                     requestCreepToServer(balloon);
-                    changeStateOfCreepBtn();
+                    //changeStateOfCreepBtn();
                 }
             });
 
@@ -151,7 +152,6 @@ public class CardReceived extends Card {
         }
     }
 
-
     private void changeStateOfCreepBtn() {
         if (((ReceivedBalloon) balloon).getIs_creeped() == 0) {
             holder.creepBtn.setImageResource(R.drawable.ic_creepy_grey_24px);
@@ -160,12 +160,12 @@ public class CardReceived extends Card {
         }
     }
 
-    private void changeColorOfSentimentIndication(double sentiment){
-        if(sentiment < 0){
+    private void changeColorOfSentimentIndication(double sentiment) {
+        if (sentiment < 0) {
             holder.sentimentIndication.setBackgroundResource(R.color.red);
-        }else if(sentiment > 0){
+        } else if (sentiment > 0) {
             holder.sentimentIndication.setBackgroundResource(R.color.green);
-        }else{
+        } else {
             holder.sentimentIndication.setBackgroundResource(R.color.colorPrimary);
         }
     }
@@ -197,8 +197,10 @@ public class CardReceived extends Card {
         MapView mapView;
 
         GoogleMap map;
-        
-        ImageButton refillBtn; ImageButton likeBtn; ImageButton creepBtn;
+
+        ImageButton refillBtn;
+        ImageButton likeBtn;
+        ImageButton creepBtn;
         View sentimentIndication;
 
         @Override
@@ -321,7 +323,7 @@ public class CardReceived extends Card {
                 ((ReceivedBalloon) balloon).setIs_liked(1);
                 changeStateOfLikeBtn();
 
-            }else {
+            } else {
                 ((ReceivedBalloon) balloon).setIs_liked(0);
                 changeStateOfLikeBtn();
             }
@@ -417,19 +419,12 @@ public class CardReceived extends Card {
         @Override
         protected void onPostExecute(JSONObject jsonObject) {
             super.onPostExecute(jsonObject);
-
             // checks if an error is in the response
-            if (!jsonObject.has("error")) {
-                int isRefilled = ((ReceivedBalloon) balloon).getIs_refilled();
-                if (isRefilled == 0) {
-                    ((ReceivedBalloon) balloon).setIs_refilled(1);
-                    changeStateOfRefillBtn();
-                } else {
-                    ((ReceivedBalloon) balloon).setIs_refilled(0);
-                    changeStateOfRefillBtn();
-                }
-            } else {
+            if ((jsonObject == null) && (jsonObject.has("error"))) {
                 ((ReceivedBalloon) balloon).setIs_refilled(0);
+                holder.refillBtn.setImageResource(R.drawable.ic_refill_primary_24px);
+            }else {
+                ((ReceivedBalloon) balloon).setIs_refilled(1);
             }
         }
     }
@@ -522,7 +517,7 @@ public class CardReceived extends Card {
             super.onPostExecute(jsonObject);
 
             // checks if an error is in the response
-            if (!jsonObject.has("error")) {
+            if ((jsonObject != null) && (!jsonObject.has("error"))) {
                 int isCreeped = ((ReceivedBalloon) balloon).getIs_creeped();
                 if (isCreeped == 0) {
                     ((ReceivedBalloon) balloon).setIs_creeped(1);
