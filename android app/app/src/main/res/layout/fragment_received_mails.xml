@@ -6,12 +6,22 @@ android:layout_width="match_parent"
 android:layout_height="match_parent"
 style="@style/card.shadow_image">
 
+
+    <ProgressBar
+        android:theme="@style/LinearProgress"
+        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:id="@+id/receivedProgressBar"
+        android:indeterminate="true"/>
+
     <ImageView
-    android:layout_width="571px"
-    android:layout_height="396px"
-    android:layout_centerHorizontal="true"
-    android:layout_centerVertical="true"
-    android:id="@+id/emptyStateImage"
+        android:layout_width="571px"
+        android:layout_height="396px"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:id="@+id/emptyStateImage"
     />
     <it.gmariotti.cardslib.library.recyclerview.view.CardRecyclerView
         xmlns:card="http://schemas.android.com/apk/res-auto"

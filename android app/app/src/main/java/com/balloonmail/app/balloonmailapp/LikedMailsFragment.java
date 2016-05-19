@@ -1,7 +1,6 @@
 package com.balloonmail.app.balloonmailapp;
 
 
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
@@ -13,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 
 import com.balloonmail.app.balloonmailapp.Utilities.Global;
 import com.balloonmail.app.balloonmailapp.models.Balloon;
@@ -57,7 +57,7 @@ public class LikedMailsFragment extends Fragment {
     private DateFormat dateFormat;
     View rootView;
     Bundle savedInstanceState;
-    private ProgressDialog mProgressDialog;
+    ProgressBar progressBar;
     CardArrayRecyclerViewAdapter mCardArrayAdapter;
     private SharedPreferences sharedPreferences;
     private static String api_token;
@@ -80,6 +80,9 @@ public class LikedMailsFragment extends Fragment {
         balloonsMap = new HashMap<>();
         cards = new ArrayList<>();
         likedBalloonList = new ArrayList<>();
+
+        progressBar = (ProgressBar)rootView.findViewById(R.id.likedProgressBar);
+
         sharedPreferences = getContext().getSharedPreferences(Global.USER_INFO_PREF_FILE, Context.MODE_PRIVATE);
         api_token = sharedPreferences.getString(Global.PREF_USER_API_TOKEN, "");
 
@@ -195,11 +198,6 @@ public class LikedMailsFragment extends Fragment {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            mProgressDialog = new ProgressDialog(getContext());
-            mProgressDialog.setIndeterminate(true);
-            mProgressDialog.setMessage("Getting your liked balloons..");
-            mProgressDialog.setCancelable(false);
-            mProgressDialog.show();
         }
 
         @Override
@@ -237,8 +235,7 @@ public class LikedMailsFragment extends Fragment {
             }
             reader.close();
             streamReader.close();
-            if (mProgressDialog.isShowing())
-                mProgressDialog.dismiss();
+
             JSONObject jsonObject = new JSONObject(stringBuilder.toString());
             JSONArray jsonArray = jsonObject.getJSONArray("balloons");
             cards = new ArrayList<>();
@@ -260,8 +257,8 @@ public class LikedMailsFragment extends Fragment {
         @Override
         protected void onPostExecute(Integer aVoid) {
             super.onPostExecute(aVoid);
-            if (mProgressDialog.isShowing()) {
-                mProgressDialog.dismiss();
+            if(progressBar.isShown()){
+                progressBar.setVisibility(View.GONE);
             }
             if (aVoid != null) {
                 if (aVoid == 0) {
