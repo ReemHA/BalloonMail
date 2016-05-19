@@ -1,18 +1,19 @@
 package com.balloonmail.app.balloonmailapp;
 
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 
 import com.balloonmail.app.balloonmailapp.Utilities.Global;
 import com.balloonmail.app.balloonmailapp.models.Balloon;
@@ -37,6 +38,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -55,7 +57,8 @@ public class SentMailsFragment extends Fragment {
     private DatabaseHelper dbHelper;
     private Dao<SentBalloon, Integer> sentBalloonDao;
     private DateFormat dateFormat;
-    private ProgressDialog mProgressDialog;
+    ProgressBar progressBar;
+    SwipeRefreshLayout swipeRefreshLayout;
     View rootView;
     Bundle savedInstanceState;
     CardArrayRecyclerViewAdapter mCardArrayAdapter;
@@ -78,6 +81,22 @@ public class SentMailsFragment extends Fragment {
         cards = new ArrayList<>();
         sentBalloonList = new ArrayList<>();
 
+        progressBar = (ProgressBar) rootView.findViewById(R.id.sentProgressBar);
+
+        swipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipe_refresh_layout);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                try {
+                    loadSentBalloons();
+                } catch (ExecutionException e) {
+                    e.printStackTrace();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
         sharedPreferences = getContext().getSharedPreferences(Global.USER_INFO_PREF_FILE, Context.MODE_PRIVATE);
         api_token = sharedPreferences.getString(Global.PREF_USER_API_TOKEN, "");
         // Doa of SentBalloon table
@@ -92,6 +111,7 @@ public class SentMailsFragment extends Fragment {
         if (!Global.isConnected(getContext())) {
             try {
                 cards = initCardsFromLocalDb();
+                Collections.reverse(cards);
                 mCardArrayAdapter.setCards(cards);
             } catch (SQLException e) {
                 e.printStackTrace();
@@ -192,6 +212,7 @@ public class SentMailsFragment extends Fragment {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
+
         }
     }
 
@@ -224,11 +245,6 @@ public class SentMailsFragment extends Fragment {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            mProgressDialog = new ProgressDialog(getActivity());
-            mProgressDialog.setIndeterminate(true);
-            mProgressDialog.setMessage("Getting your sent balloons..");
-            mProgressDialog.setCancelable(false);
-            mProgressDialog.show();
         }
 
         @Override
@@ -267,8 +283,7 @@ public class SentMailsFragment extends Fragment {
             }
             reader.close();
             streamReader.close();
-            if (mProgressDialog.isShowing())
-                mProgressDialog.dismiss();
+
             JSONObject jsonObject = new JSONObject(stringBuilder.toString());
             JSONArray jsonArray = jsonObject.getJSONArray("balloons");
             cards = new ArrayList<>();
@@ -289,8 +304,11 @@ public class SentMailsFragment extends Fragment {
         @Override
         protected void onPostExecute(Integer aVoid) {
             super.onPostExecute(aVoid);
-            if (mProgressDialog.isShowing()) {
-                mProgressDialog.dismiss();
+            if(progressBar.isShown()){
+                progressBar.setVisibility(View.GONE);
+            }
+            if(swipeRefreshLayout.isRefreshing()){
+                swipeRefreshLayout.setRefreshing(false);
             }
             if (aVoid != null) {
                 if (aVoid == 0) {
@@ -299,6 +317,7 @@ public class SentMailsFragment extends Fragment {
                     emptyStateImage.setBackgroundResource(0);
                 }
             }
+            Collections.reverse(cards);
             mCardArrayAdapter.setCards(cards);
             mCardArrayAdapter.notifyDataSetChanged();
         }

@@ -6,19 +6,37 @@ android:layout_width="match_parent"
 android:layout_height="match_parent"
 style="@style/card.shadow_image">
 
-<ImageView
-    android:layout_width="571px"
-    android:layout_height="396px"
-    android:layout_centerHorizontal="true"
-    android:layout_centerVertical="true"
-    android:id="@+id/emptyStateImage"
-    />
-    <it.gmariotti.cardslib.library.recyclerview.view.CardRecyclerView
-        xmlns:card="http://schemas.android.com/apk/res-auto"
-        xmlns:android="http://schemas.android.com/apk/res/android"
+
+    <ProgressBar
+        android:theme="@style/LinearProgress"
+        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        card:list_card_layout_resourceID="@layout/native_recyclerview_card_layout"
-        android:id="@+id/cvLikesCardRecyclerView" />
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:id="@+id/likedProgressBar"
+        android:indeterminate="true"/>
+
+    <ImageView
+        android:layout_width="571px"
+        android:layout_height="396px"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:id="@+id/emptyStateImage"
+    />
+
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/swipe_refresh_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <it.gmariotti.cardslib.library.recyclerview.view.CardRecyclerView
+            xmlns:card="http://schemas.android.com/apk/res-auto"
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            card:list_card_layout_resourceID="@layout/native_recyclerview_card_layout"
+            android:id="@+id/cvLikesCardRecyclerView" />
+
+    </android.support.v4.widget.SwipeRefreshLayout>
 
 </RelativeLayout>

@@ -1,18 +1,18 @@
 package com.balloonmail.app.balloonmailapp;
 
-
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 
 import com.balloonmail.app.balloonmailapp.Utilities.Global;
 import com.balloonmail.app.balloonmailapp.models.Balloon;
@@ -36,6 +36,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -56,7 +57,8 @@ public class LikedMailsFragment extends Fragment {
     private DateFormat dateFormat;
     View rootView;
     Bundle savedInstanceState;
-    private ProgressDialog mProgressDialog;
+    ProgressBar progressBar;
+    SwipeRefreshLayout swipeRefreshLayout;
     CardArrayRecyclerViewAdapter mCardArrayAdapter;
     private SharedPreferences sharedPreferences;
     private static String api_token;
@@ -79,6 +81,23 @@ public class LikedMailsFragment extends Fragment {
         balloonsMap = new HashMap<>();
         cards = new ArrayList<>();
         likedBalloonList = new ArrayList<>();
+
+        progressBar = (ProgressBar)rootView.findViewById(R.id.likedProgressBar);
+
+        swipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipe_refresh_layout);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                try {
+                    loadLikedBalloons();
+                } catch (ExecutionException e) {
+                    e.printStackTrace();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
         sharedPreferences = getContext().getSharedPreferences(Global.USER_INFO_PREF_FILE, Context.MODE_PRIVATE);
         api_token = sharedPreferences.getString(Global.PREF_USER_API_TOKEN, "");
 
@@ -95,6 +114,7 @@ public class LikedMailsFragment extends Fragment {
         if (!Global.isConnected(getContext())) {
             try {
                 cards = initCardsFromLocalDb();
+                Collections.reverse(cards);
                 mCardArrayAdapter.setCards(cards);
             } catch (SQLException e) {
                 e.printStackTrace();
@@ -193,11 +213,6 @@ public class LikedMailsFragment extends Fragment {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            mProgressDialog = new ProgressDialog(getContext());
-            mProgressDialog.setIndeterminate(true);
-            mProgressDialog.setMessage("Getting your liked balloons..");
-            mProgressDialog.setCancelable(false);
-            mProgressDialog.show();
         }
 
         @Override
@@ -235,8 +250,7 @@ public class LikedMailsFragment extends Fragment {
             }
             reader.close();
             streamReader.close();
-            if (mProgressDialog.isShowing())
-                mProgressDialog.dismiss();
+
             JSONObject jsonObject = new JSONObject(stringBuilder.toString());
             JSONArray jsonArray = jsonObject.getJSONArray("balloons");
             cards = new ArrayList<>();
@@ -258,8 +272,11 @@ public class LikedMailsFragment extends Fragment {
         @Override
         protected void onPostExecute(Integer aVoid) {
             super.onPostExecute(aVoid);
-            if (mProgressDialog.isShowing()) {
-                mProgressDialog.dismiss();
+            if(progressBar.isShown()){
+                progressBar.setVisibility(View.GONE);
+            }
+            if(swipeRefreshLayout.isRefreshing()){
+                swipeRefreshLayout.setRefreshing(false);
             }
             if (aVoid != null) {
                 if (aVoid == 0) {
@@ -269,6 +286,7 @@ public class LikedMailsFragment extends Fragment {
                 }
             }
 
+            Collections.reverse(cards);
             mCardArrayAdapter.setCards(cards);
             mCardArrayAdapter.notifyDataSetChanged();
         }

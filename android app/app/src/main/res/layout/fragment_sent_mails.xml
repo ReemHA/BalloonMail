@@ -1,10 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:card="http://schemas.android.com/tools"
     android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     style="@style/card.shadow_image">
+
+    <ProgressBar
+        android:theme="@style/LinearProgress"
+        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:id="@+id/sentProgressBar"
+        android:indeterminate="true"/>
 
     <ImageView
         android:layout_width="571px"
@@ -13,10 +23,17 @@
         android:layout_centerVertical="true"
         android:id="@+id/emptyStateImage"
         />
-    <it.gmariotti.cardslib.library.recyclerview.view.CardRecyclerView
+
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/swipe_refresh_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        card:list_card_layout_resourceID="@layout/native_recyclerview_card_layout"
-        android:id="@+id/cvCardRecyclerView" />
+        android:layout_height="wrap_content">
+
+        <it.gmariotti.cardslib.library.recyclerview.view.CardRecyclerView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            card:list_card_layout_resourceID="@layout/native_recyclerview_card_layout"
+            android:id="@+id/cvCardRecyclerView" />
+    </android.support.v4.widget.SwipeRefreshLayout>
 
 </RelativeLayout>
