@@ -1,11 +1,11 @@
 package com.balloonmail.app.balloonmailapp;
 
-
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -58,6 +58,7 @@ public class LikedMailsFragment extends Fragment {
     View rootView;
     Bundle savedInstanceState;
     ProgressBar progressBar;
+    SwipeRefreshLayout swipeRefreshLayout;
     CardArrayRecyclerViewAdapter mCardArrayAdapter;
     private SharedPreferences sharedPreferences;
     private static String api_token;
@@ -82,6 +83,20 @@ public class LikedMailsFragment extends Fragment {
         likedBalloonList = new ArrayList<>();
 
         progressBar = (ProgressBar)rootView.findViewById(R.id.likedProgressBar);
+
+        swipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipe_refresh_layout);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                try {
+                    loadLikedBalloons();
+                } catch (ExecutionException e) {
+                    e.printStackTrace();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
 
         sharedPreferences = getContext().getSharedPreferences(Global.USER_INFO_PREF_FILE, Context.MODE_PRIVATE);
         api_token = sharedPreferences.getString(Global.PREF_USER_API_TOKEN, "");
@@ -259,6 +274,9 @@ public class LikedMailsFragment extends Fragment {
             super.onPostExecute(aVoid);
             if(progressBar.isShown()){
                 progressBar.setVisibility(View.GONE);
+            }
+            if(swipeRefreshLayout.isRefreshing()){
+                swipeRefreshLayout.setRefreshing(false);
             }
             if (aVoid != null) {
                 if (aVoid == 0) {

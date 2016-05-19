@@ -24,10 +24,16 @@
         android:id="@+id/emptyStateImage"
         />
 
-    <it.gmariotti.cardslib.library.recyclerview.view.CardRecyclerView
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/swipe_refresh_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        card:list_card_layout_resourceID="@layout/native_recyclerview_card_layout"
-        android:id="@+id/cvCardRecyclerView" />
+        android:layout_height="wrap_content">
+
+        <it.gmariotti.cardslib.library.recyclerview.view.CardRecyclerView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            card:list_card_layout_resourceID="@layout/native_recyclerview_card_layout"
+            android:id="@+id/cvCardRecyclerView" />
+    </android.support.v4.widget.SwipeRefreshLayout>
 
 </RelativeLayout>

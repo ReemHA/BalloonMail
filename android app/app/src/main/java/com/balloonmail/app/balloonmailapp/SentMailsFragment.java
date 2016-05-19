@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -57,6 +58,7 @@ public class SentMailsFragment extends Fragment {
     private Dao<SentBalloon, Integer> sentBalloonDao;
     private DateFormat dateFormat;
     ProgressBar progressBar;
+    SwipeRefreshLayout swipeRefreshLayout;
     View rootView;
     Bundle savedInstanceState;
     CardArrayRecyclerViewAdapter mCardArrayAdapter;
@@ -80,6 +82,20 @@ public class SentMailsFragment extends Fragment {
         sentBalloonList = new ArrayList<>();
 
         progressBar = (ProgressBar) rootView.findViewById(R.id.sentProgressBar);
+
+        swipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipe_refresh_layout);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                try {
+                    loadSentBalloons();
+                } catch (ExecutionException e) {
+                    e.printStackTrace();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
 
         sharedPreferences = getContext().getSharedPreferences(Global.USER_INFO_PREF_FILE, Context.MODE_PRIVATE);
         api_token = sharedPreferences.getString(Global.PREF_USER_API_TOKEN, "");
@@ -196,6 +212,7 @@ public class SentMailsFragment extends Fragment {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
+
         }
     }
 
@@ -289,6 +306,9 @@ public class SentMailsFragment extends Fragment {
             super.onPostExecute(aVoid);
             if(progressBar.isShown()){
                 progressBar.setVisibility(View.GONE);
+            }
+            if(swipeRefreshLayout.isRefreshing()){
+                swipeRefreshLayout.setRefreshing(false);
             }
             if (aVoid != null) {
                 if (aVoid == 0) {
