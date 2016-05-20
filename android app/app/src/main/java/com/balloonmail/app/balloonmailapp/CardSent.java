@@ -35,7 +35,6 @@ import it.gmariotti.cardslib.library.internal.CardExpand;
  */
 public class CardSent extends Card {
     Balloon balloon;
-    //private ProgressDialog mProgressDialog;
     private SharedPreferences sharedPreferences;
     private static String api_token;
     private CardExpand cardExpand;
