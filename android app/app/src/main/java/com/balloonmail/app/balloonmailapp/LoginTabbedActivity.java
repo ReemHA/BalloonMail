@@ -192,13 +192,15 @@ public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiC
             String userEmail = account.getEmail();
             sharedPreferences.edit().putString(Global.PREF_USER_EMAIL, userEmail).commit();
 
-            String lat = String.valueOf(mLastLocation.getLatitude());
 
-            String lng = String.valueOf(mLastLocation.getLongitude());
-
-            // send the idToken and username to the app server
-            sendDataToServer(idToken, userName, userEmail, lat, lng);
+            if (mLastLocation != null) {
+                String lat = String.valueOf(mLastLocation.getLatitude());
+                String lng = String.valueOf(mLastLocation.getLongitude());
+                // send the idToken and username to the app server
+                sendDataToServer(idToken, userName, userEmail, lat, lng);
+            }
         } else {
+            Toast.makeText(getApplicationContext(), "Please turn on location.", Toast.LENGTH_LONG).show();
         }
     }
 

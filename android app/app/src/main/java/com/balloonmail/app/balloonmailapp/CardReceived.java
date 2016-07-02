@@ -97,15 +97,17 @@ public class CardReceived extends Card {
                 @Override
                 public void onClick(View v) {
                     requestLikeToServer(balloon);
-                    changeStateOfLikeBtn();
+                    // changeStateOfLikeBtn();
                 }
             });
 
             holder.refillBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    //((ReceivedBalloon) balloon).setIs_refilled(1);
                     requestRefillToServer(balloon);
-                    changeStateOfRefillBtn();
+                    //changeStateOfRefillBtn();
+
                 }
             });
 
@@ -113,7 +115,7 @@ public class CardReceived extends Card {
                 @Override
                 public void onClick(View v) {
                     requestCreepToServer(balloon);
-                    changeStateOfCreepBtn();
+                    //changeStateOfCreepBtn();
                 }
             });
 
@@ -151,7 +153,6 @@ public class CardReceived extends Card {
         }
     }
 
-
     private void changeStateOfCreepBtn() {
         if (((ReceivedBalloon) balloon).getIs_creeped() == 0) {
             holder.creepBtn.setImageResource(R.drawable.ic_creepy_grey_24px);
@@ -160,12 +161,12 @@ public class CardReceived extends Card {
         }
     }
 
-    private void changeColorOfSentimentIndication(double sentiment){
-        if(sentiment < 0){
+    private void changeColorOfSentimentIndication(double sentiment) {
+        if (sentiment < 0) {
             holder.sentimentIndication.setBackgroundResource(R.color.red);
-        }else if(sentiment > 0){
+        } else if (sentiment > 0) {
             holder.sentimentIndication.setBackgroundResource(R.color.green);
-        }else{
+        } else {
             holder.sentimentIndication.setBackgroundResource(R.color.colorPrimary);
         }
     }
@@ -197,8 +198,10 @@ public class CardReceived extends Card {
         MapView mapView;
 
         GoogleMap map;
-        
-        ImageButton refillBtn; ImageButton likeBtn; ImageButton creepBtn;
+
+        ImageButton refillBtn;
+        ImageButton likeBtn;
+        ImageButton creepBtn;
         View sentimentIndication;
 
         @Override
@@ -321,7 +324,7 @@ public class CardReceived extends Card {
                 ((ReceivedBalloon) balloon).setIs_liked(1);
                 changeStateOfLikeBtn();
 
-            }else {
+            } else {
                 ((ReceivedBalloon) balloon).setIs_liked(0);
                 changeStateOfLikeBtn();
             }
@@ -417,29 +420,22 @@ public class CardReceived extends Card {
         @Override
         protected void onPostExecute(JSONObject jsonObject) {
             super.onPostExecute(jsonObject);
-
             // checks if an error is in the response
-            if (!jsonObject.has("error")) {
-                int isRefilled = ((ReceivedBalloon) balloon).getIs_refilled();
-                if (isRefilled == 0) {
-                    ((ReceivedBalloon) balloon).setIs_refilled(1);
-                    changeStateOfRefillBtn();
-                } else {
-                    ((ReceivedBalloon) balloon).setIs_refilled(0);
-                    changeStateOfRefillBtn();
-                }
-            } else {
+            if ((jsonObject == null) && (jsonObject.has("error"))) {
                 ((ReceivedBalloon) balloon).setIs_refilled(0);
+                holder.refillBtn.setImageResource(R.drawable.ic_refill_primary_24px);
+            } else {
+                ((ReceivedBalloon) balloon).setIs_refilled(1);
             }
         }
     }
 
-    private class CreateACreepRequest extends AsyncTask<Balloon, Void, JSONObject> {
+    private class CreateACreepRequest extends AsyncTask<Balloon, Void, Void> {
         URL url;
         HttpURLConnection connection;
 
         @Override
-        protected JSONObject doInBackground(Balloon... params) {
+        protected Void doInBackground(Balloon... params) {
             try {
                 url = new URL(Global.SERVER_URL + "/balloons/creep");
                 connection = (HttpURLConnection) url.openConnection();
@@ -482,7 +478,7 @@ public class CardReceived extends Card {
                 outputStream.close();
 
                 // receive the response from server
-                return setIsCreepAttrInBalloon(params[0]);
+                setIsCreepAttrInBalloon(params[0]);
             } catch (MalformedURLException e) {
                 e.printStackTrace();
             } catch (IOException e) {
@@ -494,7 +490,7 @@ public class CardReceived extends Card {
             return null;
         }
 
-        private JSONObject setIsCreepAttrInBalloon(Balloon balloon) throws IOException, JSONException {
+        private void setIsCreepAttrInBalloon(Balloon balloon) throws IOException, JSONException {
             // create StringBuilder object to append the input stream in
             StringBuilder sb = new StringBuilder();
             String line;
@@ -514,27 +510,42 @@ public class CardReceived extends Card {
             // convert response to JSONObject
             JSONObject response = new JSONObject(JSONResponse);
 
-            return response;
-        }
-
-        @Override
-        protected void onPostExecute(JSONObject jsonObject) {
-            super.onPostExecute(jsonObject);
-
             // checks if an error is in the response
-            if (!jsonObject.has("error")) {
+            if ((response != null) && (!response.has("error"))) {
                 int isCreeped = ((ReceivedBalloon) balloon).getIs_creeped();
                 if (isCreeped == 0) {
                     ((ReceivedBalloon) balloon).setIs_creeped(1);
-                    changeStateOfCreepBtn();
                 } else {
                     ((ReceivedBalloon) balloon).setIs_creeped(0);
-                    changeStateOfCreepBtn();
                 }
             } else {
                 ((ReceivedBalloon) balloon).setIs_creeped(0);
             }
+            return;
         }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            changeStateOfRefillBtn();
+        }
+        //        @Override
+//        protected void onPostExecute(JSONObject jsonObject) {
+//            super.onPostExecute(jsonObject);
+//
+//            // checks if an error is in the response
+//            if ((jsonObject != null) && (!jsonObject.has("error"))) {
+//                int isCreeped = ((ReceivedBalloon) balloon).getIs_creeped();
+//                if (isCreeped == 0) {
+//                    ((ReceivedBalloon) balloon).setIs_creeped(1);
+//                    changeStateOfCreepBtn();
+//                } else {
+//                    ((ReceivedBalloon) balloon).setIs_creeped(0);
+//                    changeStateOfCreepBtn();
+//                }
+//            } else {
+//                ((ReceivedBalloon) balloon).setIs_creeped(0);
+//            }
     }
 
 }

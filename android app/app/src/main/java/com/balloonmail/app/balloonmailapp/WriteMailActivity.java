@@ -200,17 +200,24 @@ public class WriteMailActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
                 Global.balloonHolder.setBalloon(balloon);
-
-                if (mProgressDialog.isShowing())
-                    mProgressDialog.dismiss();
-                // move from this activity
-                Intent intent = new Intent(getApplicationContext(), MailsTabbedActivity.class);
-                startActivity(intent);
-                finish();
             } else {
             }
 
             return;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            if (mProgressDialog.isShowing())
+                mProgressDialog.dismiss();
+            // move from this activity
+            Intent intent = new Intent(getApplicationContext(), MailsTabbedActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK |
+                    Intent.FLAG_ACTIVITY_CLEAR_TOP |
+                    Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+            finish();
         }
     }
 }
