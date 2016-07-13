@@ -1,4 +1,4 @@
-package com.balloonmail.app.balloonmailapp;
+package com.balloonmail.app.balloonmailapp.fragments;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -14,7 +14,9 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 
-import com.balloonmail.app.balloonmailapp.Utilities.Global;
+import com.balloonmail.app.balloonmailapp.CardLikes;
+import com.balloonmail.app.balloonmailapp.R;
+import com.balloonmail.app.balloonmailapp.utilities.Global;
 import com.balloonmail.app.balloonmailapp.models.Balloon;
 import com.balloonmail.app.balloonmailapp.models.DatabaseHelper;
 import com.balloonmail.app.balloonmailapp.models.LikedBalloon;

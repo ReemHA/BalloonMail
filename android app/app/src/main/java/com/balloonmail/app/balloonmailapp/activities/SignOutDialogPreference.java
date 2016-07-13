@@ -1,4 +1,4 @@
-package com.balloonmail.app.balloonmailapp;
+package com.balloonmail.app.balloonmailapp.activities;
 
 import android.content.Context;
 import android.content.DialogInterface;
@@ -7,7 +7,7 @@ import android.preference.DialogPreference;
 import android.util.AttributeSet;
 import android.util.Log;
 
-import com.balloonmail.app.balloonmailapp.Utilities.Global;
+import com.balloonmail.app.balloonmailapp.utilities.Global;
 
 /**
  * Created by Reem Hamdy on 5/3/2016.

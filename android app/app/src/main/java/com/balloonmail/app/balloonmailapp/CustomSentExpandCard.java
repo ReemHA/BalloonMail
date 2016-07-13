@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.balloonmail.app.balloonmailapp.activities.MailDetailsAndMapActivity;
 import com.balloonmail.app.balloonmailapp.models.Balloon;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;

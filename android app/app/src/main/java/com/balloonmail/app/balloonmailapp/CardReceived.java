@@ -9,7 +9,7 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
-import com.balloonmail.app.balloonmailapp.Utilities.Global;
+import com.balloonmail.app.balloonmailapp.utilities.Global;
 import com.balloonmail.app.balloonmailapp.models.Balloon;
 import com.balloonmail.app.balloonmailapp.models.ReceivedBalloon;
 import com.google.android.gms.maps.CameraUpdateFactory;

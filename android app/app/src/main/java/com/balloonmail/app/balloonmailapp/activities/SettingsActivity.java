@@ -1,4 +1,4 @@
-package com.balloonmail.app.balloonmailapp;
+package com.balloonmail.app.balloonmailapp.activities;
 
 
 import android.annotation.TargetApi;
@@ -8,6 +8,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceFragment;
 import android.support.v7.app.ActionBar;
+
+import com.balloonmail.app.balloonmailapp.R;
 
 import java.util.List;
 

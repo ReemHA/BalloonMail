@@ -1,9 +1,10 @@
-package com.balloonmail.app.balloonmailapp;
+package com.balloonmail.app.balloonmailapp.activities;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
+import com.balloonmail.app.balloonmailapp.R;
 import com.balloonmail.app.balloonmailapp.models.Balloon;
 
 public class MailDetailsAndMapActivity extends AppCompatActivity {

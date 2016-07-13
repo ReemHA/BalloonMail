@@ -1,4 +1,4 @@
-package com.balloonmail.app.balloonmailapp;
+package com.balloonmail.app.balloonmailapp.activities;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -14,7 +14,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
-import com.balloonmail.app.balloonmailapp.Utilities.Global;
+import com.balloonmail.app.balloonmailapp.R;
+import com.balloonmail.app.balloonmailapp.utilities.Global;
 import com.balloonmail.app.balloonmailapp.models.SentBalloon;
 
 import org.json.JSONException;

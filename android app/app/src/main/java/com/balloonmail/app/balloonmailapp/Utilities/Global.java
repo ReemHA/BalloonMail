@@ -1,4 +1,4 @@
-package com.balloonmail.app.balloonmailapp.Utilities;
+package com.balloonmail.app.balloonmailapp.utilities;
 
 import android.content.Context;
 import android.net.ConnectivityManager;

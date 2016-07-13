@@ -1,4 +1,4 @@
-package com.balloonmail.app.balloonmailapp;
+package com.balloonmail.app.balloonmailapp.fragments;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -8,7 +8,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 
-import com.balloonmail.app.balloonmailapp.Utilities.Global;
+import com.balloonmail.app.balloonmailapp.R;
+import com.balloonmail.app.balloonmailapp.activities.MailsTabbedActivity;
+import com.balloonmail.app.balloonmailapp.utilities.Global;
 
 public class HomeActivityFragment extends Fragment {
 

@@ -1,4 +1,4 @@
-package com.balloonmail.app.balloonmailapp;
+package com.balloonmail.app.balloonmailapp.activities;
 
 import android.content.res.Configuration;
 import android.os.Bundle;

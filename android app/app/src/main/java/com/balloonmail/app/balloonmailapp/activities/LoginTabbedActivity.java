@@ -1,4 +1,4 @@
-package com.balloonmail.app.balloonmailapp;
+package com.balloonmail.app.balloonmailapp.activities;
 
 import android.Manifest;
 import android.app.AlertDialog;
@@ -20,8 +20,9 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
-import com.balloonmail.app.balloonmailapp.Utilities.DatabaseUtilities;
-import com.balloonmail.app.balloonmailapp.Utilities.Global;
+import com.balloonmail.app.balloonmailapp.R;
+import com.balloonmail.app.balloonmailapp.utilities.DatabaseUtilities;
+import com.balloonmail.app.balloonmailapp.utilities.Global;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
