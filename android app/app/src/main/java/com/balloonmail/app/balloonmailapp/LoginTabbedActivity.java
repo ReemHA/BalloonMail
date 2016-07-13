@@ -1,8 +1,10 @@
 package com.balloonmail.app.balloonmailapp;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -25,6 +27,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
@@ -117,6 +120,18 @@ public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiC
             }
         });
 
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
+        int error_code = apiAvailability.isGooglePlayServicesAvailable(getApplicationContext());
+        if ((error_code == ConnectionResult.SERVICE_MISSING) ||
+                (error_code == ConnectionResult.SERVICE_VERSION_UPDATE_REQUIRED) ||
+                (error_code == ConnectionResult.SERVICE_DISABLED)) {
+            apiAvailability.getErrorDialog(this, error_code, RC_SIGN_IN);
+        }
     }
 
     @Override
@@ -322,8 +337,21 @@ public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiC
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-        Toast.makeText(getApplicationContext(), connectionResult.getErrorMessage(), Toast.LENGTH_LONG).show();
+        final AlertDialog alertDialog = new AlertDialog.Builder(getApplicationContext()).create();
+        alertDialog.setTitle("Error");
+        if (connectionResult.equals(ConnectionResult.SERVICE_MISSING) ||
+                connectionResult.equals(ConnectionResult.SERVICE_VERSION_UPDATE_REQUIRED) ||
+                connectionResult.equals(ConnectionResult.SERVICE_DISABLED)) {
+            alertDialog.setMessage("Please update your Google Play app version..");
+            alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    alertDialog.dismiss();
 
+                }
+            });
+        }
+        alertDialog.show();
     }
 
     private boolean isSignedOut() {
@@ -394,7 +422,7 @@ public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiC
         }
     }
 
-    protected void getLocation(){
+    protected void getLocation() {
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
