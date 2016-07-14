@@ -34,8 +34,8 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.LocationListener;
-import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.firebase.iid.FirebaseInstanceId;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -52,7 +52,6 @@ public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiC
         GoogleApiClient.ConnectionCallbacks, LocationListener {
 
     private static final int RC_SIGN_IN = 9001;
-    private static final String SIGN_IN_ERROR_TAG = "handle sign in";
     private static final String NETWORK_CONNECTION_MSG = "Please check your network connection.";
     private GoogleApiClient googleApiClient;
     private int i = 0;
@@ -61,7 +60,6 @@ public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiC
     private ProgressDialog mProgressDialog;
     public final int MY_PERMISSIONS_REQUEST_FINE_LOCATION = 0;
     private Location mLastLocation;
-    private LocationRequest mLocationRequest;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -226,7 +224,8 @@ public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiC
         mProgressDialog.setIndeterminate(true);
         mProgressDialog.setMessage("Logging...");
         mProgressDialog.show();
-        new loginInfoToServer().execute(userName, idToken, lat, lng);
+        String gcm_id = FirebaseInstanceId.getInstance().getToken();
+        new loginInfoToServer().execute(userName, idToken, lat, lng, gcm_id);
     }
 
     private class loginInfoToServer extends AsyncTask<String, Void, Void> {
@@ -260,7 +259,7 @@ public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiC
                 jsonBody.put("access_token", strings[1]);
                 jsonBody.put("lat", Double.parseDouble(strings[2]));
                 jsonBody.put("lng", Double.parseDouble(strings[3]));
-                jsonBody.put("gcm_id", 1);
+                jsonBody.put("gcm_id", strings[4]);
 
                 // connect to server
                 connection.connect();
