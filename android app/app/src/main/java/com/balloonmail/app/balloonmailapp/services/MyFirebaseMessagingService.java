@@ -11,7 +11,7 @@ import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
 
 import com.balloonmail.app.balloonmailapp.R;
-import com.balloonmail.app.balloonmailapp.fragments.ReceivedMailsFragment;
+import com.balloonmail.app.balloonmailapp.activities.MailsTabbedActivity;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
@@ -39,7 +39,6 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                 msg = "You received a balloon from "+
                         getCountryName(getApplicationContext(), Double.valueOf(data.get("lng")), Double.valueOf(data.get("lat")))
                         + ".";
-                break;
             case "CRP":
                 msg = data.get("creeps") + " creeped your balloon!";
                 break;
@@ -53,7 +52,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     }
 
     private void sendNotification(String message) {
-        Intent intent = new Intent(this, ReceivedMailsFragment.class);
+        Intent intent = new Intent(this, MailsTabbedActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP
                 | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         PendingIntent pendingIntent = PendingIntent.getActivity(this,

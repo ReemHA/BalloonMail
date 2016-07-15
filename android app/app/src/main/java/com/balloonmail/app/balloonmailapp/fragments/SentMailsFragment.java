@@ -42,10 +42,13 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.TimeZone;
 import java.util.concurrent.ExecutionException;
 
 import it.gmariotti.cardslib.library.internal.Card;
@@ -287,16 +290,21 @@ public class SentMailsFragment extends Fragment {
             }
             reader.close();
             streamReader.close();
-
             JSONObject jsonObject = new JSONObject(stringBuilder.toString());
             JSONArray jsonArray = jsonObject.getJSONArray("balloons");
             cards = new ArrayList<>();
+            Date dateFormat_temp;
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject object = jsonArray.getJSONObject(i);
-
+                try {
+                    dateFormat_temp = dateFormat.parse(object.getString("sent_at"));
+                }catch (NullPointerException e){
+                    Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("GMT+2:00"));
+                    dateFormat_temp = cal.getTime();
+                }
                 SentBalloon balloon = new SentBalloon(object.getString("text"), object.getInt("balloon_id"),
                         object.getDouble("reach"), object.getInt("creeps"), object.getInt("refills"), object.getDouble("sentiment"),
-                        dateFormat.parse(object.getString("sent_at")));
+                        dateFormat_temp);
                 Card card = createCard(balloon);
                 cards.add(card);
                 balloonsMap.put(balloon, card);
