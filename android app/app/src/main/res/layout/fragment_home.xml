@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background"
-    tools:context="com.balloonmail.app.balloonmailapp.HomeActivityFragment"
+    tools:context=".fragments.HomeActivityFragment"
     tools:showIn="@layout/activity_home">
 
     <ImageView

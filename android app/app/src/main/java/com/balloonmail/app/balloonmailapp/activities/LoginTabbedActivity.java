@@ -1,8 +1,10 @@
-package com.balloonmail.app.balloonmailapp;
+package com.balloonmail.app.balloonmailapp.activities;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -18,20 +20,22 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
-import com.balloonmail.app.balloonmailapp.Utilities.DatabaseUtilities;
-import com.balloonmail.app.balloonmailapp.Utilities.Global;
+import com.balloonmail.app.balloonmailapp.R;
+import com.balloonmail.app.balloonmailapp.utilities.DatabaseUtilities;
+import com.balloonmail.app.balloonmailapp.utilities.Global;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.LocationListener;
-import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.firebase.iid.FirebaseInstanceId;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -48,7 +52,6 @@ public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiC
         GoogleApiClient.ConnectionCallbacks, LocationListener {
 
     private static final int RC_SIGN_IN = 9001;
-    private static final String SIGN_IN_ERROR_TAG = "handle sign in";
     private static final String NETWORK_CONNECTION_MSG = "Please check your network connection.";
     private GoogleApiClient googleApiClient;
     private int i = 0;
@@ -57,7 +60,6 @@ public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiC
     private ProgressDialog mProgressDialog;
     public final int MY_PERMISSIONS_REQUEST_FINE_LOCATION = 0;
     private Location mLastLocation;
-    private LocationRequest mLocationRequest;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -117,6 +119,18 @@ public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiC
             }
         });
 
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
+        int error_code = apiAvailability.isGooglePlayServicesAvailable(getApplicationContext());
+        if ((error_code == ConnectionResult.SERVICE_MISSING) ||
+                (error_code == ConnectionResult.SERVICE_VERSION_UPDATE_REQUIRED) ||
+                (error_code == ConnectionResult.SERVICE_DISABLED)) {
+            apiAvailability.getErrorDialog(this, error_code, RC_SIGN_IN);
+        }
     }
 
     @Override
@@ -210,7 +224,8 @@ public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiC
         mProgressDialog.setIndeterminate(true);
         mProgressDialog.setMessage("Logging...");
         mProgressDialog.show();
-        new loginInfoToServer().execute(userName, idToken, lat, lng);
+        String gcm_id = FirebaseInstanceId.getInstance().getToken();
+        new loginInfoToServer().execute(userName, idToken, lat, lng, gcm_id);
     }
 
     private class loginInfoToServer extends AsyncTask<String, Void, Void> {
@@ -244,7 +259,7 @@ public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiC
                 jsonBody.put("access_token", strings[1]);
                 jsonBody.put("lat", Double.parseDouble(strings[2]));
                 jsonBody.put("lng", Double.parseDouble(strings[3]));
-                jsonBody.put("gcm_id", 1);
+                jsonBody.put("gcm_id", strings[4]);
 
                 // connect to server
                 connection.connect();
@@ -322,8 +337,21 @@ public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiC
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-        Toast.makeText(getApplicationContext(), connectionResult.getErrorMessage(), Toast.LENGTH_LONG).show();
+        final AlertDialog alertDialog = new AlertDialog.Builder(getApplicationContext()).create();
+        alertDialog.setTitle("Error");
+        if (connectionResult.equals(ConnectionResult.SERVICE_MISSING) ||
+                connectionResult.equals(ConnectionResult.SERVICE_VERSION_UPDATE_REQUIRED) ||
+                connectionResult.equals(ConnectionResult.SERVICE_DISABLED)) {
+            alertDialog.setMessage("Please update your Google Play app version..");
+            alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    alertDialog.dismiss();
 
+                }
+            });
+        }
+        alertDialog.show();
     }
 
     private boolean isSignedOut() {
@@ -394,7 +422,7 @@ public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiC
         }
     }
 
-    protected void getLocation(){
+    protected void getLocation() {
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {

@@ -1,9 +1,11 @@
-package com.balloonmail.app.balloonmailapp;
+package com.balloonmail.app.balloonmailapp.activities;
 
 import android.content.Intent;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+
+import com.balloonmail.app.balloonmailapp.R;
 
 public class SplashScreen extends AppCompatActivity {
     private final int SPLASH_SCREEN_TIMEOUT = 1500;

@@ -1,7 +1,9 @@
 {
   "project_info": {
     "project_number": "113808451021",
-    "project_id": "balloonmailapp-1293"
+    "firebase_url": "https://balloonmailapp-1293.firebaseio.com",
+    "project_id": "balloonmailapp-1293",
+    "storage_bucket": "balloonmailapp-1293.appspot.com"
   },
   "client": [
     {
@@ -13,11 +15,11 @@
       },
       "oauth_client": [
         {
-          "client_id": "113808451021-cui63s2ecvtcvnesgbh0dgc5k80i1bt1.apps.googleusercontent.com",
+          "client_id": "113808451021-eistl2of63mabsh7qm7pbs1s8egcpn53.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.balloonmail.app.balloonmailapp",
-            "certificate_hash": "62673070F71DB1E4DB4583B61611C5C80B654008"
+            "certificate_hash": "9895364927FAAB4A1B78370FB9291A8A7C56709D"
           }
         },
         {
@@ -29,12 +31,24 @@
           }
         },
         {
+          "client_id": "113808451021-cui63s2ecvtcvnesgbh0dgc5k80i1bt1.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.balloonmail.app.balloonmailapp",
+            "certificate_hash": "62673070F71DB1E4DB4583B61611C5C80B654008"
+          }
+        },
+        {
           "client_id": "113808451021-im0he0rlcbmtf37q1n2a4aootpvmk2lt.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.balloonmail.app.balloonmailapp",
             "certificate_hash": "6F50621AE0D9E6C3C7E0CAED400E35C63B296304"
           }
+        },
+        {
+          "client_id": "113808451021-bdi4a2r4nrk89p5hql9rsgu8negbtmu2.apps.googleusercontent.com",
+          "client_type": 3
         },
         {
           "client_id": "113808451021-5bbh4fp49eo7tdq8j93arot30tt49q8j.apps.googleusercontent.com",
@@ -54,13 +68,13 @@
           "status": 2,
           "other_platform_oauth_client": [
             {
-              "client_id": "113808451021-5bbh4fp49eo7tdq8j93arot30tt49q8j.apps.googleusercontent.com",
+              "client_id": "113808451021-bdi4a2r4nrk89p5hql9rsgu8negbtmu2.apps.googleusercontent.com",
               "client_type": 3
             }
           ]
         },
         "ads_service": {
-          "status": 1
+          "status": 2
         }
       }
     }

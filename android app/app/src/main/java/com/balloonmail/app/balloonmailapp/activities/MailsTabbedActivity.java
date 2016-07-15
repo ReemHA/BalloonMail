@@ -1,4 +1,4 @@
-package com.balloonmail.app.balloonmailapp;
+package com.balloonmail.app.balloonmailapp.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -14,7 +14,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.balloonmail.app.balloonmailapp.Utilities.Global;
+import com.balloonmail.app.balloonmailapp.fragments.LikedMailsFragment;
+import com.balloonmail.app.balloonmailapp.R;
+import com.balloonmail.app.balloonmailapp.fragments.ReceivedMailsFragment;
+import com.balloonmail.app.balloonmailapp.fragments.SentMailsFragment;
+import com.balloonmail.app.balloonmailapp.utilities.Global;
 import com.balloonmail.app.balloonmailapp.models.DatabaseHelper;
 import com.balloonmail.app.balloonmailapp.models.LikedBalloon;
 import com.balloonmail.app.balloonmailapp.models.ReceivedBalloon;

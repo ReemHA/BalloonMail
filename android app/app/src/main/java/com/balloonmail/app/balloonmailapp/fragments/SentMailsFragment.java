@@ -1,4 +1,4 @@
-package com.balloonmail.app.balloonmailapp;
+package com.balloonmail.app.balloonmailapp.fragments;
 
 import android.content.Context;
 import android.content.Intent;
@@ -15,10 +15,14 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 
-import com.balloonmail.app.balloonmailapp.Utilities.Global;
+import com.balloonmail.app.balloonmailapp.CardSent;
+import com.balloonmail.app.balloonmailapp.R;
+import com.balloonmail.app.balloonmailapp.activities.MailDetailsAndMapActivity;
+import com.balloonmail.app.balloonmailapp.activities.MailsTabbedActivity;
 import com.balloonmail.app.balloonmailapp.models.Balloon;
 import com.balloonmail.app.balloonmailapp.models.DatabaseHelper;
 import com.balloonmail.app.balloonmailapp.models.SentBalloon;
+import com.balloonmail.app.balloonmailapp.utilities.Global;
 import com.google.android.gms.maps.model.LatLng;
 import com.j256.ormlite.android.apptools.OpenHelperManager;
 import com.j256.ormlite.dao.Dao;
@@ -38,10 +42,13 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.TimeZone;
 import java.util.concurrent.ExecutionException;
 
 import it.gmariotti.cardslib.library.internal.Card;
@@ -283,15 +290,21 @@ public class SentMailsFragment extends Fragment {
             }
             reader.close();
             streamReader.close();
-
             JSONObject jsonObject = new JSONObject(stringBuilder.toString());
             JSONArray jsonArray = jsonObject.getJSONArray("balloons");
             cards = new ArrayList<>();
+            Date dateFormat_temp;
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject object = jsonArray.getJSONObject(i);
+                try {
+                    dateFormat_temp = dateFormat.parse(object.getString("sent_at"));
+                }catch (NullPointerException e){
+                    Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("GMT+2:00"));
+                    dateFormat_temp = cal.getTime();
+                }
                 SentBalloon balloon = new SentBalloon(object.getString("text"), object.getInt("balloon_id"),
                         object.getDouble("reach"), object.getInt("creeps"), object.getInt("refills"), object.getDouble("sentiment"),
-                        dateFormat.parse(object.getString("sent_at")));
+                        dateFormat_temp);
                 Card card = createCard(balloon);
                 cards.add(card);
                 balloonsMap.put(balloon, card);
