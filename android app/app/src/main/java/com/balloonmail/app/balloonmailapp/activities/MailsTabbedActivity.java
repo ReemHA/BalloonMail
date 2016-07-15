@@ -70,7 +70,7 @@ public class MailsTabbedActivity extends AppCompatActivity {
 
         viewPager = (ViewPager) findViewById(R.id.viewpager);
         setupViewPager(viewPager);
-        int defaultValue = 0;
+        int defaultValue = 1;
         int page = getIntent().getIntExtra(Global.ARG_MAILS_TABBED_TAG, defaultValue);
         viewPager.setCurrentItem(page);
         tabLayout = (TabLayout) findViewById(R.id.tabs);
@@ -90,6 +90,13 @@ public class MailsTabbedActivity extends AppCompatActivity {
         adapter.addFragment(receivedMailsFragment, "Received");
         adapter.addFragment(likedMailsFragment, "Likes");
         viewPager.setAdapter(adapter);
+    }
+
+    @Override
+    public void onBackPressed() {
+        Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
+        startActivity(intent);
+        finish();
     }
 
     class ViewPagerAdapter extends FragmentPagerAdapter {
