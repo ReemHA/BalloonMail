@@ -8,7 +8,7 @@ import android.net.NetworkInfo;
  * Created by Reem Hamdy on 4/24/2016.
  */
 public class Global {
-    //public static final String SERVER_URL = "http://10.0.2.2:8080";
+    //public static final String SERVER_URL = "http:// 192.168.1.5:8080";
     public static final String SERVER_URL = "http://app2-balloonmail.rhcloud.com";
 
     public static final String SERVER_CLIENT_ID =

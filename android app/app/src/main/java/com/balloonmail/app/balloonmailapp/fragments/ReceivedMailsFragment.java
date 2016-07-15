@@ -39,10 +39,13 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.TimeZone;
 import java.util.concurrent.ExecutionException;
 
 import it.gmariotti.cardslib.library.internal.Card;
@@ -260,11 +263,19 @@ public class ReceivedMailsFragment extends Fragment {
             JSONObject jsonObject = new JSONObject(stringBuilder.toString());
             JSONArray jsonArray = jsonObject.getJSONArray("balloons");
             cards = new ArrayList<>();
+            Date dateFormat_temp;
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject object = jsonArray.getJSONObject(i);
+                try {
+                    dateFormat_temp = dateFormat.parse(object.getString("sent_at"));
+                }catch (NullPointerException e){
+                    Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("GMT+2:00"));
+                    dateFormat_temp = cal.getTime();
+                }
+
                 ReceivedBalloon balloon = new ReceivedBalloon(object.getString("text"), object.getInt("balloon_id"),
                         object.getDouble("sentiment"), object.getDouble("lat"), object.getDouble("lng"),
-                        dateFormat.parse(object.getString("sent_at")));
+                        dateFormat_temp);
                 balloon.setIs_liked(object.getInt("liked"));
                 balloon.setIs_refilled(object.getInt("refilled"));
                 balloon.setIs_creeped(object.getInt("creeped"));

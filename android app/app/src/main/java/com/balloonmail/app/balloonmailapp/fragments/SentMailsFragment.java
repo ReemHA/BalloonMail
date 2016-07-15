@@ -19,10 +19,10 @@ import com.balloonmail.app.balloonmailapp.CardSent;
 import com.balloonmail.app.balloonmailapp.R;
 import com.balloonmail.app.balloonmailapp.activities.MailDetailsAndMapActivity;
 import com.balloonmail.app.balloonmailapp.activities.MailsTabbedActivity;
-import com.balloonmail.app.balloonmailapp.utilities.Global;
 import com.balloonmail.app.balloonmailapp.models.Balloon;
 import com.balloonmail.app.balloonmailapp.models.DatabaseHelper;
 import com.balloonmail.app.balloonmailapp.models.SentBalloon;
+import com.balloonmail.app.balloonmailapp.utilities.Global;
 import com.google.android.gms.maps.model.LatLng;
 import com.j256.ormlite.android.apptools.OpenHelperManager;
 import com.j256.ormlite.dao.Dao;
@@ -293,6 +293,7 @@ public class SentMailsFragment extends Fragment {
             cards = new ArrayList<>();
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject object = jsonArray.getJSONObject(i);
+
                 SentBalloon balloon = new SentBalloon(object.getString("text"), object.getInt("balloon_id"),
                         object.getDouble("reach"), object.getInt("creeps"), object.getInt("refills"), object.getDouble("sentiment"),
                         dateFormat.parse(object.getString("sent_at")));

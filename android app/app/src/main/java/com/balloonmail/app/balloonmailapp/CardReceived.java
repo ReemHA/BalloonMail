@@ -288,6 +288,7 @@ public class CardReceived extends Card {
         }
 
         private Integer setIsLikedAttrInBalloon(Balloon balloon) throws IOException, JSONException {
+
             // create StringBuilder object to append the input stream in
             StringBuilder sb = new StringBuilder();
             String line;
@@ -331,13 +332,12 @@ public class CardReceived extends Card {
         }
     }
 
-
-    private class CreateARefillRequest extends AsyncTask<Balloon, Void, JSONObject> {
+    private class CreateARefillRequest extends AsyncTask<Balloon, Void, Integer> {
         URL url;
         HttpURLConnection connection;
 
         @Override
-        protected JSONObject doInBackground(Balloon... params) {
+        protected Integer doInBackground(Balloon... params) {
             try {
                 url = new URL(Global.SERVER_URL + "/balloons/refill");
                 connection = (HttpURLConnection) url.openConnection();
@@ -392,7 +392,7 @@ public class CardReceived extends Card {
             return null;
         }
 
-        private JSONObject setIsRefillAttrInBalloon(Balloon balloon) throws IOException, JSONException {
+        private Integer setIsRefillAttrInBalloon(Balloon balloon) throws IOException, JSONException {
             // create StringBuilder object to append the input stream in
             StringBuilder sb = new StringBuilder();
             String line;
@@ -412,16 +412,23 @@ public class CardReceived extends Card {
             // convert response to JSONObject
             JSONObject response = new JSONObject(JSONResponse);
 
-            return response;
+            // checks if an error is in the response
+            if (!response.has("error")) {
+                int is_refilled = ((ReceivedBalloon) balloon).getIs_refilled();
+                return is_refilled;
+            } else {
+                ((ReceivedBalloon) balloon).setIs_liked(0);
+                return 0;
+            }
 
 
         }
 
         @Override
-        protected void onPostExecute(JSONObject jsonObject) {
-            super.onPostExecute(jsonObject);
+        protected void onPostExecute(Integer aVoid) {
+            super.onPostExecute(aVoid);
             // checks if an error is in the response
-            if ((jsonObject == null) && (jsonObject.has("error"))) {
+            if ((aVoid == null)) {
                 ((ReceivedBalloon) balloon).setIs_refilled(0);
                 holder.refillBtn.setImageResource(R.drawable.ic_refill_primary_24px);
             } else {
@@ -527,7 +534,7 @@ public class CardReceived extends Card {
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            changeStateOfRefillBtn();
+            changeStateOfCreepBtn();
         }
         //        @Override
 //        protected void onPostExecute(JSONObject jsonObject) {
