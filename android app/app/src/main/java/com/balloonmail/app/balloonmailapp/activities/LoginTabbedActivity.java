@@ -91,7 +91,7 @@ public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiC
         // get api_token from the shared preference
         if (!isSignedOut() && api_token != "") {
             getLocation();
-            Intent intent = new Intent(LoginTabbedActivity.this, HomeActivity.class);
+            Intent intent = new Intent(LoginTabbedActivity.this, MailsTabbedActivity.class);
             startActivity(intent);
             LoginTabbedActivity.this.finish();
         }
@@ -323,7 +323,7 @@ public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiC
                     mProgressDialog.dismiss();
                 }
 
-                Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
+                Intent intent = new Intent(getApplicationContext(), MailsTabbedActivity.class);
                 startActivity(intent);
                 finish();
             } else {

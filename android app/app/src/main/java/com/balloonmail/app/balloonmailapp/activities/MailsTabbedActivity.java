@@ -66,11 +66,11 @@ public class MailsTabbedActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         viewPager = (ViewPager) findViewById(R.id.viewpager);
         setupViewPager(viewPager);
-        int defaultValue = 0;
+        int defaultValue = 1;
         int page = getIntent().getIntExtra(Global.ARG_MAILS_TABBED_TAG, defaultValue);
         viewPager.setCurrentItem(page);
         tabLayout = (TabLayout) findViewById(R.id.tabs);
