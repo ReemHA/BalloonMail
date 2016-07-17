@@ -317,10 +317,10 @@ public class SentMailsFragment extends Fragment {
         @Override
         protected void onPostExecute(Integer aVoid) {
             super.onPostExecute(aVoid);
-            if(progressBar.isShown()){
+            if (progressBar.isShown()) {
                 progressBar.setVisibility(View.GONE);
             }
-            if(swipeRefreshLayout.isRefreshing()){
+            if (swipeRefreshLayout.isRefreshing()) {
                 swipeRefreshLayout.setRefreshing(false);
             }
             if (aVoid != null) {
@@ -337,7 +337,7 @@ public class SentMailsFragment extends Fragment {
     }
 
 
-    private void updateBalloonWithPaths(Balloon balloon){
+    private void updateBalloonWithPaths(Balloon balloon) {
         new GetAllPathsOfSource().execute(balloon);
     }
 
@@ -394,14 +394,14 @@ public class SentMailsFragment extends Fragment {
             JSONObject jsonObject = new JSONObject(stringBuilder.toString());
             double sourceIdJsonObject = jsonObject.getDouble("source");
             JSONArray jsonArray = jsonObject.getJSONArray("paths");
-            LatLng userSourceLocation = new LatLng(0,0);
+            LatLng userSourceLocation = new LatLng(0, 0);
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject object = jsonArray.getJSONObject(i);
                 double from_user = object.getDouble("from_user");
 
                 LatLng source = new LatLng(object.getDouble("from_lat"), object.getDouble("from_lng"));
 
-                if(from_user == sourceIdJsonObject){
+                if (from_user == sourceIdJsonObject) {
                     userSourceLocation = source;
                 }
 

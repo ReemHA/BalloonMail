@@ -191,7 +191,7 @@ public class LikedMailsFragment extends Fragment {
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
-        if (isVisibleToUser && Global.isConnected(getContext())){
+        if (isVisibleToUser && Global.isConnected(getContext())) {
             try {
                 loadLikedBalloons();
             } catch (ExecutionException e) {
@@ -260,8 +260,8 @@ public class LikedMailsFragment extends Fragment {
                 JSONObject object = jsonArray.getJSONObject(i);
                 LikedBalloon balloon = new LikedBalloon(object.getString("text"), object.getInt("balloon_id"), object.getDouble("sentiment"),
                         object.getDouble("lat"), object.getDouble("lng"), dateFormat.parse(object.getString("sent_at")));
-                Log.d(LikedMailsFragment.class.getSimpleName(), "lat: "+object.getDouble("lat"));
-                Log.d(LikedMailsFragment.class.getSimpleName(), "lng: "+object.getDouble("lng"));
+                Log.d(LikedMailsFragment.class.getSimpleName(), "lat: " + object.getDouble("lat"));
+                Log.d(LikedMailsFragment.class.getSimpleName(), "lng: " + object.getDouble("lng"));
                 balloon.setIs_creeped(object.getInt("creeped"));
                 balloon.setIs_refilled(object.getInt("refilled"));
                 Card card = createCard(balloon);
@@ -274,10 +274,10 @@ public class LikedMailsFragment extends Fragment {
         @Override
         protected void onPostExecute(Integer aVoid) {
             super.onPostExecute(aVoid);
-            if(progressBar.isShown()){
+            if (progressBar.isShown()) {
                 progressBar.setVisibility(View.GONE);
             }
-            if(swipeRefreshLayout.isRefreshing()){
+            if (swipeRefreshLayout.isRefreshing()) {
                 swipeRefreshLayout.setRefreshing(false);
             }
             if (aVoid != null) {

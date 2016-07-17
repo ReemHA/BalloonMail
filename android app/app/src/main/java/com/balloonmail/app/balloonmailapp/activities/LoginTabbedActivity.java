@@ -54,6 +54,7 @@ public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiC
     private static final int RC_SIGN_IN = 9001;
     private static final String NETWORK_CONNECTION_MSG = "Please check your network connection.";
     private GoogleApiClient googleApiClient;
+    private GoogleSignInOptions gso;
     private int i = 0;
     DatabaseUtilities databaseUtilities;
     SharedPreferences sharedPreferences;
@@ -69,31 +70,21 @@ public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiC
         // get api_token from the shared preference
         sharedPreferences = this.getSharedPreferences(Global.USER_INFO_PREF_FILE, MODE_PRIVATE);
         String api_token = sharedPreferences.getString(Global.PREF_USER_API_TOKEN, "");
-        Log.d(LoginTabbedActivity.class.getSimpleName(), api_token);
 
         databaseUtilities = new DatabaseUtilities();
 
         // Configure sign in to request the user's id token
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(Global.SERVER_CLIENT_ID)
-                .requestProfile()
-                .requestEmail()
-                .build();
+        gso = buildSignInOptions();
 
         // GoogleApiClient is main entry for Google Play services integration. Build GoogleApiClient to access the options specified by gso
-        googleApiClient = new GoogleApiClient.Builder(this)
-                .enableAutoManage(this, this)
-                .addConnectionCallbacks(this)
-                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
-                .addApi(LocationServices.API)
-                .build();
+        googleApiClient = buildApiClient();
 
-        // get api_token from the shared preference
+        // Get api_token from the shared preference
         if (!isSignedOut() && api_token != "") {
             getLocation();
             Intent intent = new Intent(LoginTabbedActivity.this, HomeActivity.class);
             startActivity(intent);
-            LoginTabbedActivity.this.finish();
+            finish();
         }
 
         // create a new blank database for the new signed in user
@@ -121,6 +112,24 @@ public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiC
 
     }
 
+    private GoogleSignInOptions buildSignInOptions() {
+        return new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(Global.SERVER_CLIENT_ID)
+                .requestProfile()
+                .requestEmail()
+                .build();
+    }
+
+    private GoogleApiClient buildApiClient() {
+        return new GoogleApiClient.Builder(this)
+                .enableAutoManage(this, this)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
+                .addApi(LocationServices.API)
+                .build();
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -146,7 +155,7 @@ public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiC
     protected void onStop() {
         super.onStop();
         if (googleApiClient.isConnected()) {
-            googleApiClient.connect();
+            googleApiClient.disconnect();
         }
     }
 
@@ -334,7 +343,6 @@ public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiC
         }
     }
 
-
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
         final AlertDialog alertDialog = new AlertDialog.Builder(getApplicationContext()).create();
@@ -351,7 +359,7 @@ public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiC
                 }
             });
         }
-        alertDialog.show();
+        //alertDialog.show();
     }
 
     private boolean isSignedOut() {
@@ -378,8 +386,8 @@ public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiC
     private void logOutFromGoogleAccount() {
         if (googleApiClient.isConnected()) {
             googleApiClient.clearDefaultAccountAndReconnect();
-            googleApiClient.connect();
             signOut();
+            googleApiClient.connect();
         }
     }
 
@@ -409,8 +417,6 @@ public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiC
 
     }
 
-
-    //This method is invoked after requestLocationUpdates
     @Override
     public void onLocationChanged(Location location) {
         mLastLocation = location;

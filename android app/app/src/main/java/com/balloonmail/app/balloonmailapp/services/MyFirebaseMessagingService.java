@@ -39,6 +39,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                 msg = "You received a balloon from "+
                         getCountryName(getApplicationContext(), Double.valueOf(data.get("lng")), Double.valueOf(data.get("lat")))
                         + ".";
+                break;
             case "CRP":
                 msg = data.get("creeps") + " creeped your balloon!";
                 break;
