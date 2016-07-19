@@ -18,7 +18,6 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
-import android.widget.Toast;
 
 import com.balloonmail.app.balloonmailapp.R;
 import com.balloonmail.app.balloonmailapp.utilities.DatabaseUtilities;
@@ -61,6 +60,7 @@ public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiC
     private ProgressDialog mProgressDialog;
     public final int MY_PERMISSIONS_REQUEST_FINE_LOCATION = 0;
     private Location mLastLocation;
+    private static final int RC_LOCATION = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -179,6 +179,10 @@ public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiC
                     e.printStackTrace();
                 }
             }
+        }else if (requestCode == RC_LOCATION){
+            if (resultCode == RESULT_OK){
+                getLocation();
+            }
         }
     }
 
@@ -192,8 +196,9 @@ public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiC
             startActivityForResult(signInIntent, RC_SIGN_IN);
         } else {
 
-            // show a toast if no network connection is available
-            Toast.makeText(getApplicationContext(), NETWORK_CONNECTION_MSG, Toast.LENGTH_LONG).show();
+            // show a message if the device is not connected to the internet
+            Global.showMessage(getApplicationContext(), NETWORK_CONNECTION_MSG,
+                    Global.ERROR_MSG.NETWORK_CONN_FAIL.getMsg());
         }
     }
 
@@ -219,11 +224,34 @@ public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiC
             if (mLastLocation != null) {
                 String lat = String.valueOf(mLastLocation.getLatitude());
                 String lng = String.valueOf(mLastLocation.getLongitude());
+
                 // send the idToken and username to the app server
                 sendDataToServer(idToken, userName, userEmail, lat, lng);
+            } else {
+                // show message if location service is turned off
+                final AlertDialog alertDialog = new AlertDialog.Builder(this).create();
+                alertDialog.setMessage("Your GPS seems to be disabled, do you want to enable it?");
+                alertDialog.setCancelable(false);
+                alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        startActivityForResult(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS),
+                                RC_LOCATION);
+                    }
+                });
+                alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        alertDialog.dismiss();
+                    }
+                });
+                alertDialog.show();
             }
         } else {
-            Toast.makeText(getApplicationContext(), "Please turn on location.", Toast.LENGTH_LONG).show();
+
+            // show message if result returned from Google isn't successfully returned
+            Global.showMessage(this, "Google didn't successfully returned token",
+                    Global.ERROR_MSG.SERVER_CONN_FAIL.getMsg());
         }
     }
 
@@ -336,7 +364,9 @@ public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiC
                 startActivity(intent);
                 finish();
             } else {
-                // Toast.makeText(getApplicationContext(), "Error signing in", Toast.LENGTH_LONG).show();
+                // show message if response returned from server has error
+                Global.showMessage(LoginTabbedActivity.this, response.get("error").toString(),
+                        Global.ERROR_MSG.SERVER_CONN_FAIL.getMsg());
             }
 
             return;
@@ -345,21 +375,13 @@ public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiC
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-        final AlertDialog alertDialog = new AlertDialog.Builder(getApplicationContext()).create();
-        alertDialog.setTitle("Error");
+        // show message if connection to Google failed
         if (connectionResult.equals(ConnectionResult.SERVICE_MISSING) ||
                 connectionResult.equals(ConnectionResult.SERVICE_VERSION_UPDATE_REQUIRED) ||
                 connectionResult.equals(ConnectionResult.SERVICE_DISABLED)) {
-            alertDialog.setMessage("Please update your Google Play app version..");
-            alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
-                    alertDialog.dismiss();
-
-                }
-            });
+            Global.showMessage(this, "Google didn't successfully returned token",
+                    Global.ERROR_MSG.SERVER_CONN_FAIL.getMsg());
         }
-        //alertDialog.show();
     }
 
     private boolean isSignedOut() {

@@ -69,6 +69,7 @@ public class ReceivedMailsFragment extends Fragment {
     private SharedPreferences sharedPreferences;
     private static String api_token;
     ImageView emptyStateImage;
+
     public ReceivedMailsFragment() {
         // Required empty public constructor
     }
@@ -188,15 +189,6 @@ public class ReceivedMailsFragment extends Fragment {
         }
     }
 
-//    @Override
-//    public void onAttach(Context context) {
-//        super.onAttach(context);
-//        if (context instanceof Activity){
-//            mActivity = (Activity) context;
-//        }
-//
-//    }
-
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
@@ -261,30 +253,36 @@ public class ReceivedMailsFragment extends Fragment {
             reader.close();
             streamReader.close();
             JSONObject jsonObject = new JSONObject(stringBuilder.toString());
-            JSONArray jsonArray = jsonObject.getJSONArray("balloons");
-            cards = new ArrayList<>();
-            Date dateFormat_temp;
-            for (int i = 0; i < jsonArray.length(); i++) {
-                JSONObject object = jsonArray.getJSONObject(i);
-                try {
-                    dateFormat_temp = dateFormat.parse(object.getString("sent_at"));
-                }catch (NullPointerException e){
-                    Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("GMT+2:00"));
-                    dateFormat_temp = cal.getTime();
+            if (!jsonObject.has("error")) {
+                JSONArray jsonArray = jsonObject.getJSONArray("balloons");
+                cards = new ArrayList<>();
+                Date dateFormat_temp;
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject object = jsonArray.getJSONObject(i);
+                    try {
+                        dateFormat_temp = dateFormat.parse(object.getString("sent_at"));
+                    } catch (NullPointerException e) {
+                        Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("GMT+2:00"));
+                        dateFormat_temp = cal.getTime();
+                    }
+
+                    ReceivedBalloon balloon = new ReceivedBalloon(object.getString("text"), object.getInt("balloon_id"),
+                            object.getDouble("sentiment"), object.getDouble("lat"), object.getDouble("lng"),
+                            dateFormat_temp);
+                    balloon.setIs_liked(object.getInt("liked"));
+                    balloon.setIs_refilled(object.getInt("refilled"));
+                    balloon.setIs_creeped(object.getInt("creeped"));
+                    Card card = createCard(balloon);
+                    cards.add(card);
+                    balloonsMap.put(balloon, card);
                 }
 
-                ReceivedBalloon balloon = new ReceivedBalloon(object.getString("text"), object.getInt("balloon_id"),
-                        object.getDouble("sentiment"), object.getDouble("lat"), object.getDouble("lng"),
-                        dateFormat_temp);
-                balloon.setIs_liked(object.getInt("liked"));
-                balloon.setIs_refilled(object.getInt("refilled"));
-                balloon.setIs_creeped(object.getInt("creeped"));
-                Card card = createCard(balloon);
-                cards.add(card);
-                balloonsMap.put(balloon, card);
+                return jsonArray.length();
+            } else {
+                Global.showMessage(ReceivedMailsFragment.this.getContext(), jsonObject.get("error").toString(),
+                        Global.ERROR_MSG.SERVER_CONN_FAIL.getMsg());
+                return 0;
             }
-
-            return jsonArray.length();
         }
 
         @Override

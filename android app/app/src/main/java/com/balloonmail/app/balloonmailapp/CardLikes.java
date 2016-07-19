@@ -9,9 +9,9 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
-import com.balloonmail.app.balloonmailapp.utilities.Global;
 import com.balloonmail.app.balloonmailapp.models.Balloon;
 import com.balloonmail.app.balloonmailapp.models.LikedBalloon;
+import com.balloonmail.app.balloonmailapp.utilities.Global;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -47,11 +47,9 @@ public class CardLikes extends Card {
     private SharedPreferences sharedPreferences;
     private static String api_token;
     LikedCardViewHolder holder;
-    boolean isLiked;
-    boolean isCreeped;
-    boolean isSent;
 
-    public CardLikes(Context context, Balloon balloon) {
+
+    public CardLikes(Context context, Balloon balloon, Bundle savedInstanceState) {
         super(context, R.layout.card_likes_item);
         this.balloon = balloon;
         this.context = context;
@@ -78,7 +76,6 @@ public class CardLikes extends Card {
             }
 
             holder = new LikedCardViewHolder();
-            //holder.title = (TextView) view.findViewById(R.id.e_textView);
             holder.mapView = (MapView) view.findViewById(R.id.row_map);
 
             holder.initializeMapView();
@@ -89,14 +86,13 @@ public class CardLikes extends Card {
             }
 
             api_token = sharedPreferences.getString(Global.PREF_USER_API_TOKEN, "");
-
             holder.refillBtn = (ImageButton) view.findViewById(R.id.refillActionBtn_liked);
             holder.likeBtn = (ImageButton) view.findViewById(R.id.likeActionBtn_liked);
             holder.creepBtn = (ImageButton) view.findViewById(R.id.creepActionBtn_liked);
             holder.sentimentIndication = view.findViewById(R.id.sentiment_indication);
 
             //Initial States
-            changeStateOfLikeBtn();
+            initializeStateOfLikeBtn();
             changeStateOfRefillBtn();
             changeStateOfCreepBtn();
 
@@ -104,7 +100,6 @@ public class CardLikes extends Card {
                 @Override
                 public void onClick(View v) {
                     requestLikeToServer(balloon);
-                    //changeStateOfLikeBtn();
                 }
             });
 
@@ -112,7 +107,6 @@ public class CardLikes extends Card {
                 @Override
                 public void onClick(View v) {
                     requestRefillToServer(balloon);
-                    //changeStateOfRefillBtn();
                 }
             });
 
@@ -120,7 +114,6 @@ public class CardLikes extends Card {
                 @Override
                 public void onClick(View v) {
                     requestCreepToServer(balloon);
-                   //changeStateOfCreepBtn();
                 }
             });
 
@@ -128,12 +121,8 @@ public class CardLikes extends Card {
         }
     }
 
-    private void changeStateOfLikeBtn() {
-      //  if (((LikedBalloon) balloon).getIs_liked() == 0) {
-            holder.likeBtn.setImageResource(R.drawable.ic_like_clicked_24px);
-//        } else {
-//            holder.likeBtn.setImageResource(R.drawable.ic_like_clicked_24px);
-//        }
+    private void initializeStateOfLikeBtn() {
+        holder.likeBtn.setImageResource(R.drawable.ic_like_clicked_24px);
     }
 
     private void requestLikeToServer(Balloon likedBalloon) {
@@ -164,12 +153,12 @@ public class CardLikes extends Card {
         new CreateACreepRequest().execute(creepedBalloon);
     }
 
-    private void changeColorOfSentimentIndication(double sentiment){
-        if(sentiment < 0){
+    private void changeColorOfSentimentIndication(double sentiment) {
+        if (sentiment < 0) {
             holder.sentimentIndication.setBackgroundResource(R.color.red);
-        }else if(sentiment > 0){
+        } else if (sentiment > 0) {
             holder.sentimentIndication.setBackgroundResource(R.color.green);
-        }else{
+        } else {
             holder.sentimentIndication.setBackgroundResource(R.color.colorPrimary);
         }
     }
@@ -201,7 +190,9 @@ public class CardLikes extends Card {
         MapView mapView;
 
         GoogleMap map;
-        ImageButton refillBtn; ImageButton likeBtn; ImageButton creepBtn;
+        ImageButton refillBtn;
+        ImageButton likeBtn;
+        ImageButton creepBtn;
         View sentimentIndication;
 
         @Override
@@ -227,11 +218,12 @@ public class CardLikes extends Card {
 
     }
 
-    private class CreateALikeRequest extends AsyncTask<Balloon, Void, JSONObject> {
+    private class CreateALikeRequest extends AsyncTask<Balloon, Void, Void> {
         URL url;
         HttpURLConnection connection;
+
         @Override
-        protected JSONObject doInBackground(Balloon... params) {
+        protected Void doInBackground(Balloon... params) {
             try {
                 url = new URL(Global.SERVER_URL + "/balloons/like");
                 connection = (HttpURLConnection) url.openConnection();
@@ -274,7 +266,7 @@ public class CardLikes extends Card {
                 outputStream.close();
 
                 // receive the response from server
-                return setIsLikedAttrInBalloon(params[0]);
+                setIsLikedAttrInBalloon(params[0]);
             } catch (MalformedURLException e) {
                 e.printStackTrace();
             } catch (IOException e) {
@@ -286,7 +278,7 @@ public class CardLikes extends Card {
             return null;
         }
 
-        private JSONObject setIsLikedAttrInBalloon(Balloon  balloon) throws IOException, JSONException {
+        private void setIsLikedAttrInBalloon(Balloon balloon) throws IOException, JSONException {
             // create StringBuilder object to append the input stream in
             StringBuilder sb = new StringBuilder();
             String line;
@@ -305,27 +297,27 @@ public class CardLikes extends Card {
 
             // convert response to JSONObject
             JSONObject response = new JSONObject(JSONResponse);
+            if ((response == null) || (response.has("error"))) {
+                Global.showMessage(getContext(), response.get("error").toString(),
+                        Global.ERROR_MSG.SERVER_CONN_FAIL.getMsg());
+                ((LikedBalloon) balloon).setIs_liked(0);
+            }
 
-            return response;
+            return;
         }
 
         @Override
-        protected void onPostExecute(JSONObject jsonObject) {
-            super.onPostExecute(jsonObject);
-            // checks if an error is in the response
-            if ((jsonObject != null) && !jsonObject.has("error")) {
-                ((LikedBalloon) balloon).setIs_liked(1);
-            } else {
-                ((LikedBalloon) balloon).setIs_liked(0);
-            }
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
         }
     }
 
-    private class CreateARefillRequest extends AsyncTask<Balloon, Void, JSONObject> {
+    private class CreateARefillRequest extends AsyncTask<Balloon, Void, Void> {
         URL url;
         HttpURLConnection connection;
+
         @Override
-        protected JSONObject doInBackground(Balloon... params) {
+        protected Void doInBackground(Balloon... params) {
             try {
                 url = new URL(Global.SERVER_URL + "/balloons/refill");
                 connection = (HttpURLConnection) url.openConnection();
@@ -368,7 +360,7 @@ public class CardLikes extends Card {
                 outputStream.close();
 
                 // receive the response from server
-                return setIsLikedAttrInBalloon(params[0]);
+                setIsRefillAttrInBalloon(params[0]);
             } catch (MalformedURLException e) {
                 e.printStackTrace();
             } catch (IOException e) {
@@ -380,7 +372,7 @@ public class CardLikes extends Card {
             return null;
         }
 
-        private JSONObject setIsLikedAttrInBalloon(Balloon  balloon) throws IOException, JSONException {
+        private void setIsRefillAttrInBalloon(Balloon balloon) throws IOException, JSONException {
             // create StringBuilder object to append the input stream in
             StringBuilder sb = new StringBuilder();
             String line;
@@ -400,26 +392,36 @@ public class CardLikes extends Card {
             // convert response to JSONObject
             JSONObject response = new JSONObject(JSONResponse);
 
-            return response;
+            // checks if an error is in the response
+            if ((response != null) && (!response.has("error"))) {
+                int isRefilled = ((LikedBalloon) balloon).getIs_refilled();
+                if (isRefilled == 0) {
+                    ((LikedBalloon) balloon).setIs_refilled(1);
+                } else {
+                    ((LikedBalloon) balloon).setIs_refilled(0);
+                }
+            } else {
+                Global.showMessage(getContext(), response.get("error").toString(),
+                        Global.ERROR_MSG.SERVER_CONN_FAIL.getMsg());
+                ((LikedBalloon) balloon).setIs_refilled(0);
+            }
+            return;
         }
 
         @Override
-        protected void onPostExecute(JSONObject jsonObject) {
-            super.onPostExecute(jsonObject);
-            // checks if an error is in the response
-            if ((jsonObject != null) && !jsonObject.has("error")) {
-                ((LikedBalloon) balloon).setIs_refilled(1);
-            } else {
-                ((LikedBalloon) balloon).setIs_refilled(0);
-            }
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            changeStateOfRefillBtn();
+
         }
     }
 
-    private class CreateACreepRequest extends AsyncTask<Balloon, Void, JSONObject> {
+    private class CreateACreepRequest extends AsyncTask<Balloon, Void, Void> {
         URL url;
         HttpURLConnection connection;
+
         @Override
-        protected JSONObject doInBackground(Balloon... params) {
+        protected Void doInBackground(Balloon... params) {
             try {
                 url = new URL(Global.SERVER_URL + "/balloons/creep");
                 connection = (HttpURLConnection) url.openConnection();
@@ -462,7 +464,7 @@ public class CardLikes extends Card {
                 outputStream.close();
 
                 // receive the response from server
-                return setIsLikedAttrInBalloon(params[0]);
+                setIsCreepAttrInBalloon(params[0]);
             } catch (MalformedURLException e) {
                 e.printStackTrace();
             } catch (IOException e) {
@@ -474,7 +476,7 @@ public class CardLikes extends Card {
             return null;
         }
 
-        private JSONObject setIsLikedAttrInBalloon(Balloon  balloon) throws IOException, JSONException {
+        private void setIsCreepAttrInBalloon(Balloon balloon) throws IOException, JSONException {
             // create StringBuilder object to append the input stream in
             StringBuilder sb = new StringBuilder();
             String line;
@@ -494,18 +496,26 @@ public class CardLikes extends Card {
             // convert response to JSONObject
             JSONObject response = new JSONObject(JSONResponse);
 
-            return response;
+            // checks if an error is in the response
+            if ((response != null) && (!response.has("error"))) {
+                int isCreeped = ((LikedBalloon) balloon).getIs_creeped();
+                if (isCreeped == 0) {
+                    ((LikedBalloon) balloon).setIs_creeped(1);
+                } else {
+                    ((LikedBalloon) balloon).setIs_creeped(0);
+                }
+            } else {
+                Global.showMessage(getContext(), response.get("error").toString(),
+                        Global.ERROR_MSG.SERVER_CONN_FAIL.getMsg());
+                ((LikedBalloon) balloon).setIs_creeped(0);
+            }
+            return;
         }
 
         @Override
-        protected void onPostExecute(JSONObject jsonObject) {
-            super.onPostExecute(jsonObject);
-            // checks if an error is in the response
-            if ((jsonObject != null) && !jsonObject.has("error")) {
-                ((LikedBalloon) balloon).setIs_creeped(1);
-            } else {
-                ((LikedBalloon) balloon).setIs_creeped(0);
-            }
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            changeStateOfCreepBtn();
         }
     }
 
