@@ -51,7 +51,6 @@ import it.gmariotti.cardslib.library.recyclerview.view.CardRecyclerView;
 public class LikedMailsFragment extends Fragment {
 
     private ArrayList<Card> cards;
-    private LinearLayoutManager mLayoutManager;
     private HashMap<LikedBalloon, Card> balloonsMap;
     private static List<LikedBalloon> likedBalloonList;
     private DatabaseHelper dbHelper;
@@ -84,7 +83,7 @@ public class LikedMailsFragment extends Fragment {
         cards = new ArrayList<>();
         likedBalloonList = new ArrayList<>();
 
-        progressBar = (ProgressBar)rootView.findViewById(R.id.likedProgressBar);
+        progressBar = (ProgressBar) rootView.findViewById(R.id.likedProgressBar);
 
         swipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipe_refresh_layout);
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -155,7 +154,7 @@ public class LikedMailsFragment extends Fragment {
     }
 
     private Card createCard(Balloon balloon) {
-        Card card = new CardLikes(getActivity().getBaseContext(), balloon);
+        Card card = new CardLikes(getActivity().getBaseContext(), balloon, savedInstanceState);
         card.setCardElevation(getResources().getDimension(R.dimen.card_shadow_elevation));
         return card;
     }
@@ -254,21 +253,28 @@ public class LikedMailsFragment extends Fragment {
             streamReader.close();
 
             JSONObject jsonObject = new JSONObject(stringBuilder.toString());
-            JSONArray jsonArray = jsonObject.getJSONArray("balloons");
-            cards = new ArrayList<>();
-            for (int i = 0; i < jsonArray.length(); i++) {
-                JSONObject object = jsonArray.getJSONObject(i);
-                LikedBalloon balloon = new LikedBalloon(object.getString("text"), object.getInt("balloon_id"), object.getDouble("sentiment"),
-                        object.getDouble("lat"), object.getDouble("lng"), dateFormat.parse(object.getString("sent_at")));
-                Log.d(LikedMailsFragment.class.getSimpleName(), "lat: " + object.getDouble("lat"));
-                Log.d(LikedMailsFragment.class.getSimpleName(), "lng: " + object.getDouble("lng"));
-                balloon.setIs_creeped(object.getInt("creeped"));
-                balloon.setIs_refilled(object.getInt("refilled"));
-                Card card = createCard(balloon);
-                cards.add(card);
-                balloonsMap.put(balloon, card);
+            if (!jsonObject.has("error")) {
+                JSONArray jsonArray = jsonObject.getJSONArray("balloons");
+                cards = new ArrayList<>();
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject object = jsonArray.getJSONObject(i);
+                    LikedBalloon balloon = new LikedBalloon(object.getString("text"), object.getInt("balloon_id"), object.getDouble("sentiment"),
+                            object.getDouble("lat"), object.getDouble("lng"), dateFormat.parse(object.getString("sent_at")));
+                    Log.d(LikedMailsFragment.class.getSimpleName(), "lat: " + object.getDouble("lat"));
+                    Log.d(LikedMailsFragment.class.getSimpleName(), "lng: " + object.getDouble("lng"));
+                    balloon.setIs_creeped(object.getInt("creeped"));
+                    balloon.setIs_refilled(object.getInt("refilled"));
+                    Card card = createCard(balloon);
+                    cards.add(card);
+                    balloonsMap.put(balloon, card);
+                }
+                return jsonArray.length();
+            } else {
+                Global.showMessage(LikedMailsFragment.this.getContext(), jsonObject.get("error").toString(),
+                        Global.ERROR_MSG.SERVER_CONN_FAIL.getMsg());
+                return 0;
             }
-            return jsonArray.length();
+
         }
 
         @Override

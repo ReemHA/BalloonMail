@@ -196,12 +196,15 @@ public class WriteMailActivity extends AppCompatActivity {
                 SentBalloon balloon = null;
                 try {
                     balloon = new SentBalloon(response.getString("text"), response.getInt("balloon_id"), response.getDouble("reach"),
-                            response.getInt("creeps"), response.getInt("refills"), response.getDouble("sentiment"), dateFormat.parse(response.getString("sent_at")));
+                            response.getInt("creeps"), response.getInt("refills"), response.getDouble("sentiment"),
+                            dateFormat.parse(response.getString("sent_at")));
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
                 Global.balloonHolder.setBalloon(balloon);
             } else {
+                Global.showMessage(WriteMailActivity.this, response.get("error").toString(),
+                        Global.ERROR_MSG.SERVER_CONN_FAIL.getMsg());
             }
 
             return;

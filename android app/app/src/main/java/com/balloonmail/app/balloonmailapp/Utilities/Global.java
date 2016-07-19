@@ -1,8 +1,11 @@
 package com.balloonmail.app.balloonmailapp.utilities;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.support.v7.app.AlertDialog;
+import android.widget.Toast;
 
 /**
  * Created by Reem Hamdy on 4/24/2016.
@@ -24,11 +27,25 @@ public class Global {
     public static final String PREF_USER_API_TOKEN = "api_token";
     public static final String PREF_USER_LAT = "lat";
     public static final String PREF_USER_LNG = "lon";
+    public static final boolean inDebug = true;
+    public enum ERROR_MSG {
+        SERVER_CONN_FAIL("Couldn't connect to server."),
+        NETWORK_CONN_FAIL("No internet connection.");
+        String msg;
+
+        ERROR_MSG(String msg) {
+            this.msg = msg;
+        }
+
+        public String getMsg() {
+            return msg;
+        }
+    }
+
 
     public static boolean isConnected(Context context) {
         // check the state of network connectivity
         ConnectivityManager manager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-
         // get an instance of the current active network
         NetworkInfo info = manager.getActiveNetworkInfo();
         if (info != null && info.isConnected()) {
@@ -40,4 +57,23 @@ public class Global {
 
     public static BalloonHolder balloonHolder = BalloonHolder.getInstance();
 
+    public static void showMessage(Context context, String debug_message, String release_message) {
+        String title = "Opss!";
+        final AlertDialog alertDialog;
+        if (inDebug) {
+            Toast.makeText(context, debug_message, Toast.LENGTH_LONG).show();
+        } else {
+            alertDialog = new AlertDialog.Builder(context).create();
+            alertDialog.setTitle(title);
+            alertDialog.setMessage(release_message);
+            alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    alertDialog.dismiss();
+                }
+            });
+            alertDialog.show();
+        }
+
+    }
 }

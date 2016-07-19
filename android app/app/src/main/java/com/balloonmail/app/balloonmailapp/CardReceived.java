@@ -45,7 +45,6 @@ public class CardReceived extends Card {
     private Bundle savedInstanceState;
     private SharedPreferences sharedPreferences;
     private static String api_token;
-
     ReceivedCardViewHolder holder;
 
     public CardReceived(Balloon balloon, Context context, Bundle savedInstanceState) {
@@ -97,16 +96,13 @@ public class CardReceived extends Card {
                 @Override
                 public void onClick(View v) {
                     requestLikeToServer(balloon);
-                    // changeStateOfLikeBtn();
                 }
             });
 
             holder.refillBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    //((ReceivedBalloon) balloon).setIs_refilled(1);
                     requestRefillToServer(balloon);
-                    //changeStateOfRefillBtn();
 
                 }
             });
@@ -115,7 +111,6 @@ public class CardReceived extends Card {
                 @Override
                 public void onClick(View v) {
                     requestCreepToServer(balloon);
-                    //changeStateOfCreepBtn();
                 }
             });
 
@@ -227,12 +222,12 @@ public class CardReceived extends Card {
 
     }
 
-    private class CreateALikeRequest extends AsyncTask<Balloon, Void, Integer> {
+    private class CreateALikeRequest extends AsyncTask<Balloon, Void, Void> {
         URL url;
         HttpURLConnection connection;
 
         @Override
-        protected Integer doInBackground(Balloon... params) {
+        protected Void doInBackground(Balloon... params) {
             try {
                 url = new URL(Global.SERVER_URL + "/balloons/like");
                 connection = (HttpURLConnection) url.openConnection();
@@ -275,7 +270,7 @@ public class CardReceived extends Card {
                 outputStream.close();
 
                 // receive the response from server
-                return setIsLikedAttrInBalloon(params[0]);
+                setIsLikedAttrInBalloon(params[0]);
             } catch (MalformedURLException e) {
                 e.printStackTrace();
             } catch (IOException e) {
@@ -287,7 +282,7 @@ public class CardReceived extends Card {
             return null;
         }
 
-        private Integer setIsLikedAttrInBalloon(Balloon balloon) throws IOException, JSONException {
+        private void setIsLikedAttrInBalloon(Balloon balloon) throws IOException, JSONException {
 
             // create StringBuilder object to append the input stream in
             StringBuilder sb = new StringBuilder();
@@ -309,35 +304,34 @@ public class CardReceived extends Card {
             JSONObject response = new JSONObject(JSONResponse);
 
             // checks if an error is in the response
-            if (!response.has("error")) {
+            if ((response != null) && (!response.has("error"))) {
                 int isLiked = ((ReceivedBalloon) balloon).getIs_liked();
-                return isLiked;
+                if (isLiked == 0) {
+                    ((ReceivedBalloon) balloon).setIs_liked(1);
+                } else {
+                    ((ReceivedBalloon) balloon).setIs_liked(0);
+                }
             } else {
+                Global.showMessage(getContext(), response.get("error").toString(),
+                        Global.ERROR_MSG.SERVER_CONN_FAIL.getMsg());
                 ((ReceivedBalloon) balloon).setIs_liked(0);
-                return 0;
             }
+            return;
         }
 
         @Override
-        protected void onPostExecute(Integer isLiked) {
-            super.onPostExecute(isLiked);
-            if (isLiked == 0) {
-                ((ReceivedBalloon) balloon).setIs_liked(1);
-                changeStateOfLikeBtn();
-
-            } else {
-                ((ReceivedBalloon) balloon).setIs_liked(0);
-                changeStateOfLikeBtn();
-            }
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            changeStateOfLikeBtn();
         }
     }
 
-    private class CreateARefillRequest extends AsyncTask<Balloon, Void, Integer> {
+    private class CreateARefillRequest extends AsyncTask<Balloon, Void, Void> {
         URL url;
         HttpURLConnection connection;
 
         @Override
-        protected Integer doInBackground(Balloon... params) {
+        protected Void doInBackground(Balloon... params) {
             try {
                 url = new URL(Global.SERVER_URL + "/balloons/refill");
                 connection = (HttpURLConnection) url.openConnection();
@@ -380,7 +374,7 @@ public class CardReceived extends Card {
                 outputStream.close();
 
                 // receive the response from server
-                return setIsRefillAttrInBalloon(params[0]);
+                setIsRefillAttrInBalloon(params[0]);
             } catch (MalformedURLException e) {
                 e.printStackTrace();
             } catch (IOException e) {
@@ -392,7 +386,7 @@ public class CardReceived extends Card {
             return null;
         }
 
-        private Integer setIsRefillAttrInBalloon(Balloon balloon) throws IOException, JSONException {
+        private void setIsRefillAttrInBalloon(Balloon balloon) throws IOException, JSONException {
             // create StringBuilder object to append the input stream in
             StringBuilder sb = new StringBuilder();
             String line;
@@ -413,27 +407,26 @@ public class CardReceived extends Card {
             JSONObject response = new JSONObject(JSONResponse);
 
             // checks if an error is in the response
-            if (!response.has("error")) {
-                int is_refilled = ((ReceivedBalloon) balloon).getIs_refilled();
-                return is_refilled;
+            if ((response != null) && (!response.has("error"))) {
+                int isRefilled = ((ReceivedBalloon) balloon).getIs_refilled();
+                if (isRefilled == 0) {
+                    ((ReceivedBalloon) balloon).setIs_refilled(1);
+                } else {
+                    ((ReceivedBalloon) balloon).setIs_refilled(0);
+                }
             } else {
-                ((ReceivedBalloon) balloon).setIs_liked(0);
-                return 0;
+                Global.showMessage(getContext(), response.get("error").toString(),
+                        Global.ERROR_MSG.SERVER_CONN_FAIL.getMsg());
+                ((ReceivedBalloon) balloon).setIs_refilled(0);
             }
-
+            return;
 
         }
 
         @Override
-        protected void onPostExecute(Integer aVoid) {
+        protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            // checks if an error is in the response
-            if ((aVoid == null)) {
-                ((ReceivedBalloon) balloon).setIs_refilled(0);
-                holder.refillBtn.setImageResource(R.drawable.ic_refill_primary_24px);
-            } else {
-                ((ReceivedBalloon) balloon).setIs_refilled(1);
-            }
+            changeStateOfRefillBtn();
         }
     }
 
@@ -526,6 +519,8 @@ public class CardReceived extends Card {
                     ((ReceivedBalloon) balloon).setIs_creeped(0);
                 }
             } else {
+                Global.showMessage(getContext(), response.get("error").toString(),
+                        Global.ERROR_MSG.SERVER_CONN_FAIL.getMsg());
                 ((ReceivedBalloon) balloon).setIs_creeped(0);
             }
             return;
@@ -536,23 +531,7 @@ public class CardReceived extends Card {
             super.onPostExecute(aVoid);
             changeStateOfCreepBtn();
         }
-        //        @Override
-//        protected void onPostExecute(JSONObject jsonObject) {
-//            super.onPostExecute(jsonObject);
-//
-//            // checks if an error is in the response
-//            if ((jsonObject != null) && (!jsonObject.has("error"))) {
-//                int isCreeped = ((ReceivedBalloon) balloon).getIs_creeped();
-//                if (isCreeped == 0) {
-//                    ((ReceivedBalloon) balloon).setIs_creeped(1);
-//                    changeStateOfCreepBtn();
-//                } else {
-//                    ((ReceivedBalloon) balloon).setIs_creeped(0);
-//                    changeStateOfCreepBtn();
-//                }
-//            } else {
-//                ((ReceivedBalloon) balloon).setIs_creeped(0);
-//            }
+
     }
 
 }
