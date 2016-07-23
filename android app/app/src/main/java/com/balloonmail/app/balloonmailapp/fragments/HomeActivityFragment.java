@@ -28,6 +28,7 @@ public class HomeActivityFragment extends Fragment {
             public void onClick(View v) {
                 Intent intent = new Intent(getActivity(), MailsTabbedActivity.class);
                 intent.putExtra(Global.ARG_MAILS_TABBED_TAG, Global.SENT_TABBED_PAGE);
+                getActivity().finish();
                 startActivity(intent);
             }
         });
@@ -38,6 +39,7 @@ public class HomeActivityFragment extends Fragment {
             public void onClick(View v) {
                 Intent intent = new Intent(getActivity(), MailsTabbedActivity.class);
                 intent.putExtra(Global.ARG_MAILS_TABBED_TAG, Global.RECEIVED_TABBED_PAGE);
+                getActivity().finish();
                 startActivity(intent);
             }
         });
@@ -48,6 +50,7 @@ public class HomeActivityFragment extends Fragment {
             public void onClick(View v) {
                 Intent intent = new Intent(getActivity(), MailsTabbedActivity.class);
                 intent.putExtra(Global.ARG_MAILS_TABBED_TAG, Global.LIKES_TABBED_PAGE);
+                getActivity().finish();
                 startActivity(intent);
             }
         });

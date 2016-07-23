@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">BalloonMail</string>
     <string name="action_settings">Settings</string>
-    <string name="title_activity_mails_tabbed">BalloonMails</string>
+    <string name="title_activity_mails_tabbed">BalloonMail</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_activity_login_tabbed">Login</string>
     <string name="title_activity_home">HomeActivity</string>

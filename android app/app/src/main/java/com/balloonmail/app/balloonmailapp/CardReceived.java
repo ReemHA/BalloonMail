@@ -215,7 +215,7 @@ public class CardReceived extends Card {
                 mapView.onCreate(savedInstanceState);
                 // Set the map ready callback to receive the GoogleMap object
                 mapView.getMapAsync(this);
-                //mapView.setClickable(false);
+                mapView.setClickable(false);
 
             }
         }
