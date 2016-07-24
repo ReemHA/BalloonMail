@@ -1,9 +1,6 @@
 package com.balloonmail.app.balloonmailapp.fragments;
 
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -19,6 +16,9 @@ import com.balloonmail.app.balloonmailapp.CardSent;
 import com.balloonmail.app.balloonmailapp.R;
 import com.balloonmail.app.balloonmailapp.activities.MailDetailsAndMapActivity;
 import com.balloonmail.app.balloonmailapp.activities.MailsTabbedActivity;
+import com.balloonmail.app.balloonmailapp.async.PostHandler;
+import com.balloonmail.app.balloonmailapp.async.ReusableAsync;
+import com.balloonmail.app.balloonmailapp.async.SuccessHandler;
 import com.balloonmail.app.balloonmailapp.models.Balloon;
 import com.balloonmail.app.balloonmailapp.models.DatabaseHelper;
 import com.balloonmail.app.balloonmailapp.models.SentBalloon;
@@ -31,22 +31,12 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.sql.SQLException;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
-import java.util.concurrent.ExecutionException;
 
 import it.gmariotti.cardslib.library.internal.Card;
 import it.gmariotti.cardslib.library.recyclerview.internal.CardArrayRecyclerViewAdapter;
@@ -60,15 +50,12 @@ public class SentMailsFragment extends Fragment {
     private static List<SentBalloon> sentBalloonList;
     private DatabaseHelper dbHelper;
     private Dao<SentBalloon, Integer> sentBalloonDao;
-    private DateFormat dateFormat;
     ProgressBar progressBar;
     SwipeRefreshLayout swipeRefreshLayout;
     View rootView;
     Bundle savedInstanceState;
     CardArrayRecyclerViewAdapter mCardArrayAdapter;
     ImageView emptyStateImage;
-    private SharedPreferences sharedPreferences;
-    private static String api_token;
 
     public SentMailsFragment() {
         // Required empty public constructor
@@ -79,30 +66,19 @@ public class SentMailsFragment extends Fragment {
                              Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.fragment_sent_mails, container, false);
         dbHelper = OpenHelperManager.getHelper(getContext(), DatabaseHelper.class);
+        progressBar = (ProgressBar) rootView.findViewById(R.id.progressBar_id);
         this.savedInstanceState = savedInstanceState;
-        dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss", Locale.ENGLISH);
         balloonsMap = new HashMap<>();
         cards = new ArrayList<>();
         sentBalloonList = new ArrayList<>();
-
-        progressBar = (ProgressBar) rootView.findViewById(R.id.sentProgressBar);
-
         swipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipe_refresh_layout);
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                try {
-                    loadSentBalloons();
-                } catch (ExecutionException e) {
-                    e.printStackTrace();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+                loadSentBalloons();
             }
         });
 
-        sharedPreferences = getContext().getSharedPreferences(Global.USER_INFO_PREF_FILE, Context.MODE_PRIVATE);
-        api_token = sharedPreferences.getString(Global.PREF_USER_API_TOKEN, "");
         // Doa of SentBalloon table
         sentBalloonDao = null;
         try {
@@ -111,7 +87,6 @@ public class SentMailsFragment extends Fragment {
             e.printStackTrace();
         }
         mCardArrayAdapter = new CardArrayRecyclerViewAdapter(getActivity(), cards);
-
         if (!Global.isConnected(getContext())) {
             try {
                 cards = initCardsFromLocalDb();
@@ -120,8 +95,11 @@ public class SentMailsFragment extends Fragment {
             } catch (SQLException e) {
                 e.printStackTrace();
             }
+        }else {
+            loadSentBalloons();
         }
 
+        Log.d(SentMailsFragment.class.getSimpleName(), "1");
 
         //Staggered grid view
         CardRecyclerView mRecyclerView = (CardRecyclerView) rootView.findViewById(R.id.cvCardRecyclerView);
@@ -178,9 +156,6 @@ public class SentMailsFragment extends Fragment {
                 Global.balloonHolder.setBalloon((SentBalloon) balloon);
                 Intent intent = new Intent(getContext(), MailDetailsAndMapActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                //Bundle bundle = new Bundle();
-                //bundle.putSerializable("balloon", balloon1);
-                //intent.putExtras(bundle);
                 getContext().startActivity(intent);
             }
         });
@@ -208,20 +183,57 @@ public class SentMailsFragment extends Fragment {
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
-        if (isVisibleToUser && Global.isConnected(getContext())) {
-            try {
-                loadSentBalloons();
-            } catch (ExecutionException e) {
-                e.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-
-        }
     }
 
-    private void loadSentBalloons() throws ExecutionException, InterruptedException {
-        new fetchSentBalloonsFromServer().execute();
+    private void loadSentBalloons() {
+        new ReusableAsync<Integer>(this.getContext())
+                .get("/balloons/sent")
+                .bearer(Global.getApiToken(this.getContext()))
+                .progressBar(progressBar)
+                .onSuccess(new SuccessHandler<Integer>() {
+                    @Override
+                    public Integer handle(JSONObject jsonObject) throws JSONException {
+                        JSONArray jsonArray = jsonObject.getJSONArray("balloons");
+                        cards = new ArrayList<>();
+                        for (int i = 0; i < jsonArray.length(); i++) {
+                            JSONObject object = jsonArray.getJSONObject(i);
+                            Date sent_at = null;
+                            String sent_test = object.getString("sent_at");
+                            sent_at = Global.getDateFromString(sent_test);
+                            if (sent_at == null) {
+                                throw new JSONException("error date format");
+                            }
+                            SentBalloon balloon = new SentBalloon(object.getString("text"), object.getInt("balloon_id"),
+                                    object.getDouble("reach"), object.getInt("creeps"), object.getInt("refills"), object.getDouble("sentiment"),
+                                    sent_at);
+                            Card card = createCard(balloon);
+                            cards.add(card);
+                            balloonsMap.put(balloon, card);
+                        }
+
+
+                        return jsonArray.length();
+                    }
+                })
+                .onPost(new PostHandler<Integer>() {
+                    @Override
+                    public void handle(Integer aVoid) {
+                        if (swipeRefreshLayout.isRefreshing()) {
+                            swipeRefreshLayout.setRefreshing(false);
+                        }
+                        if (aVoid != null) {
+                            if (aVoid == 0) {
+                                emptyStateImage.setBackgroundResource(R.drawable.empty_state);
+                            } else {
+                                emptyStateImage.setBackgroundResource(0);
+                            }
+                        }
+                        Collections.reverse(cards);
+                        mCardArrayAdapter.setCards(cards);
+                        mCardArrayAdapter.notifyDataSetChanged();
+                    }
+                })
+                .send();
     }
 
 
@@ -241,187 +253,42 @@ public class SentMailsFragment extends Fragment {
         }
     }
 
-    private class fetchSentBalloonsFromServer extends AsyncTask<Object, Void, Integer> {
-        URL url;
-        HttpURLConnection connection;
-        String line;
+    private void updateBalloonWithPaths(final Balloon balloon) {
+        new ReusableAsync<Void>(this.getContext())
+                .get("/balloons/paths")
+                .bearer(Global.getApiToken(this.getContext()))
+                .addQuery("balloon_id", Integer.toString(balloon.getBalloon_id()))
+                .onSuccess(new SuccessHandler<Void>() {
+                    @Override
+                    public Void handle(JSONObject jsonObject) throws JSONException {
+                        HashMap<LatLng, ArrayList<LatLng>> paths = new HashMap<>();
+                        double sourceIdJsonObject = jsonObject.getDouble("source");
+                        JSONArray jsonArray = jsonObject.getJSONArray("paths");
+                        LatLng userSourceLocation = new LatLng(0, 0);
+                        for (int i = 0; i < jsonArray.length(); i++) {
+                            JSONObject object = jsonArray.getJSONObject(i);
+                            double from_user = object.getDouble("from_user");
 
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-        }
+                            LatLng source = new LatLng(object.getDouble("from_lat"), object.getDouble("from_lng"));
 
-        @Override
-        protected Integer doInBackground(Object... params) {
-            try {
-                url = new URL(Global.SERVER_URL + "/balloons/sent");
-                connection = (HttpURLConnection) url.openConnection();
-                connection.setRequestMethod("GET");
+                            if (from_user == sourceIdJsonObject) {
+                                userSourceLocation = source;
+                            }
 
-                sharedPreferences = getContext().getSharedPreferences(Global.USER_INFO_PREF_FILE, Context.MODE_PRIVATE);
-                api_token = sharedPreferences.getString(Global.PREF_USER_API_TOKEN, "");
-                connection.setRequestProperty("authorization", "Bearer " + api_token);
-                connection.setRequestProperty("Content-Type", "application/json");
-                connection.setRequestProperty("charset", "utf-8");
-                connection.connect();
-                return getResponse();
-
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (JSONException e) {
-                e.printStackTrace();
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-            return null;
-        }
-
-        private int getResponse() throws IOException, JSONException, ParseException {
-            InputStreamReader streamReader = new InputStreamReader(connection.getInputStream());
-            BufferedReader reader = new BufferedReader(streamReader);
-            StringBuilder stringBuilder = new StringBuilder();
-            while ((line = reader.readLine()) != null) {
-                stringBuilder.append(line);
-            }
-            reader.close();
-            streamReader.close();
-            JSONObject jsonObject = new JSONObject(stringBuilder.toString());
-            if (!jsonObject.has("error")) {
-                JSONArray jsonArray = jsonObject.getJSONArray("balloons");
-                cards = new ArrayList<>();
-                for (int i = 0; i < jsonArray.length(); i++) {
-                    JSONObject object = jsonArray.getJSONObject(i);
-                    SentBalloon balloon = new SentBalloon(object.getString("text"), object.getInt("balloon_id"),
-                            object.getDouble("reach"), object.getInt("creeps"), object.getInt("refills"), object.getDouble("sentiment"),
-                            dateFormat.parse(object.getString("sent_at")));
-                    Card card = createCard(balloon);
-                    cards.add(card);
-                    balloonsMap.put(balloon, card);
-                }
-
-
-                return jsonArray.length();
-            } else {
-                Global.showMessage(SentMailsFragment.this.getContext(), jsonObject.get("error").toString(),
-                        Global.ERROR_MSG.SERVER_CONN_FAIL.getMsg());
-                return 0;
-            }
-        }
-
-        @Override
-        protected void onPostExecute(Integer aVoid) {
-            super.onPostExecute(aVoid);
-            if (progressBar.isShown()) {
-                progressBar.setVisibility(View.GONE);
-            }
-            if (swipeRefreshLayout.isRefreshing()) {
-                swipeRefreshLayout.setRefreshing(false);
-            }
-            if (aVoid != null) {
-                if (aVoid == 0) {
-                    emptyStateImage.setBackgroundResource(R.drawable.empty_state);
-                } else {
-                    emptyStateImage.setBackgroundResource(0);
-                }
-            }
-            Collections.reverse(cards);
-            mCardArrayAdapter.setCards(cards);
-            mCardArrayAdapter.notifyDataSetChanged();
-        }
-    }
-
-
-    private void updateBalloonWithPaths(Balloon balloon) {
-        new GetAllPathsOfSource().execute(balloon);
-    }
-
-    private class GetAllPathsOfSource extends AsyncTask<Balloon, Void, Void> {
-        URL url;
-        HttpURLConnection connection;
-        String line;
-
-        @Override
-        protected Void doInBackground(Balloon... balloons) {
-
-            try {
-                url = new URL(Global.SERVER_URL + "/balloons/paths" + "?balloon_id=" + balloons[0].getBalloon_id());
-                connection = (HttpURLConnection) url.openConnection();
-                connection.setRequestMethod("GET");
-                connection.setRequestProperty("authorization", "Bearer " + api_token);
-                connection.setRequestProperty("Content-Type", "application/json");
-                connection.setRequestProperty("charset", "utf-8");
-                try {
-                    connection.connect();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            } catch (MalformedURLException e1) {
-                e1.printStackTrace();
-            } catch (IOException e1) {
-                e1.printStackTrace();
-            }
-            try {
-                getResponse(balloons[0]);
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (JSONException e) {
-                e.printStackTrace();
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-
-            return null;
-        }
-
-        private void getResponse(Balloon balloon) throws IOException, JSONException, ParseException {
-            HashMap<LatLng, ArrayList<LatLng>> paths = new HashMap<>();
-
-            InputStreamReader streamReader = new InputStreamReader(connection.getInputStream());
-            BufferedReader reader = new BufferedReader(streamReader);
-            StringBuilder stringBuilder = new StringBuilder();
-            while ((line = reader.readLine()) != null) {
-                stringBuilder.append(line);
-            }
-            reader.close();
-            streamReader.close();
-
-            JSONObject jsonObject = new JSONObject(stringBuilder.toString());
-            if (!jsonObject.has("error")) {
-                double sourceIdJsonObject = jsonObject.getDouble("source");
-                JSONArray jsonArray = jsonObject.getJSONArray("paths");
-                LatLng userSourceLocation = new LatLng(0, 0);
-                for (int i = 0; i < jsonArray.length(); i++) {
-                    JSONObject object = jsonArray.getJSONObject(i);
-                    double from_user = object.getDouble("from_user");
-
-                    LatLng source = new LatLng(object.getDouble("from_lat"), object.getDouble("from_lng"));
-
-                    if (from_user == sourceIdJsonObject) {
-                        userSourceLocation = source;
+                            ArrayList<LatLng> dests = paths.get(source);
+                            if (!paths.containsKey(source)) {
+                                dests = new ArrayList<>();
+                                paths.put(source, dests);
+                            }
+                            dests.add(new LatLng(object.getDouble("to_lat"), object.getDouble("to_lng")));
+                        }
+                        balloon.setDestinationsHashMap(paths);
+                        balloon.setSourceBalloon(userSourceLocation.latitude, userSourceLocation.longitude);
+                        Global.balloonHolder.setBalloon((SentBalloon) balloon);
+                        return null;
                     }
-
-                    ArrayList<LatLng> dests = paths.get(source);
-                    if (!paths.containsKey(source)) {
-                        dests = new ArrayList<>();
-                        paths.put(source, dests);
-                    }
-                    dests.add(new LatLng(object.getDouble("to_lat"), object.getDouble("to_lng")));
-                }
-                balloon.setDestinationsHashMap(paths);
-                balloon.setSourceBalloon(userSourceLocation.latitude, userSourceLocation.longitude);
-                Global.balloonHolder.setBalloon((SentBalloon) balloon);
-            } else {
-                Global.showMessage(SentMailsFragment.this.getContext(), jsonObject.get("error").toString()
-                        , Global.ERROR_MSG.SERVER_CONN_FAIL.getMsg());
-            }
-            return;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
-        }
+                })
+                .send();
     }
+
 }

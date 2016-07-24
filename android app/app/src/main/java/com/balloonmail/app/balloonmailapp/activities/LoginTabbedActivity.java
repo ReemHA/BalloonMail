@@ -2,14 +2,12 @@ package com.balloonmail.app.balloonmailapp.activities;
 
 import android.Manifest;
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -20,6 +18,9 @@ import android.util.Log;
 import android.view.View;
 
 import com.balloonmail.app.balloonmailapp.R;
+import com.balloonmail.app.balloonmailapp.async.PostHandler;
+import com.balloonmail.app.balloonmailapp.async.ReusableAsync;
+import com.balloonmail.app.balloonmailapp.async.SuccessHandler;
 import com.balloonmail.app.balloonmailapp.utilities.DatabaseUtilities;
 import com.balloonmail.app.balloonmailapp.utilities.Global;
 import com.google.android.gms.auth.api.Auth;
@@ -39,14 +40,6 @@ import com.google.firebase.iid.FirebaseInstanceId;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-
 public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener,
         GoogleApiClient.ConnectionCallbacks, LocationListener {
 
@@ -57,7 +50,6 @@ public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiC
     private int i = 0;
     DatabaseUtilities databaseUtilities;
     SharedPreferences sharedPreferences;
-    private ProgressDialog mProgressDialog;
     public final int MY_PERMISSIONS_REQUEST_FINE_LOCATION = 0;
     private Location mLastLocation;
     private static final int RC_LOCATION = 1;
@@ -68,7 +60,7 @@ public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiC
         setContentView(R.layout.activity_login_tabbed);
 
         // get api_token from the shared preference
-        sharedPreferences = this.getSharedPreferences(Global.USER_INFO_PREF_FILE, MODE_PRIVATE);
+        sharedPreferences = getSharedPreferences(Global.USER_INFO_PREF_FILE, MODE_PRIVATE);
         String api_token = sharedPreferences.getString(Global.PREF_USER_API_TOKEN, "");
 
         databaseUtilities = new DatabaseUtilities();
@@ -256,121 +248,39 @@ public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiC
     }
 
 
-    private void sendDataToServer(String idToken, final String userName, final String userEmail, String lat, String lng) {
-        mProgressDialog = new ProgressDialog(LoginTabbedActivity.this);
-        mProgressDialog.setIndeterminate(true);
-        mProgressDialog.setMessage("Logging...");
-        mProgressDialog.show();
+    private void sendDataToServer(String idToken, final String userName, final String userEmail, String lat, String lng){
         String gcm_id = FirebaseInstanceId.getInstance().getToken();
-        new loginInfoToServer().execute(userName, idToken, lat, lng, gcm_id);
-    }
+        new ReusableAsync<>(this)
+                .post("/token/google")
+                .dialog("Logging...")
+                .addData("user_name", userName)
+                .addData("access_token", idToken)
+                .addData("lat", lat)
+                .addData("lng", lng)
+                .addData("gcm_id", gcm_id)
+                .onSuccess(new SuccessHandler<Void>() {
+                    @Override
+                    public Void handle(JSONObject data) throws JSONException {
+                        String api_token = null;
+                        api_token = data.getString("api_token");
+                        boolean created = data.getBoolean("created");
 
-    private class loginInfoToServer extends AsyncTask<String, Void, Void> {
-        URL url;
-        HttpURLConnection connection;
+                        // add api_token to SharedPreferences
+                        SharedPreferences sharedPreferences = getSharedPreferences(Global.USER_INFO_PREF_FILE, MODE_PRIVATE);
+                        sharedPreferences.edit().putString(Global.PREF_USER_API_TOKEN, api_token).commit();
 
-        @Override
-        protected Void doInBackground(String... strings) {
-            try {
-                url = new URL(Global.SERVER_URL + "/token/google");
-                connection = (HttpURLConnection) url.openConnection();
-
-                // set connection to allow output
-                connection.setDoOutput(true);
-
-                // set connection to allow input
-                connection.setDoInput(true);
-
-                // set the request method to POST
-                connection.setRequestMethod("POST");
-
-                // set content-type property
-                connection.setRequestProperty("Content-Type", "application/json");
-
-                // set charset property to utf-8
-                connection.setRequestProperty("charset", "utf-8");
-
-                // put user name and id token in a JSONObject
-                JSONObject jsonBody = new JSONObject();
-                jsonBody.put("user_name", strings[0]);
-                jsonBody.put("access_token", strings[1]);
-                jsonBody.put("lat", Double.parseDouble(strings[2]));
-                jsonBody.put("lng", Double.parseDouble(strings[3]));
-                jsonBody.put("gcm_id", strings[4]);
-
-                // connect to server
-                connection.connect();
-
-                DataOutputStream outputStream = new DataOutputStream(connection.getOutputStream());
-
-                // write JSON body to the output stream
-                outputStream.write(jsonBody.toString().getBytes("utf-8"));
-
-                // flush to ensure all data in the stream is sent
-                outputStream.flush();
-
-                // close stream
-                outputStream.close();
-
-                // receive the response from server
-                getResponseFromServer();
-
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            return null;
-        }
-
-        private void getResponseFromServer() throws IOException, JSONException {
-            // create StringBuilder object to append the input stream in
-            StringBuilder sb = new StringBuilder();
-            String line;
-
-            // get input stream
-            BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-
-            // append stream in a the StringBuilder object
-            while ((line = reader.readLine()) != null) {
-                sb.append(line + "\n");
-            }
-            reader.close();
-
-            // convert StringBuilder object to string and store it in a variable
-            String JSONResponse = sb.toString();
-            Log.d(WriteMailActivity.class.getSimpleName(), JSONResponse);
-
-            // convert response to JSONObject
-            JSONObject response = new JSONObject(JSONResponse);
-
-            // checks if an error is in the response
-            if (!response.has("error")) {
-
-                String api_token = response.getString("api_token");
-                boolean created = response.getBoolean("created");
-                // add api_token to SharedPreferences
-                SharedPreferences sharedPreferences = LoginTabbedActivity.this.getSharedPreferences(Global.USER_INFO_PREF_FILE, MODE_PRIVATE);
-                sharedPreferences.edit().putString(Global.PREF_USER_API_TOKEN, api_token).commit();
-
-
-                if (mProgressDialog.isShowing()) {
-                    mProgressDialog.dismiss();
-                }
-
-                Intent intent = new Intent(getApplicationContext(), MailsTabbedActivity.class); //HomeActivity
-                startActivity(intent);
-                finish();
-            } else {
-                // show message if response returned from server has error
-                Global.showMessage(LoginTabbedActivity.this, response.get("error").toString(),
-                        Global.ERROR_MSG.SERVER_CONN_FAIL.getMsg());
-            }
-
-            return;
-        }
+                        return null;
+                    }
+                })
+                .onPost(new PostHandler() {
+                    @Override
+                    public void handle(Object data) {
+                        Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                })
+                .send();
     }
 
     @Override
