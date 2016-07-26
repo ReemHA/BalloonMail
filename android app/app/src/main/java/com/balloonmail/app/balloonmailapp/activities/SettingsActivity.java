@@ -8,6 +8,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceFragment;
 import android.support.v7.app.ActionBar;
+import android.view.MenuItem;
 
 import com.balloonmail.app.balloonmailapp.R;
 
@@ -55,5 +56,15 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.pref_sign_out);
         }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == android.R.id.home) {
+            finish(); // or go to another activity
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

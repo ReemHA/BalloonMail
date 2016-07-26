@@ -32,7 +32,7 @@
             android:layout_toLeftOf="@+id/actions_layout"
             android:layout_marginLeft="@dimen/actions_padding_left"
             tools:text="This is a very long message to test the presence of text over action buttons"
-            android:maxLines="2"/>
+            /><!--android:maxLines="2"-->
 
         <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
             android:orientation="horizontal"
