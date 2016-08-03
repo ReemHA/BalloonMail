@@ -2,13 +2,15 @@ package com.balloonmail.app.balloonmailapp;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import com.balloonmail.app.balloonmailapp.async.PostHandler;
+import com.balloonmail.app.balloonmailapp.async.ReusableAsync;
+import com.balloonmail.app.balloonmailapp.async.SuccessHandler;
 import com.balloonmail.app.balloonmailapp.models.Balloon;
 import com.balloonmail.app.balloonmailapp.models.LikedBalloon;
 import com.balloonmail.app.balloonmailapp.utilities.Global;
@@ -24,14 +26,6 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
 
 import it.gmariotti.cardslib.library.internal.Card;
 
@@ -125,8 +119,19 @@ public class CardLikes extends Card {
         holder.likeBtn.setImageResource(R.drawable.ic_like_clicked_24px);
     }
 
-    private void requestLikeToServer(Balloon likedBalloon) {
-        new CreateALikeRequest().execute(likedBalloon);
+    private void requestLikeToServer(final Balloon likedBalloon) {
+        new ReusableAsync<Void>(this.getContext())
+                .post("/balloons/like")
+                .bearer(Global.getApiToken(getContext()))
+                .addData("balloon_id", Integer.toString(likedBalloon.getBalloon_id()))
+                .onSuccess(new SuccessHandler<Void>() {
+                    @Override
+                    public Void handle(JSONObject data) throws JSONException {
+                        ((LikedBalloon) likedBalloon).setIs_liked(0);
+                        return null;
+                    }
+                })
+                .send();
     }
 
     private void changeStateOfRefillBtn() {
@@ -137,8 +142,30 @@ public class CardLikes extends Card {
         }
     }
 
-    private void requestRefillToServer(Balloon refilledBalloon) {
-        new CreateARefillRequest().execute(refilledBalloon);
+    private void requestRefillToServer(final Balloon refilledBalloon) {
+        new ReusableAsync<Void>(this.getContext())
+                .post("/balloons/refill")
+                .bearer(Global.getApiToken(getContext()))
+                .addData("balloon_id", Integer.toString(refilledBalloon.getBalloon_id()))
+                .onSuccess(new SuccessHandler<Void>() {
+                    @Override
+                    public Void handle(JSONObject data) throws JSONException {
+                        int isRefilled = ((LikedBalloon) balloon).getIs_refilled();
+                        if (isRefilled == 0) {
+                            ((LikedBalloon) balloon).setIs_refilled(1);
+                        } else {
+                            ((LikedBalloon) balloon).setIs_refilled(0);
+                        }
+                        return null;
+                    }
+                })
+                .onPost(new PostHandler<Void>() {
+                    @Override
+                    public void handle(Void data) {
+                        changeStateOfRefillBtn();
+                    }
+                })
+                .send();
     }
 
     private void changeStateOfCreepBtn() {
@@ -150,7 +177,29 @@ public class CardLikes extends Card {
     }
 
     private void requestCreepToServer(Balloon creepedBalloon) {
-        new CreateACreepRequest().execute(creepedBalloon);
+        new ReusableAsync<Void>(this.getContext())
+                .post("/balloons/refill")
+                .bearer(Global.getApiToken(getContext()))
+                .addData("balloon_id", Integer.toString(creepedBalloon.getBalloon_id()))
+                .onSuccess(new SuccessHandler<Void>() {
+                    @Override
+                    public Void handle(JSONObject data) throws JSONException {
+                        int isCreeped = ((LikedBalloon) balloon).getIs_creeped();
+                        if (isCreeped == 0) {
+                            ((LikedBalloon) balloon).setIs_creeped(1);
+                        } else {
+                            ((LikedBalloon) balloon).setIs_creeped(0);
+                        }
+                        return null;
+                    }
+                })
+                .onPost(new PostHandler<Void>() {
+                    @Override
+                    public void handle(Void data) {
+                        changeStateOfCreepBtn();
+                    }
+                })
+                .send();
     }
 
     private void changeColorOfSentimentIndication(double sentiment) {
@@ -217,307 +266,5 @@ public class CardLikes extends Card {
         }
 
     }
-
-    private class CreateALikeRequest extends AsyncTask<Balloon, Void, Void> {
-        URL url;
-        HttpURLConnection connection;
-
-        @Override
-        protected Void doInBackground(Balloon... params) {
-            try {
-                url = new URL(Global.SERVER_URL + "/balloons/like");
-                connection = (HttpURLConnection) url.openConnection();
-                // set connection to allow output
-                connection.setDoOutput(true);
-
-                // set connection to allow input
-                connection.setDoInput(true);
-
-                // set the request method to POST
-                connection.setRequestMethod("POST");
-
-                // set content-type property
-                connection.setRequestProperty("Content-Type", "application/json");
-
-                // set charset property to utf-8
-                connection.setRequestProperty("charset", "utf-8");
-
-                connection.setRequestProperty("authorization", "Bearer " + api_token);
-
-                // set accept property
-                connection.setRequestProperty("Accept", "application/json");
-
-                // put user name and id token in a JSONObject
-                JSONObject jsonBody = new JSONObject();
-                jsonBody.put("balloon_id", params[0].getBalloon_id());
-
-                // connect to server
-                connection.connect();
-
-                DataOutputStream outputStream = new DataOutputStream(connection.getOutputStream());
-
-                // write JSON body to the output stream
-                outputStream.write(jsonBody.toString().getBytes("utf-8"));
-
-                // flush to ensure all data in the stream is sent
-                outputStream.flush();
-
-                // close stream
-                outputStream.close();
-
-                // receive the response from server
-                setIsLikedAttrInBalloon(params[0]);
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-
-            return null;
-        }
-
-        private void setIsLikedAttrInBalloon(Balloon balloon) throws IOException, JSONException {
-            // create StringBuilder object to append the input stream in
-            StringBuilder sb = new StringBuilder();
-            String line;
-
-            // get input stream
-            BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-
-            // append stream in a the StringBuilder object
-            while ((line = reader.readLine()) != null) {
-                sb.append(line + "\n");
-            }
-            reader.close();
-
-            // convert StringBuilder object to string and store it in a variable
-            String JSONResponse = sb.toString();
-
-            // convert response to JSONObject
-            JSONObject response = new JSONObject(JSONResponse);
-            if ((response == null) || (response.has("error"))) {
-                Global.showMessage(getContext(), response.get("error").toString(),
-                        Global.ERROR_MSG.SERVER_CONN_FAIL.getMsg());
-                ((LikedBalloon) balloon).setIs_liked(0);
-            }
-
-            return;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
-        }
-    }
-
-    private class CreateARefillRequest extends AsyncTask<Balloon, Void, Void> {
-        URL url;
-        HttpURLConnection connection;
-
-        @Override
-        protected Void doInBackground(Balloon... params) {
-            try {
-                url = new URL(Global.SERVER_URL + "/balloons/refill");
-                connection = (HttpURLConnection) url.openConnection();
-                // set connection to allow output
-                connection.setDoOutput(true);
-
-                // set connection to allow input
-                connection.setDoInput(true);
-
-                // set the request method to POST
-                connection.setRequestMethod("POST");
-
-                // set content-type property
-                connection.setRequestProperty("Content-Type", "application/json");
-
-                // set charset property to utf-8
-                connection.setRequestProperty("charset", "utf-8");
-
-                connection.setRequestProperty("authorization", "Bearer " + api_token);
-
-                // set accept property
-                connection.setRequestProperty("Accept", "application/json");
-
-                // put user name and id token in a JSONObject
-                JSONObject jsonBody = new JSONObject();
-                jsonBody.put("balloon_id", params[0].getBalloon_id());
-
-                // connect to server
-                connection.connect();
-
-                DataOutputStream outputStream = new DataOutputStream(connection.getOutputStream());
-
-                // write JSON body to the output stream
-                outputStream.write(jsonBody.toString().getBytes("utf-8"));
-
-                // flush to ensure all data in the stream is sent
-                outputStream.flush();
-
-                // close stream
-                outputStream.close();
-
-                // receive the response from server
-                setIsRefillAttrInBalloon(params[0]);
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-
-            return null;
-        }
-
-        private void setIsRefillAttrInBalloon(Balloon balloon) throws IOException, JSONException {
-            // create StringBuilder object to append the input stream in
-            StringBuilder sb = new StringBuilder();
-            String line;
-
-            // get input stream
-            BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-
-            // append stream in a the StringBuilder object
-            while ((line = reader.readLine()) != null) {
-                sb.append(line + "\n");
-            }
-            reader.close();
-
-            // convert StringBuilder object to string and store it in a variable
-            String JSONResponse = sb.toString();
-
-            // convert response to JSONObject
-            JSONObject response = new JSONObject(JSONResponse);
-
-            // checks if an error is in the response
-            if ((response != null) && (!response.has("error"))) {
-                int isRefilled = ((LikedBalloon) balloon).getIs_refilled();
-                if (isRefilled == 0) {
-                    ((LikedBalloon) balloon).setIs_refilled(1);
-                } else {
-                    ((LikedBalloon) balloon).setIs_refilled(0);
-                }
-            } else {
-                Global.showMessage(getContext(), response.get("error").toString(),
-                        Global.ERROR_MSG.SERVER_CONN_FAIL.getMsg());
-                ((LikedBalloon) balloon).setIs_refilled(0);
-            }
-            return;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
-            changeStateOfRefillBtn();
-
-        }
-    }
-
-    private class CreateACreepRequest extends AsyncTask<Balloon, Void, Void> {
-        URL url;
-        HttpURLConnection connection;
-
-        @Override
-        protected Void doInBackground(Balloon... params) {
-            try {
-                url = new URL(Global.SERVER_URL + "/balloons/creep");
-                connection = (HttpURLConnection) url.openConnection();
-                // set connection to allow output
-                connection.setDoOutput(true);
-
-                // set connection to allow input
-                connection.setDoInput(true);
-
-                // set the request method to POST
-                connection.setRequestMethod("POST");
-
-                // set content-type property
-                connection.setRequestProperty("Content-Type", "application/json");
-
-                // set charset property to utf-8
-                connection.setRequestProperty("charset", "utf-8");
-
-                connection.setRequestProperty("authorization", "Bearer " + api_token);
-
-                // set accept property
-                connection.setRequestProperty("Accept", "application/json");
-
-                // put user name and id token in a JSONObject
-                JSONObject jsonBody = new JSONObject();
-                jsonBody.put("balloon_id", params[0].getBalloon_id());
-
-                // connect to server
-                connection.connect();
-
-                DataOutputStream outputStream = new DataOutputStream(connection.getOutputStream());
-
-                // write JSON body to the output stream
-                outputStream.write(jsonBody.toString().getBytes("utf-8"));
-
-                // flush to ensure all data in the stream is sent
-                outputStream.flush();
-
-                // close stream
-                outputStream.close();
-
-                // receive the response from server
-                setIsCreepAttrInBalloon(params[0]);
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-
-            return null;
-        }
-
-        private void setIsCreepAttrInBalloon(Balloon balloon) throws IOException, JSONException {
-            // create StringBuilder object to append the input stream in
-            StringBuilder sb = new StringBuilder();
-            String line;
-
-            // get input stream
-            BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-
-            // append stream in a the StringBuilder object
-            while ((line = reader.readLine()) != null) {
-                sb.append(line + "\n");
-            }
-            reader.close();
-
-            // convert StringBuilder object to string and store it in a variable
-            String JSONResponse = sb.toString();
-
-            // convert response to JSONObject
-            JSONObject response = new JSONObject(JSONResponse);
-
-            // checks if an error is in the response
-            if ((response != null) && (!response.has("error"))) {
-                int isCreeped = ((LikedBalloon) balloon).getIs_creeped();
-                if (isCreeped == 0) {
-                    ((LikedBalloon) balloon).setIs_creeped(1);
-                } else {
-                    ((LikedBalloon) balloon).setIs_creeped(0);
-                }
-            } else {
-                Global.showMessage(getContext(), response.get("error").toString(),
-                        Global.ERROR_MSG.SERVER_CONN_FAIL.getMsg());
-                ((LikedBalloon) balloon).setIs_creeped(0);
-            }
-            return;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
-            changeStateOfCreepBtn();
-        }
-    }
-
 }
 

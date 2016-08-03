@@ -2,7 +2,6 @@ package com.balloonmail.app.balloonmailapp.fragments;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -17,10 +16,13 @@ import android.widget.ProgressBar;
 import com.balloonmail.app.balloonmailapp.CardReceived;
 import com.balloonmail.app.balloonmailapp.R;
 import com.balloonmail.app.balloonmailapp.activities.MailsTabbedActivity;
-import com.balloonmail.app.balloonmailapp.utilities.Global;
+import com.balloonmail.app.balloonmailapp.async.PostHandler;
+import com.balloonmail.app.balloonmailapp.async.ReusableAsync;
+import com.balloonmail.app.balloonmailapp.async.SuccessHandler;
 import com.balloonmail.app.balloonmailapp.models.Balloon;
 import com.balloonmail.app.balloonmailapp.models.DatabaseHelper;
 import com.balloonmail.app.balloonmailapp.models.ReceivedBalloon;
+import com.balloonmail.app.balloonmailapp.utilities.Global;
 import com.j256.ormlite.android.apptools.OpenHelperManager;
 import com.j256.ormlite.dao.Dao;
 
@@ -28,25 +30,16 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.TimeZone;
-import java.util.concurrent.ExecutionException;
 
 import it.gmariotti.cardslib.library.internal.Card;
 import it.gmariotti.cardslib.library.recyclerview.internal.CardArrayRecyclerViewAdapter;
@@ -81,24 +74,16 @@ public class ReceivedMailsFragment extends Fragment {
         rootView = inflater.inflate(R.layout.fragment_received_mails, container, false);
         this.savedInstanceState = savedInstanceState;
         dbHelper = OpenHelperManager.getHelper(getContext(), DatabaseHelper.class);
+        progressBar = (ProgressBar) rootView.findViewById(R.id.progressBar_id);
         dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss", Locale.ENGLISH);
         balloonsMap = new HashMap<>();
         cards = new ArrayList<>();
         receivedBalloonList = new ArrayList<>();
-
-        progressBar = (ProgressBar) rootView.findViewById(R.id.receivedProgressBar);
-
         swipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipe_refresh_layout);
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                try {
-                    loadReceivedBalloons();
-                } catch (ExecutionException e) {
-                    e.printStackTrace();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+                loadReceivedBalloons();
             }
         });
 
@@ -121,6 +106,8 @@ public class ReceivedMailsFragment extends Fragment {
             } catch (SQLException e) {
                 e.printStackTrace();
             }
+        } else {
+            loadReceivedBalloons();
         }
         //Staggered grid view
         CardRecyclerView mRecyclerView = (CardRecyclerView) rootView.findViewById(R.id.cvReceivedCardRecyclerView);
@@ -192,121 +179,60 @@ public class ReceivedMailsFragment extends Fragment {
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
-        if (isVisibleToUser && Global.isConnected(getContext())) {
-            try {
-                loadReceivedBalloons();
-            } catch (ExecutionException e) {
-                e.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
     }
 
-    private void loadReceivedBalloons() throws ExecutionException, InterruptedException {
-        new fetchReceivedBalloonsFromServer().execute();
-    }
+    private void loadReceivedBalloons() {
+        new ReusableAsync<Integer>(this.getContext())
+                .get("/balloons/received")
+                .bearer(Global.getApiToken(this.getContext()))
+                .progressBar(progressBar)
+                .onSuccess(new SuccessHandler<Integer>() {
+                    @Override
+                    public Integer handle(JSONObject jsonObject) throws JSONException {
+                        JSONArray jsonArray = jsonObject.getJSONArray("balloons");
+                        cards = new ArrayList<>();
+                        for (int i = 0; i < jsonArray.length(); i++) {
+                            JSONObject object = jsonArray.getJSONObject(i);
+                            Date sent_at = null;
+                            try {
+                                sent_at = dateFormat.parse(object.getString("sent_at"));
+                            } catch (ParseException e) {
+                                e.printStackTrace();
+                            }
 
-    private class fetchReceivedBalloonsFromServer extends AsyncTask<Object, Void, Integer> {
-        URL url;
-        HttpURLConnection connection;
-        String line;
+                            ReceivedBalloon balloon = new ReceivedBalloon(object.getString("text"), object.getInt("balloon_id"),
+                                    object.getDouble("sentiment"), object.getDouble("lat"), object.getDouble("lng"),
+                                    sent_at);
+                            balloon.setIs_liked(object.getInt("liked"));
+                            balloon.setIs_refilled(object.getInt("refilled"));
+                            balloon.setIs_creeped(object.getInt("creeped"));
+                            Card card = createCard(balloon);
+                            cards.add(card);
+                            balloonsMap.put(balloon, card);
+                        }
 
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-        }
-
-        @Override
-        protected Integer doInBackground(Object... params) {
-            try {
-                url = new URL(Global.SERVER_URL + "/balloons/received");
-                connection = (HttpURLConnection) url.openConnection();
-                connection.setRequestMethod("GET");
-                sharedPreferences = getContext().getSharedPreferences(Global.USER_INFO_PREF_FILE, Context.MODE_PRIVATE);
-                api_token = sharedPreferences.getString(Global.PREF_USER_API_TOKEN, "");
-                connection.setRequestProperty("authorization", "Bearer " + api_token);
-                connection.setRequestProperty("Content-Type", "application/json");
-                connection.setRequestProperty("charset", "utf-8");
-                connection.connect();
-                return getResponse();
-
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (JSONException e) {
-                e.printStackTrace();
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-            return null;
-        }
-
-        private int getResponse() throws IOException, JSONException, ParseException {
-            InputStreamReader streamReader = new InputStreamReader(connection.getInputStream());
-            BufferedReader reader = new BufferedReader(streamReader);
-            StringBuilder stringBuilder = new StringBuilder();
-            while ((line = reader.readLine()) != null) {
-                stringBuilder.append(line);
-            }
-            reader.close();
-            streamReader.close();
-            JSONObject jsonObject = new JSONObject(stringBuilder.toString());
-            if (!jsonObject.has("error")) {
-                JSONArray jsonArray = jsonObject.getJSONArray("balloons");
-                cards = new ArrayList<>();
-                Date dateFormat_temp;
-                for (int i = 0; i < jsonArray.length(); i++) {
-                    JSONObject object = jsonArray.getJSONObject(i);
-                    try {
-                        dateFormat_temp = dateFormat.parse(object.getString("sent_at"));
-                    } catch (NullPointerException e) {
-                        Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("GMT+2:00"));
-                        dateFormat_temp = cal.getTime();
+                        return jsonArray.length();
                     }
+                })
+                .onPost(new PostHandler<Integer>() {
+                    @Override
+                    public void handle(Integer aVoid) {
+                        if (swipeRefreshLayout.isRefreshing()) {
+                            swipeRefreshLayout.setRefreshing(false);
+                        }
+                        if (aVoid != null) {
+                            if (aVoid == 0) {
+                                emptyStateImage.setBackgroundResource(R.drawable.empty_state);
+                            } else {
+                                emptyStateImage.setBackgroundResource(0);
+                            }
+                        }
 
-                    ReceivedBalloon balloon = new ReceivedBalloon(object.getString("text"), object.getInt("balloon_id"),
-                            object.getDouble("sentiment"), object.getDouble("lat"), object.getDouble("lng"),
-                            dateFormat_temp);
-                    balloon.setIs_liked(object.getInt("liked"));
-                    balloon.setIs_refilled(object.getInt("refilled"));
-                    balloon.setIs_creeped(object.getInt("creeped"));
-                    Card card = createCard(balloon);
-                    cards.add(card);
-                    balloonsMap.put(balloon, card);
-                }
-
-                return jsonArray.length();
-            } else {
-                Global.showMessage(ReceivedMailsFragment.this.getContext(), jsonObject.get("error").toString(),
-                        Global.ERROR_MSG.SERVER_CONN_FAIL.getMsg());
-                return 0;
-            }
-        }
-
-        @Override
-        protected void onPostExecute(Integer aVoid) {
-            super.onPostExecute(aVoid);
-            if (progressBar.isShown()) {
-                progressBar.setVisibility(View.GONE);
-            }
-            if (swipeRefreshLayout.isRefreshing()) {
-                swipeRefreshLayout.setRefreshing(false);
-            }
-            if (aVoid != null) {
-                if (aVoid == 0) {
-                    emptyStateImage.setBackgroundResource(R.drawable.empty_state);
-                } else {
-                    emptyStateImage.setBackgroundResource(0);
-                }
-            }
-
-            Collections.reverse(cards);
-            mCardArrayAdapter.setCards(cards);
-            mCardArrayAdapter.notifyDataSetChanged();
-
-        }
+                        Collections.reverse(cards);
+                        mCardArrayAdapter.setCards(cards);
+                        mCardArrayAdapter.notifyDataSetChanged();
+                    }
+                })
+                .send();
     }
-
 }

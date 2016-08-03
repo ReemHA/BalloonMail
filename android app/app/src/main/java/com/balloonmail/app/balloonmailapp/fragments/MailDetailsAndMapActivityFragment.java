@@ -50,9 +50,6 @@ public class MailDetailsAndMapActivityFragment extends Fragment implements OnMap
 
         rootView = inflater.inflate(R.layout.fragment_mail_details_and_map, container, false);
 
-        //Bundle bundle = getArguments();
-        //if(bundle != null){
-            //balloon = (Balloon)bundle.getSerializable("balloonDetailFragment");
             balloon = Global.balloonHolder.getBalloon();
 
             TextView text = (TextView)rootView.findViewById(R.id.sentBalloonTextTv);
@@ -61,8 +58,6 @@ public class MailDetailsAndMapActivityFragment extends Fragment implements OnMap
             TextView refill = (TextView)rootView.findViewById(R.id.refillTv_details);
             refill.setText(String.valueOf(balloon.getRefills()) + " refills");
 
-            //TextView reach = (TextView)rootView.findViewById(R.id.reachTv_details);
-            //reach.setText(String.valueOf(balloon.getReach()) + " reach");
 
             TextView creep = (TextView)rootView.findViewById(R.id.creepTv_details);
             creep.setText(String.valueOf(balloon.getCreeps()) + " creeps");

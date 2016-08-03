@@ -2,18 +2,22 @@ package com.balloonmail.app.balloonmailapp.utilities;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.support.v7.app.AlertDialog;
 import android.widget.Toast;
 
+import java.util.Calendar;
+import java.util.Date;
+import java.util.TimeZone;
+
 /**
  * Created by Reem Hamdy on 4/24/2016.
  */
 public class Global {
-    //public static final String SERVER_URL = "http:// 192.168.1.5:8080";
+    //public static final String SERVER_URL = "http://6.6.6.149:8080";
     public static final String SERVER_URL = "http://app2-balloonmail.rhcloud.com";
-
     public static final String SERVER_CLIENT_ID =
             "113808451021-5bbh4fp49eo7tdq8j93arot30tt49q8j.apps.googleusercontent.com";
     public static final String ARG_MAILS_TABBED_TAG = "tabbedPage";
@@ -28,9 +32,11 @@ public class Global {
     public static final String PREF_USER_LAT = "lat";
     public static final String PREF_USER_LNG = "lon";
     public static final boolean inDebug = true;
+
     public enum ERROR_MSG {
         SERVER_CONN_FAIL("Couldn't connect to server."),
         NETWORK_CONN_FAIL("No internet connection.");
+
         String msg;
 
         ERROR_MSG(String msg) {
@@ -41,7 +47,6 @@ public class Global {
             return msg;
         }
     }
-
 
     public static boolean isConnected(Context context) {
         // check the state of network connectivity
@@ -75,5 +80,32 @@ public class Global {
             alertDialog.show();
         }
 
+    }
+
+    public static Date getDateFromString(String date) {
+        //Assuming date format yyyy-mm-dd hh:MM:ss
+        String[] token = date.split(" +");
+        if (token.length != 2)
+            return null;
+        String[] _date = token[0].split("-");
+        if (_date.length != 3)
+            return null;
+        String[] time = token[1].split(":");
+        if (time.length != 3)
+            return null;
+        Calendar c = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+        c.set(Integer.parseInt(_date[0]),
+                Integer.parseInt(_date[1]),
+                Integer.parseInt(_date[2]),
+                Integer.parseInt(time[0]),
+                Integer.parseInt(time[0]),
+                Integer.parseInt(time[0])
+        );
+        return c.getTime();
+    }
+
+    public static String getApiToken(Context context) {
+        SharedPreferences sharedPreferences = context.getSharedPreferences(Global.USER_INFO_PREF_FILE, Context.MODE_PRIVATE);
+        return sharedPreferences.getString(Global.PREF_USER_API_TOKEN, "");
     }
 }
