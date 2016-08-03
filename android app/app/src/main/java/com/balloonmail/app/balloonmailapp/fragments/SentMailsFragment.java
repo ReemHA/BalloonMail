@@ -92,10 +92,12 @@ public class SentMailsFragment extends Fragment {
                 cards = initCardsFromLocalDb();
                 Collections.reverse(cards);
                 mCardArrayAdapter.setCards(cards);
+                Global.showMessage(this.getContext(), "No internet conn",
+                        Global.ERROR_MSG.SERVER_CONN_FAIL.getMsg());
             } catch (SQLException e) {
                 e.printStackTrace();
             }
-        }else {
+        } else {
             loadSentBalloons();
         }
 
@@ -147,7 +149,7 @@ public class SentMailsFragment extends Fragment {
     }
 
     private Card createCard(final Balloon balloon) {
-        Card card = new CardSent(balloon, getActivity().getBaseContext());
+        Card card = new CardSent(balloon, getActivity());
 
         card.setOnClickListener(new Card.OnCardClickListener() {
             @Override

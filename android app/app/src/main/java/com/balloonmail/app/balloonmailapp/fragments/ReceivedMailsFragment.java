@@ -103,6 +103,10 @@ public class ReceivedMailsFragment extends Fragment {
                 cards = initCardsFromLocalDb();
                 Collections.reverse(cards);
                 mCardArrayAdapter.setCards(cards);
+
+                Global.showMessage(this.getContext(), "No internet conn",
+                        Global.ERROR_MSG.SERVER_CONN_FAIL.getMsg());
+
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -142,7 +146,7 @@ public class ReceivedMailsFragment extends Fragment {
     }
 
     private Card createCard(Balloon balloon) {
-        Card card = new CardReceived(balloon, getActivity().getBaseContext(), savedInstanceState);
+        Card card = new CardReceived(balloon, getActivity(), savedInstanceState);
         card.setCardElevation(getResources().getDimension(R.dimen.card_shadow_elevation));
         return card;
     }

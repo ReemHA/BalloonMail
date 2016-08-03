@@ -83,7 +83,7 @@ public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiC
             databaseUtilities.createDatabase(LoginTabbedActivity.this);
         }
 
-        getLocation();
+        //getLocation();
 
         SignInButton google_sign_in = (SignInButton) findViewById(R.id.login_google_button);
         google_sign_in.setSize(SignInButton.SIZE_WIDE);
@@ -153,12 +153,10 @@ public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiC
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == RESULT_OK) {
 
-        // check the request code returned
-        if (requestCode == RC_SIGN_IN) {
-
-            // check the result code returned
-            if (resultCode == RESULT_OK) {
+            // check the request code returned
+            if (requestCode == RC_SIGN_IN) {
 
                 // store returned data
                 GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
@@ -170,8 +168,9 @@ public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiC
                     e.printStackTrace();
                 }
             }
-        }else if (requestCode == RC_LOCATION){
-            if (resultCode == RESULT_OK){
+        } else {
+            if (requestCode == RC_LOCATION) {
+                Log.d(LoginTabbedActivity.class.getSimpleName(), "true");
                 getLocation();
             }
         }
@@ -188,36 +187,38 @@ public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiC
         } else {
 
             // show a message if the device is not connected to the internet
-            Global.showMessage(getApplicationContext(), NETWORK_CONNECTION_MSG,
+            Global.showMessage(this, NETWORK_CONNECTION_MSG,
                     Global.ERROR_MSG.NETWORK_CONN_FAIL.getMsg());
         }
     }
 
     // handle the data returned from onActivityResult
     private void handleSignIntent(GoogleSignInResult result) throws JSONException {
-
+        final String[] lat = new String[1];
+        final String[] lng = new String[1];
         if (result.isSuccess()) {
 
             // get the idToken of the user
             GoogleSignInAccount account = result.getSignInAccount();
-            String idToken = account.getIdToken();
+            final String idToken = account.getIdToken();
 
 
             // get the user name
-            String userName = account.getDisplayName();
+            final String userName = account.getDisplayName();
             sharedPreferences.edit().putString(Global.PREF_USER_NAME, userName).commit();
 
             // get the user email
-            String userEmail = account.getEmail();
+            final String userEmail = account.getEmail();
             sharedPreferences.edit().putString(Global.PREF_USER_EMAIL, userEmail).commit();
 
+            // get user location
+            getLocation();
 
             if (mLastLocation != null) {
-                String lat = String.valueOf(mLastLocation.getLatitude());
-                String lng = String.valueOf(mLastLocation.getLongitude());
+                lat[0] = String.valueOf(mLastLocation.getLatitude());
+                lng[0] = String.valueOf(mLastLocation.getLongitude());
+                sendDataToServer(idToken, userName, userEmail, lat[0], lng[0]);
 
-                // send the idToken and username to the app server
-                sendDataToServer(idToken, userName, userEmail, lat, lng);
             } else {
                 // show message if location service is turned off
                 final AlertDialog alertDialog = new AlertDialog.Builder(this).create();
@@ -234,9 +235,16 @@ public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiC
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         alertDialog.dismiss();
+
+                        lat[0] = String.valueOf(Global.LAT);
+                        lng[0] = String.valueOf(Global.LNG);
+                        sendDataToServer(idToken, userName, userEmail, lat[0], lng[0]);
+                        Global.showMessage(LoginTabbedActivity.this, "send the default location",
+                                Global.ERROR_MSG.DEFAULT_LOCATION_WARNING.getMsg());
                     }
                 });
                 alertDialog.show();
+
             }
         } else {
 
@@ -247,7 +255,7 @@ public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiC
     }
 
 
-    private void sendDataToServer(String idToken, final String userName, final String userEmail, String lat, String lng){
+    private void sendDataToServer(String idToken, final String userName, final String userEmail, String lat, String lng) {
         String gcm_id = FirebaseInstanceId.getInstance().getToken();
         new ReusableAsync<>(this)
                 .post("/token/google")

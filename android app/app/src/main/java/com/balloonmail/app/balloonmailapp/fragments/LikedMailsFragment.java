@@ -98,6 +98,8 @@ public class LikedMailsFragment extends Fragment {
                 cards = initCardsFromLocalDb();
                 Collections.reverse(cards);
                 mCardArrayAdapter.setCards(cards);
+                Global.showMessage(this.getContext(), "No internet conn",
+                        Global.ERROR_MSG.SERVER_CONN_FAIL.getMsg());
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -136,7 +138,7 @@ public class LikedMailsFragment extends Fragment {
     }
 
     private Card createCard(Balloon balloon) {
-        Card card = new CardLikes(getActivity().getBaseContext(), balloon, savedInstanceState);
+        Card card = new CardLikes(getActivity(), balloon, savedInstanceState);
         card.setCardElevation(getResources().getDimension(R.dimen.card_shadow_elevation));
         return card;
     }
