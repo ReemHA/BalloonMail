@@ -71,7 +71,6 @@ public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiC
         // GoogleApiClient is main entry for Google Play services integration. Build GoogleApiClient to access the options specified by gso
         googleApiClient = buildApiClient();
 
-        // Get api_token from the shared preference
         if (!isSignedOut() && api_token != "") {
             getLocation();
             Intent intent = new Intent(LoginTabbedActivity.this, MailsTabbedActivity.class); //HomeActivity
@@ -275,7 +274,7 @@ public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiC
                 .onPost(new PostHandler() {
                     @Override
                     public void handle(Object data) {
-                        Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
+                        Intent intent = new Intent(getApplicationContext(), MailsTabbedActivity.class);
                         startActivity(intent);
                         finish();
                     }
