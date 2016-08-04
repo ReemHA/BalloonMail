@@ -13,4 +13,7 @@
     <dimen name="button_height">60dp</dimen>
     <dimen name="icon_size_48">48dp</dimen>
     <dimen name="card_shadow_elevation">5dp</dimen>
+
+    <dimen name="native_recyclerview_card_margin_left">8dp</dimen>
+    <dimen name="native_recyclerview_card_margin_right">8dp</dimen>
 </resources>
