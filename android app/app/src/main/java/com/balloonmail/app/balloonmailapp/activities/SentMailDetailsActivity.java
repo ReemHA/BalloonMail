@@ -5,16 +5,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
 import com.balloonmail.app.balloonmailapp.R;
-import com.balloonmail.app.balloonmailapp.models.Balloon;
 
-public class MailDetailsAndMapActivity extends AppCompatActivity {
-
-    Balloon balloon;
+public class SentMailDetailsActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_mail_details_and_map);
+        setContentView(R.layout.activity_sent_mail_details);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -29,11 +26,11 @@ public class MailDetailsAndMapActivity extends AppCompatActivity {
 
             //Bundle arguments = new Bundle();
             //arguments.putSerializable("balloonDetailFragment", balloon);
-            //MailDetailsAndMapActivityFragment mailDetailsAndMapActivityFragment = new MailDetailsAndMapActivityFragment();
+            //SentMailDetailsFragment mailDetailsAndMapActivityFragment = new SentMailDetailsFragment();
             //mailDetailsAndMapActivityFragment.setArguments(arguments);
 
             getSupportFragmentManager().beginTransaction()
-                    .add(R.id.fragment, new MailDetailsAndMapActivityFragment())
+                    .add(R.id.fragment, new SentMailDetailsFragment())
                     .commit();
         }*/
     }

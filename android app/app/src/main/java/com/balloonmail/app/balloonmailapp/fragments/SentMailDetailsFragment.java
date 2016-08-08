@@ -28,13 +28,13 @@ import java.util.HashMap;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class MailDetailsAndMapActivityFragment extends Fragment implements OnMapReadyCallback{
+public class SentMailDetailsFragment extends Fragment implements OnMapReadyCallback{
 
     Balloon balloon;
     View rootView;
     GoogleMap map;
 
-    public MailDetailsAndMapActivityFragment() {
+    public SentMailDetailsFragment() {
     }
 
     @Override
@@ -48,7 +48,7 @@ public class MailDetailsAndMapActivityFragment extends Fragment implements OnMap
         if (rootView != null)
             return rootView;
 
-        rootView = inflater.inflate(R.layout.fragment_mail_details_and_map, container, false);
+        rootView = inflater.inflate(R.layout.fragment_sent_mail_details, container, false);
 
             balloon = Global.balloonHolder.getBalloon();
 

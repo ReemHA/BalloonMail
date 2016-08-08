@@ -2,8 +2,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".fragments.MailDetailsAndMapActivityFragment"
-    tools:showIn="@layout/activity_mail_details_and_map">
+    tools:context=".fragments.SentMailDetailsFragment"
+    tools:showIn="@layout/activity_sent_mail_details">
 
     <RelativeLayout
         android:layout_width="wrap_content"

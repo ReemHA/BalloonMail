@@ -7,7 +7,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.balloonmail.app.balloonmailapp.activities.MailDetailsAndMapActivity;
+import com.balloonmail.app.balloonmailapp.activities.SentMailDetailsActivity;
 import com.balloonmail.app.balloonmailapp.models.Balloon;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -132,7 +132,7 @@ public class CustomSentExpandCard extends CardExpand{
         map.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng latLng) {
-                Intent intent = new Intent(context, MailDetailsAndMapActivity.class);
+                Intent intent = new Intent(context, SentMailDetailsActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 //Bundle bundle = new Bundle();
                 //bundle.putSerializable("balloon", balloon);

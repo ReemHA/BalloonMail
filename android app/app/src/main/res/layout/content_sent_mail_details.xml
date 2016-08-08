@@ -2,8 +2,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/fragment"
-    android:name="com.balloonmail.app.balloonmailapp.fragments.MailDetailsAndMapActivityFragment"
+    android:name="com.balloonmail.app.balloonmailapp.fragments.SentMailDetailsFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:layout="@layout/fragment_mail_details_and_map" />
+    tools:layout="@layout/fragment_sent_mail_details" />
