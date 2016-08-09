@@ -1,10 +1,13 @@
 package com.balloonmail.app.balloonmailapp.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 
 import com.balloonmail.app.balloonmailapp.R;
+import com.balloonmail.app.balloonmailapp.utilities.Global;
 
 public class SentMailDetailsActivity extends AppCompatActivity {
 
@@ -16,24 +19,27 @@ public class SentMailDetailsActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
-        /*if(savedInstanceState == null){
-
-            //Intent intent = this.getIntent();
-            //Bundle bundle = intent.getExtras();
-            //balloon = (Balloon) bundle.getSerializable("balloon");
-
-
-            //Bundle arguments = new Bundle();
-            //arguments.putSerializable("balloonDetailFragment", balloon);
-            //SentMailDetailsFragment mailDetailsAndMapActivityFragment = new SentMailDetailsFragment();
-            //mailDetailsAndMapActivityFragment.setArguments(arguments);
-
-            getSupportFragmentManager().beginTransaction()
-                    .add(R.id.fragment, new SentMailDetailsFragment())
-                    .commit();
-        }*/
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == android.R.id.home) {
+            backIntentToSent();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        backIntentToSent();
+    }
+
+    public void backIntentToSent(){
+        Intent intent = new Intent(getApplicationContext(), MailsTabbedActivity.class);
+        intent.putExtra(Global.ARG_MAILS_TABBED_TAG, Global.SENT_TABBED_PAGE);
+        finish();
+    }
 }

@@ -6,7 +6,10 @@ import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.support.design.widget.Snackbar;
+import android.view.View;
 import android.widget.Toast;
+
+import com.balloonmail.app.balloonmailapp.R;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -111,6 +114,15 @@ public class Global {
         loc[1] = DUMMY_LNG;
         return loc;
     }
-
+    
+    public static void changeColorOfSentimentIndication(double sentiment, View view){
+        if(sentiment < 0){
+            view.setBackgroundResource(R.color.red);
+        }else if(sentiment > 0){
+            view.setBackgroundResource(R.color.green);
+        }else{
+            view.setBackgroundResource(R.color.colorPrimary);
+        }
+    }
 
 }
