@@ -31,9 +31,10 @@ public class Global {
     public static final String PREF_USER_API_TOKEN = "api_token";
     public static final String PREF_USER_LAT = "lat";
     public static final String PREF_USER_LNG = "lon";
-    public static final boolean inDebug = false;
     private static final double DUMMY_LAT = 51.507351;
     private static final double DUMMY_LNG = -0.127758;
+    public static final boolean inDebug = true;
+    public static final String RECEIVED_OR_LIKED = "rOrl";
 
     public enum ERROR_MSG {
         SERVER_CONN_FAIL("Couldn't connect to server."),

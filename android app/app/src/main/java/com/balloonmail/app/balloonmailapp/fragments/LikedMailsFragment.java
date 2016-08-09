@@ -157,6 +157,7 @@ public class LikedMailsFragment extends Fragment {
             public void onClick(Card card, View view) {
                 Intent intent = new Intent(getContext(), ReceivedAndLikedMailDetailsActivity.class);
                 Global.balloonHolder.setBalloon((LikedBalloon) balloon);
+                intent.putExtra(Global.RECEIVED_OR_LIKED, "l");
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 getContext().startActivity(intent);
             }
