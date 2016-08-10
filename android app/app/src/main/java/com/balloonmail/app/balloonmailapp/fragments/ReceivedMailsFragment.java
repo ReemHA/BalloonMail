@@ -130,7 +130,7 @@ public class ReceivedMailsFragment extends Fragment {
     }
 
     public ArrayList<Card> initCardsFromLocalDb() throws SQLException {
-        ArrayList<Card> cards = new ArrayList<>();
+        ArrayList<Card> cards_temp = new ArrayList<>();
         Card card;
 
         // a received balloon in Db?
@@ -138,11 +138,11 @@ public class ReceivedMailsFragment extends Fragment {
         if (receivedBalloonsListInDb.size() > 0 && receivedBalloonsListInDb != null) {
             for (int i = 0; i < receivedBalloonsListInDb.size(); i++) {
                 card = createCard(receivedBalloonsListInDb.get(i));
-                cards.add(card);
+                cards_temp.add(card);
             }
         }
 
-        return cards;
+        return cards_temp;
     }
 
     private Card createCard(Balloon balloon) {

@@ -239,7 +239,7 @@ public class ReusableAsync<T> {
         } catch (JSONException e) {
             e.printStackTrace();
             error_msg = "JSON exception";
-        } finally {
+        }finally {
             try {
                 if (outputStream != null) {
                     outputStream.close();

@@ -103,8 +103,6 @@ public class LikedMailsFragment extends Fragment {
             } catch (SQLException e) {
                 e.printStackTrace();
             }
-        } else {
-            loadLikedBalloons();
         }
 
         //Staggered grid view
@@ -174,6 +172,7 @@ public class LikedMailsFragment extends Fragment {
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
+        loadLikedBalloons();
     }
 
     private void loadLikedBalloons() {
