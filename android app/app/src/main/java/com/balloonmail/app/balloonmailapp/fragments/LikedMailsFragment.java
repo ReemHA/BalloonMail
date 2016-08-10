@@ -1,5 +1,6 @@
 package com.balloonmail.app.balloonmailapp.fragments;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -56,6 +57,8 @@ public class LikedMailsFragment extends Fragment {
     SwipeRefreshLayout swipeRefreshLayout;
     CardArrayRecyclerViewAdapter mCardArrayAdapter;
     ImageView emptyStateImage;
+    private Context context;
+
 
 
     public LikedMailsFragment() {
@@ -66,6 +69,7 @@ public class LikedMailsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        this.context = getContext();
         rootView = inflater.inflate(R.layout.fragment_liked_mails, container, false);
 
         this.savedInstanceState = savedInstanceState;
@@ -103,6 +107,8 @@ public class LikedMailsFragment extends Fragment {
             } catch (SQLException e) {
                 e.printStackTrace();
             }
+        } else {
+            loadLikedBalloons();
         }
 
         //Staggered grid view
@@ -172,13 +178,12 @@ public class LikedMailsFragment extends Fragment {
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
-        loadLikedBalloons();
     }
 
     private void loadLikedBalloons() {
-        new ReusableAsync<Integer>(this.getContext())
+        new ReusableAsync<Integer>(context)
                 .get("/balloons/liked")
-                .bearer(Global.getApiToken(this.getContext()))
+                .bearer(Global.getApiToken(context))
                 .progressBar(progressBar)
                 .onSuccess(new SuccessHandler<Integer>() {
                     @Override
