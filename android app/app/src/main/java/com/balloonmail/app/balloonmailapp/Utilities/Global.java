@@ -32,8 +32,8 @@ public class Global {
     public static final String PREF_USER_LAT = "lat";
     public static final String PREF_USER_LNG = "lon";
     public static final boolean inDebug = false;
-    public static final double LAT = 51.507351;
-    public static final double LNG = -0.127758;
+    private static final double DUMMY_LAT = 51.507351;
+    private static final double DUMMY_LNG = -0.127758;
 
     public enum ERROR_MSG {
         SERVER_CONN_FAIL("Couldn't connect to server."),
@@ -102,6 +102,13 @@ public class Global {
     public static String getApiToken(Context context) {
         SharedPreferences sharedPreferences = context.getSharedPreferences(Global.USER_INFO_PREF_FILE, Context.MODE_PRIVATE);
         return sharedPreferences.getString(Global.PREF_USER_API_TOKEN, "");
+    }
+
+    public static double[] getDummyLocation(){
+        double[] loc = new double[2];
+        loc[0] = DUMMY_LAT;
+        loc[1] = DUMMY_LNG;
+        return loc;
     }
 
 

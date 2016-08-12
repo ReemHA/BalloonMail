@@ -235,10 +235,9 @@ public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiC
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         alertDialog.dismiss();
-
-                        lat[0] = String.valueOf(Global.LAT);
-                        lng[0] = String.valueOf(Global.LNG);
-                        sendDataToServer(idToken, userName, userEmail, lat[0], lng[0]);
+                        double[] dummy_location = Global.getDummyLocation();
+                        sendDataToServer(idToken, userName, userEmail, Double.toString(dummy_location[0]),
+                                Double.toString(dummy_location[1]));
                         Global.showMessage(LoginTabbedActivity.this, "send the default location",
                                 Global.ERROR_MSG.DEFAULT_LOCATION_WARNING.getMsg());
                     }
@@ -385,13 +384,15 @@ public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiC
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        switch (requestCode) {
-            case MY_PERMISSIONS_REQUEST_FINE_LOCATION: {
-                //The application granted the permission
-                getLocation();
-            }
-
+//        switch (requestCode) {
+//            case MY_PERMISSIONS_REQUEST_FINE_LOCATION: {
+//                //The application granted the permission
+//                getLocation();
+//            }
+        if (requestCode == MY_PERMISSIONS_REQUEST_FINE_LOCATION) {
+            getLocation();
+        } else {
+            // permission denied
         }
     }
-
 }
