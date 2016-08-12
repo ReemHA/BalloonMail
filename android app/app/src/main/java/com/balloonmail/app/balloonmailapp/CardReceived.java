@@ -3,6 +3,7 @@ package com.balloonmail.app.balloonmailapp;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
@@ -96,15 +97,39 @@ public class CardReceived extends Card {
             holder.refillBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    requestRefillToServer(balloon);
-
+                    if (((ReceivedBalloon) balloon).getIs_refilled() == 0) {
+                        Log.d(CardReceived.class.getSimpleName(), " 1 refill is clicked");
+                        requestRefillToServer(balloon);
+                        Log.d(CardReceived.class.getSimpleName(), "refill change color");
+                    } else {
+                        // in case no internet connection the server conn fail msg should appear
+                        if (!Global.isConnected(context)) {
+                            Global.showMessage(context, "No internet connection",
+                                    Global.ERROR_MSG.SERVER_CONN_FAIL.getMsg());
+                        } else {
+                            Global.showMessage(context, "refill btn clicked twice",
+                                    Global.ERROR_MSG.REFILL_REQ_FAIL.getMsg());
+                        }
+                    }
                 }
             });
 
             holder.creepBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    requestCreepToServer(balloon);
+                    if (((ReceivedBalloon) balloon).getIs_creeped() == 0) {
+                        requestCreepToServer(balloon);
+                    } else {
+
+                        // in case no internet connection the server conn fail msg should appear
+                        if (!Global.isConnected(context)) {
+                            Global.showMessage(context, "No internet connection",
+                                    Global.ERROR_MSG.SERVER_CONN_FAIL.getMsg());
+                        } else {
+                            Global.showMessage(context, "creep btn clicked twice",
+                                    Global.ERROR_MSG.CREEP_REQ_FAIL.getMsg());
+                        }
+                    }
                 }
             });
 
@@ -121,7 +146,7 @@ public class CardReceived extends Card {
     }
 
     private void requestLikeToServer(Balloon likedBalloon) {
-        new ReusableAsync<Void>(this.getContext())
+        new ReusableAsync<Void>(context)
                 .bearer(api_token)
                 .post("/balloons/like")
                 .addData("balloon_id", Integer.toString(likedBalloon.getBalloon_id()))
@@ -147,17 +172,20 @@ public class CardReceived extends Card {
     }
 
     private void requestRefillToServer(Balloon refilledBalloon) {
-        new ReusableAsync<Void>(this.getContext())
+        new ReusableAsync<Void>(context)
                 .post("/balloons/refill")
                 .bearer(Global.getApiToken(getContext()))
                 .addData("balloon_id", Integer.toString(refilledBalloon.getBalloon_id()))
                 .onSuccess(new SuccessHandler<Void>() {
                     @Override
                     public Void handle(JSONObject data) throws JSONException {
+                        Log.d(CardReceived.class.getSimpleName(), "2 onSuccess");
                         int isRefilled = ((ReceivedBalloon) balloon).getIs_refilled();
                         if (isRefilled == 0) {
+                            Log.d(CardReceived.class.getSimpleName(), "2.1");
                             ((ReceivedBalloon) balloon).setIs_refilled(1);
                         } else {
+                            Log.d(CardReceived.class.getSimpleName(), "2.0");
                             ((ReceivedBalloon) balloon).setIs_refilled(0);
                         }
                         return null;
@@ -166,6 +194,7 @@ public class CardReceived extends Card {
                 .onPost(new PostHandler<Void>() {
                     @Override
                     public void handle(Void data) {
+                        Log.d(CardReceived.class.getSimpleName(), "3 onPost");
                         changeStateOfRefillBtn();
                     }
                 })
@@ -173,7 +202,7 @@ public class CardReceived extends Card {
     }
 
     private void requestCreepToServer(Balloon creepedBalloon) {
-        new ReusableAsync<Void>(this.getContext())
+        new ReusableAsync<Void>(context)
                 .post("/balloons/creep")
                 .bearer(Global.getApiToken(getContext()))
                 .addData("balloon_id", Integer.toString(creepedBalloon.getBalloon_id()))

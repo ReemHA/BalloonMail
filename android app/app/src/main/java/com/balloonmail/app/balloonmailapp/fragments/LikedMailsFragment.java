@@ -1,5 +1,6 @@
 package com.balloonmail.app.balloonmailapp.fragments;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -56,6 +57,8 @@ public class LikedMailsFragment extends Fragment {
     SwipeRefreshLayout swipeRefreshLayout;
     CardArrayRecyclerViewAdapter mCardArrayAdapter;
     ImageView emptyStateImage;
+    private Context context;
+
 
 
     public LikedMailsFragment() {
@@ -66,6 +69,7 @@ public class LikedMailsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        this.context = getContext();
         rootView = inflater.inflate(R.layout.fragment_liked_mails, container, false);
 
         this.savedInstanceState = savedInstanceState;
@@ -98,6 +102,8 @@ public class LikedMailsFragment extends Fragment {
                 cards = initCardsFromLocalDb();
                 Collections.reverse(cards);
                 mCardArrayAdapter.setCards(cards);
+                Global.showMessage(this.getContext(), "No internet conn",
+                        Global.ERROR_MSG.SERVER_CONN_FAIL.getMsg());
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -136,7 +142,7 @@ public class LikedMailsFragment extends Fragment {
     }
 
     private Card createCard(Balloon balloon) {
-        Card card = new CardLikes(getActivity().getBaseContext(), balloon, savedInstanceState);
+        Card card = new CardLikes(getActivity(), balloon, savedInstanceState);
         card.setCardElevation(getResources().getDimension(R.dimen.card_shadow_elevation));
         return card;
     }
@@ -175,9 +181,9 @@ public class LikedMailsFragment extends Fragment {
     }
 
     private void loadLikedBalloons() {
-        new ReusableAsync<Integer>(this.getContext())
+        new ReusableAsync<Integer>(context)
                 .get("/balloons/liked")
-                .bearer(Global.getApiToken(this.getContext()))
+                .bearer(Global.getApiToken(context))
                 .progressBar(progressBar)
                 .onSuccess(new SuccessHandler<Integer>() {
                     @Override

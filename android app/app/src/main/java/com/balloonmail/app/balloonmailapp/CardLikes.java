@@ -100,14 +100,36 @@ public class CardLikes extends Card {
             holder.refillBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    requestRefillToServer(balloon);
+                    if (((LikedBalloon) balloon).getIs_refilled() == 0) {
+                        requestRefillToServer(balloon);
+                    } else {
+                        // in case no internet connection the server conn fail msg should appear
+                        if (!Global.isConnected(context)) {
+                            Global.showMessage(context, "No internet connection",
+                                    Global.ERROR_MSG.SERVER_CONN_FAIL.getMsg());
+                        } else {
+                            Global.showMessage(context, "refill btn clicked twice",
+                                    Global.ERROR_MSG.REFILL_REQ_FAIL.getMsg());
+                        }
+                    }
                 }
             });
 
             holder.creepBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    requestCreepToServer(balloon);
+                    if (((LikedBalloon) balloon).getIs_creeped() == 0) {
+                        requestCreepToServer(balloon);
+                    } else {
+                        // in case no internet connection the server conn fail msg should appear
+                        if (!Global.isConnected(context)) {
+                            Global.showMessage(context, "No internet connection",
+                                    Global.ERROR_MSG.SERVER_CONN_FAIL.getMsg());
+                        } else {
+                            Global.showMessage(context, "creep btn clicked twice",
+                                    Global.ERROR_MSG.CREEP_REQ_FAIL.getMsg());
+                        }
+                    }
                 }
             });
 
@@ -120,7 +142,7 @@ public class CardLikes extends Card {
     }
 
     private void requestLikeToServer(final Balloon likedBalloon) {
-        new ReusableAsync<Void>(this.getContext())
+        new ReusableAsync<Void>(context)
                 .post("/balloons/like")
                 .bearer(Global.getApiToken(getContext()))
                 .addData("balloon_id", Integer.toString(likedBalloon.getBalloon_id()))
@@ -143,7 +165,7 @@ public class CardLikes extends Card {
     }
 
     private void requestRefillToServer(final Balloon refilledBalloon) {
-        new ReusableAsync<Void>(this.getContext())
+        new ReusableAsync<Void>(context)
                 .post("/balloons/refill")
                 .bearer(Global.getApiToken(getContext()))
                 .addData("balloon_id", Integer.toString(refilledBalloon.getBalloon_id()))
@@ -177,7 +199,7 @@ public class CardLikes extends Card {
     }
 
     private void requestCreepToServer(Balloon creepedBalloon) {
-        new ReusableAsync<Void>(this.getContext())
+        new ReusableAsync<Void>(context)
                 .post("/balloons/refill")
                 .bearer(Global.getApiToken(getContext()))
                 .addData("balloon_id", Integer.toString(creepedBalloon.getBalloon_id()))

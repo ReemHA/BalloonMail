@@ -3,6 +3,7 @@ package com.balloonmail.app.balloonmailapp.async;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
@@ -42,7 +43,7 @@ public class ReusableAsync<T> {
     private boolean error_in_add_data = false;
     private Context context;
     private ProgressBar mProgressBar;
-
+    private int count = 0;
 
     private static class AsyncResult<T> {
         T data;
@@ -98,42 +99,12 @@ public class ReusableAsync<T> {
     }
 
     public void send() {
-        new AsyncTask<Void, Void, AsyncResult<T>>() {
-            ProgressDialog mProgressDialog;
-
-            @Override
-            protected void onPreExecute() {
-                super.onPreExecute();
-                if (dialog_msg != null) {
-                    mProgressDialog = new ProgressDialog(context);
-                    mProgressDialog.setIndeterminate(true);
-                    mProgressDialog.setMessage(dialog_msg);
-                    mProgressDialog.show();
-                }
-
-                if (mProgressBar != null) {
-                    mProgressBar.setVisibility(View.VISIBLE);
-
-                }
-            }
-
-            @Override
-            protected AsyncResult<T> doInBackground(Void... voids) {
-                return handleBackground(voids);
-            }
-
-            @Override
-            protected void onPostExecute(AsyncResult<T> result) {
-                super.onPostExecute(result);
-                handlePost(result);
-                if (dialog_msg != null && mProgressDialog.isShowing()) {
-                    mProgressDialog.dismiss();
-                }
-                if (mProgressBar != null) {
-                    mProgressBar.setVisibility(View.GONE);
-                }
-            }
-        }.execute();
+        ParallelAsync task = new ParallelAsync();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+            task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        } else {
+            task.execute();
+        }
     }
 
     public ReusableAsync dialog(String message) {
@@ -158,7 +129,6 @@ public class ReusableAsync<T> {
     }
 
     private AsyncResult<T> handleBackground(Void... voids) {
-
         if (error_in_add_data) {
             return new AsyncResult<>(null, "JSON Exception adding send data.");
         }
@@ -191,6 +161,7 @@ public class ReusableAsync<T> {
             connection.setRequestMethod(method_string);
 
             connection.setConnectTimeout(10000);
+
             // set content-type property
             connection.setRequestProperty("Content-Type", "application/json");
 
@@ -270,7 +241,7 @@ public class ReusableAsync<T> {
             }
             // convert StringBuilder object to string and store it in a variable
             String JSONResponse = sb.toString();
-
+            Log.d(ReusableAsync.class.getSimpleName(), JSONResponse);
             // convert response to JSONObject
             JSONObject response = new JSONObject(JSONResponse);
 
@@ -300,6 +271,44 @@ public class ReusableAsync<T> {
         } else {
             if (postHandler != null) {
                 postHandler.handle(result.data);
+            }
+        }
+    }
+
+
+    private class ParallelAsync extends AsyncTask<Void, Void, AsyncResult<T>> {
+        ProgressDialog mProgressDialog;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            if (dialog_msg != null) {
+                mProgressDialog = new ProgressDialog(context);
+                mProgressDialog.setIndeterminate(true);
+                mProgressDialog.setMessage(dialog_msg);
+                mProgressDialog.show();
+            }
+
+            if (mProgressBar != null) {
+                mProgressBar.setVisibility(View.VISIBLE);
+
+            }
+        }
+
+        @Override
+        protected AsyncResult<T> doInBackground(Void... voids) {
+            return handleBackground(voids);
+        }
+
+        @Override
+        protected void onPostExecute(AsyncResult<T> result) {
+            super.onPostExecute(result);
+            handlePost(result);
+            if (dialog_msg != null && mProgressDialog.isShowing()) {
+                mProgressDialog.dismiss();
+            }
+            if (mProgressBar != null) {
+                mProgressBar.setVisibility(View.GONE);
             }
         }
     }

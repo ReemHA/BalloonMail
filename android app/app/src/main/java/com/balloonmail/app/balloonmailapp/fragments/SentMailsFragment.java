@@ -1,5 +1,6 @@
 package com.balloonmail.app.balloonmailapp.fragments;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -56,7 +57,7 @@ public class SentMailsFragment extends Fragment {
     Bundle savedInstanceState;
     CardArrayRecyclerViewAdapter mCardArrayAdapter;
     ImageView emptyStateImage;
-
+    private Context context;
     public SentMailsFragment() {
         // Required empty public constructor
     }
@@ -64,8 +65,9 @@ public class SentMailsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        this.context = getContext();
         rootView = inflater.inflate(R.layout.fragment_sent_mails, container, false);
-        dbHelper = OpenHelperManager.getHelper(getContext(), DatabaseHelper.class);
+        dbHelper = OpenHelperManager.getHelper(context, DatabaseHelper.class);
         progressBar = (ProgressBar) rootView.findViewById(R.id.progressBar_id);
         this.savedInstanceState = savedInstanceState;
         balloonsMap = new HashMap<>();
@@ -87,15 +89,17 @@ public class SentMailsFragment extends Fragment {
             e.printStackTrace();
         }
         mCardArrayAdapter = new CardArrayRecyclerViewAdapter(getActivity(), cards);
-        if (!Global.isConnected(getContext())) {
+        if (!Global.isConnected(context)) {
             try {
                 cards = initCardsFromLocalDb();
                 Collections.reverse(cards);
                 mCardArrayAdapter.setCards(cards);
+                Global.showMessage(context, "No internet conn",
+                        Global.ERROR_MSG.SERVER_CONN_FAIL.getMsg());
             } catch (SQLException e) {
                 e.printStackTrace();
             }
-        }else {
+        } else {
             loadSentBalloons();
         }
 
@@ -147,16 +151,16 @@ public class SentMailsFragment extends Fragment {
     }
 
     private Card createCard(final Balloon balloon) {
-        Card card = new CardSent(balloon, getActivity().getBaseContext());
+        Card card = new CardSent(balloon, getActivity());
 
         card.setOnClickListener(new Card.OnCardClickListener() {
             @Override
             public void onClick(Card card, View view) {
                 updateBalloonWithPaths(balloon);
                 Global.balloonHolder.setBalloon((SentBalloon) balloon);
-                Intent intent = new Intent(getContext(), MailDetailsAndMapActivity.class);
+                Intent intent = new Intent(context, MailDetailsAndMapActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                getContext().startActivity(intent);
+                context.startActivity(intent);
             }
         });
 
@@ -186,9 +190,9 @@ public class SentMailsFragment extends Fragment {
     }
 
     private void loadSentBalloons() {
-        new ReusableAsync<Integer>(this.getContext())
+        new ReusableAsync<Integer>(context)
                 .get("/balloons/sent")
-                .bearer(Global.getApiToken(this.getContext()))
+                .bearer(Global.getApiToken(context))
                 .progressBar(progressBar)
                 .onSuccess(new SuccessHandler<Integer>() {
                     @Override
@@ -254,9 +258,9 @@ public class SentMailsFragment extends Fragment {
     }
 
     private void updateBalloonWithPaths(final Balloon balloon) {
-        new ReusableAsync<Void>(this.getContext())
+        new ReusableAsync<Void>(context)
                 .get("/balloons/paths")
-                .bearer(Global.getApiToken(this.getContext()))
+                .bearer(Global.getApiToken(context))
                 .addQuery("balloon_id", Integer.toString(balloon.getBalloon_id()))
                 .onSuccess(new SuccessHandler<Void>() {
                     @Override

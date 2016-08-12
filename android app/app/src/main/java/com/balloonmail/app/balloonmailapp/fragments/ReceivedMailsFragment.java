@@ -1,7 +1,6 @@
 package com.balloonmail.app.balloonmailapp.fragments;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -59,8 +58,7 @@ public class ReceivedMailsFragment extends Fragment {
     View rootView;
     Bundle savedInstanceState;
     CardArrayRecyclerViewAdapter mCardArrayAdapter;
-    private SharedPreferences sharedPreferences;
-    private static String api_token;
+    private Context context;
     ImageView emptyStateImage;
 
     public ReceivedMailsFragment() {
@@ -71,9 +69,10 @@ public class ReceivedMailsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        this.context = getContext();
         rootView = inflater.inflate(R.layout.fragment_received_mails, container, false);
         this.savedInstanceState = savedInstanceState;
-        dbHelper = OpenHelperManager.getHelper(getContext(), DatabaseHelper.class);
+        dbHelper = OpenHelperManager.getHelper(context, DatabaseHelper.class);
         progressBar = (ProgressBar) rootView.findViewById(R.id.progressBar_id);
         dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss", Locale.ENGLISH);
         balloonsMap = new HashMap<>();
@@ -87,9 +86,6 @@ public class ReceivedMailsFragment extends Fragment {
             }
         });
 
-        sharedPreferences = getContext().getSharedPreferences(Global.USER_INFO_PREF_FILE, Context.MODE_PRIVATE);
-        api_token = sharedPreferences.getString(Global.PREF_USER_API_TOKEN, "");
-
         // Doa of Received table
         receivedBalloonDao = null;
         try {
@@ -98,11 +94,15 @@ public class ReceivedMailsFragment extends Fragment {
             e.printStackTrace();
         }
         mCardArrayAdapter = new CardArrayRecyclerViewAdapter(getActivity(), cards);
-        if (!Global.isConnected(getContext())) {
+        if (!Global.isConnected(context)) {
             try {
                 cards = initCardsFromLocalDb();
                 Collections.reverse(cards);
                 mCardArrayAdapter.setCards(cards);
+
+                Global.showMessage(context, "No internet conn",
+                        Global.ERROR_MSG.SERVER_CONN_FAIL.getMsg());
+
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -126,7 +126,7 @@ public class ReceivedMailsFragment extends Fragment {
     }
 
     public ArrayList<Card> initCardsFromLocalDb() throws SQLException {
-        ArrayList<Card> cards = new ArrayList<>();
+        ArrayList<Card> cards_temp = new ArrayList<>();
         Card card;
 
         // a received balloon in Db?
@@ -134,15 +134,15 @@ public class ReceivedMailsFragment extends Fragment {
         if (receivedBalloonsListInDb.size() > 0 && receivedBalloonsListInDb != null) {
             for (int i = 0; i < receivedBalloonsListInDb.size(); i++) {
                 card = createCard(receivedBalloonsListInDb.get(i));
-                cards.add(card);
+                cards_temp.add(card);
             }
         }
 
-        return cards;
+        return cards_temp;
     }
 
     private Card createCard(Balloon balloon) {
-        Card card = new CardReceived(balloon, getActivity().getBaseContext(), savedInstanceState);
+        Card card = new CardReceived(balloon, getActivity(), savedInstanceState);
         card.setCardElevation(getResources().getDimension(R.dimen.card_shadow_elevation));
         return card;
     }
@@ -182,9 +182,9 @@ public class ReceivedMailsFragment extends Fragment {
     }
 
     private void loadReceivedBalloons() {
-        new ReusableAsync<Integer>(this.getContext())
+        new ReusableAsync<Integer>(context)
                 .get("/balloons/received")
-                .bearer(Global.getApiToken(this.getContext()))
+                .bearer(Global.getApiToken(context))
                 .progressBar(progressBar)
                 .onSuccess(new SuccessHandler<Integer>() {
                     @Override

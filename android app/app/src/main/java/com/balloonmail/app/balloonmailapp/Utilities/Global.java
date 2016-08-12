@@ -1,11 +1,11 @@
 package com.balloonmail.app.balloonmailapp.utilities;
 
+import android.app.Activity;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.support.v7.app.AlertDialog;
+import android.support.design.widget.Snackbar;
 import android.widget.Toast;
 
 import java.util.Calendar;
@@ -31,10 +31,15 @@ public class Global {
     public static final String PREF_USER_API_TOKEN = "api_token";
     public static final String PREF_USER_LAT = "lat";
     public static final String PREF_USER_LNG = "lon";
-    public static final boolean inDebug = true;
+    public static final boolean inDebug = false;
+    private static final double DUMMY_LAT = 51.507351;
+    private static final double DUMMY_LNG = -0.127758;
 
     public enum ERROR_MSG {
         SERVER_CONN_FAIL("Couldn't connect to server."),
+        CREEP_REQ_FAIL("You already creeped this balloon once."),
+        REFILL_REQ_FAIL("You can't refill this balloon again."),
+        DEFAULT_LOCATION_WARNING("A dummy location will be used."),
         NETWORK_CONN_FAIL("No internet connection.");
 
         String msg;
@@ -63,23 +68,13 @@ public class Global {
     public static BalloonHolder balloonHolder = BalloonHolder.getInstance();
 
     public static void showMessage(Context context, String debug_message, String release_message) {
-        String title = "Opss!";
-        final AlertDialog alertDialog;
         if (inDebug) {
             Toast.makeText(context, debug_message, Toast.LENGTH_LONG).show();
         } else {
-            alertDialog = new AlertDialog.Builder(context).create();
-            alertDialog.setTitle(title);
-            alertDialog.setMessage(release_message);
-            alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
-                    alertDialog.dismiss();
-                }
-            });
-            alertDialog.show();
+            Snackbar snackbar = Snackbar.make(((Activity) context).findViewById(android.R.id.content),
+                    release_message, Snackbar.LENGTH_LONG);
+            snackbar.show();
         }
-
     }
 
     public static Date getDateFromString(String date) {
@@ -108,4 +103,13 @@ public class Global {
         SharedPreferences sharedPreferences = context.getSharedPreferences(Global.USER_INFO_PREF_FILE, Context.MODE_PRIVATE);
         return sharedPreferences.getString(Global.PREF_USER_API_TOKEN, "");
     }
+
+    public static double[] getDummyLocation(){
+        double[] loc = new double[2];
+        loc[0] = DUMMY_LAT;
+        loc[1] = DUMMY_LNG;
+        return loc;
+    }
+
+
 }
