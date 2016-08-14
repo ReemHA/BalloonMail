@@ -10,8 +10,9 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.balloonmail.app.balloonmailapp.R;
-import com.balloonmail.app.balloonmailapp.utilities.Global;
 import com.balloonmail.app.balloonmailapp.models.Balloon;
+import com.balloonmail.app.balloonmailapp.utilities.ActionButtonsHandler;
+import com.balloonmail.app.balloonmailapp.utilities.Global;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -28,13 +29,13 @@ import java.util.HashMap;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class MailDetailsAndMapActivityFragment extends Fragment implements OnMapReadyCallback{
+public class SentMailDetailsFragment extends Fragment implements OnMapReadyCallback{
 
     Balloon balloon;
     View rootView;
     GoogleMap map;
 
-    public MailDetailsAndMapActivityFragment() {
+    public SentMailDetailsFragment() {
     }
 
     @Override
@@ -48,29 +49,31 @@ public class MailDetailsAndMapActivityFragment extends Fragment implements OnMap
         if (rootView != null)
             return rootView;
 
-        rootView = inflater.inflate(R.layout.fragment_mail_details_and_map, container, false);
+        rootView = inflater.inflate(R.layout.fragment_sent_mail_details, container, false);
 
-            balloon = Global.balloonHolder.getBalloon();
+        balloon = Global.balloonHolder.getBalloon();
 
-            TextView text = (TextView)rootView.findViewById(R.id.sentBalloonTextTv);
-            text.setText(balloon.getText());
+        TextView text = (TextView)rootView.findViewById(R.id.sentBalloonTextTv);
+        text.setText(balloon.getText());
 
-            TextView refill = (TextView)rootView.findViewById(R.id.refillTv_details);
-            refill.setText(String.valueOf(balloon.getRefills()) + " refills");
+        TextView refill = (TextView)rootView.findViewById(R.id.refillTv_details);
+        refill.setText(String.valueOf(balloon.getRefills()) + " refills");
 
 
-            TextView creep = (TextView)rootView.findViewById(R.id.creepTv_details);
-            creep.setText(String.valueOf(balloon.getCreeps()) + " creeps");
+        TextView creep = (TextView)rootView.findViewById(R.id.creepTv_details);
+        creep.setText(String.valueOf(balloon.getCreeps()) + " creeps");
 
-            //Map
-            SupportMapFragment mapFragment =
-                    (SupportMapFragment) this.getChildFragmentManager().findFragmentById(R.id.map_detail_fragment);
+        //Map
+        SupportMapFragment mapFragment =
+                (SupportMapFragment) this.getChildFragmentManager().findFragmentById(R.id.map_detail_fragment);
 
-            mapFragment.getMapAsync(this);
+        mapFragment.getMapAsync(this);
 
-            Global.balloonHolder.setBalloon(null);
+        View sentimentView = rootView.findViewById(R.id.sentiment_indication);
+        ActionButtonsHandler.changeColorOfSentimentIndication(balloon.getSentiment(), sentimentView);
 
-        //}
+        Global.balloonHolder.setBalloon(null);
+
 
         return rootView;
     }

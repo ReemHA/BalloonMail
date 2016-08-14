@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <RelativeLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="@dimen/activity_horizontal_margin"
+        tools:context="com.balloonmail.app.balloonmailapp.fragments.ReceivedAndLikedMailDetailsFragment">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/sentBalloonTextTv"
+            tools:text="This is a very long Balloon Text Message to test, This is a very long Balloon Text Message to test, This is a very long Balloon Text Message to test,
+         This is a very long Balloon Text Message to test, This is a very long Balloon Text Message to test, This is a very long Balloon Text Message to test,
+         This is a very long Balloon Text Message to test, This is a very long Balloon Text Message to test, This is a very long Balloon Text Message to test,
+         This is a very long Balloon Text Message to test, This is a very long Balloon Text Message to test, This is a very long Balloon Text Message to test,
+         "
+            android:layout_alignParentLeft="true"/>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/mail_detail_layout"
+            android:layout_below="@id/sentBalloonTextTv"
+            android:layout_marginTop="32dp"
+            android:orientation="horizontal"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentLeft="true"
+            android:weightSum="3">
+
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/refillRelativeLayout"
+                android:layout_weight="1">
+
+                <ImageButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_centerInParent="true"
+                    android:id="@+id/refillActionBtn_details"
+                    android:background="@drawable/ic_refill_grey_24px"
+                    />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/likeRelativeLayout"
+                android:layout_weight="1">
+
+                <ImageButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:id="@+id/likeActionBtn_details"
+                    android:layout_centerInParent="true"
+                    android:background="@drawable/ic_like_grey_24px"
+                    />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/creepRelativeLayout"
+                android:layout_weight="1">
+
+                <ImageButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_centerInParent="true"
+                    android:id="@+id/creepActionBtn_details"
+                    android:background="@drawable/ic_creepy_grey_24px"
+                    />
+            </RelativeLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/map_layout"
+            android:layout_below="@id/mail_detail_layout"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginTop="16dp">
+
+            <View
+                android:layout_width="10dp"
+                android:layout_height="match_parent"
+                android:id="@+id/sentiment_indication"
+                android:background="@color/red">
+            </View>
+
+            <fragment
+                android:layout_width="wrap_content"
+                android:layout_height="200dp"
+                android:id="@+id/map_detail_fragment"
+                android:name="com.google.android.gms.maps.SupportMapFragment"/>
+
+        </LinearLayout>
+
+    </RelativeLayout>
+</ScrollView>

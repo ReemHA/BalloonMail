@@ -66,9 +66,9 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activities.HomeActivity" />
-            </activity>
+        </activity>
         <activity
-            android:name=".activities.MailDetailsAndMapActivity"
+            android:name=".activities.SentMailDetailsActivity"
             android:label="@string/title_activity_mail_details_and_map"
             android:parentActivityName=".activities.MailsTabbedActivity"
             android:theme="@style/AppTheme.NoActionBar">
@@ -76,18 +76,26 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activities.MailsTabbedActivity" />
         </activity>
-        
+
         <service android:name=".services.MyFirebaseMessagingService">
             <intent-filter>
-                <action android:name="com.google.firebase.MESSAGING_EVENT"></action>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+        <service android:name=".services.MyFirebaseInstanceIDService">
+            <intent-filter>
+                <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
             </intent-filter>
         </service>
 
-        <service android:name=".services.MyFirebaseInstanceIDService">
-            <intent-filter>
-                <action android:name="com.google.firebase.INSTANCE_ID_EVENT"></action>
-            </intent-filter>
-        </service>
+        <activity android:name=".activities.ReceivedAndLikedMailDetailsActivity"
+            android:label="@string/title_activity_mail_details_and_map"
+            android:parentActivityName=".activities.MailsTabbedActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activities.MailsTabbedActivity" />
+        </activity>
     </application>
 
 </manifest>

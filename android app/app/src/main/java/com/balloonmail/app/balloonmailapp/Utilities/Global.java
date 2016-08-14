@@ -6,11 +6,15 @@ import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.support.design.widget.Snackbar;
+import android.view.View;
 import android.widget.Toast;
+
+import com.balloonmail.app.balloonmailapp.R;
 
 import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
+
 
 /**
  * Created by Reem Hamdy on 4/24/2016.
@@ -31,9 +35,10 @@ public class Global {
     public static final String PREF_USER_API_TOKEN = "api_token";
     public static final String PREF_USER_LAT = "lat";
     public static final String PREF_USER_LNG = "lon";
-    public static final boolean inDebug = false;
     private static final double DUMMY_LAT = 51.507351;
     private static final double DUMMY_LNG = -0.127758;
+    public static final boolean inDebug = false;
+    public static final String RECEIVED_OR_LIKED = "rOrl";
 
     public enum ERROR_MSG {
         SERVER_CONN_FAIL("Couldn't connect to server."),
@@ -103,13 +108,10 @@ public class Global {
         SharedPreferences sharedPreferences = context.getSharedPreferences(Global.USER_INFO_PREF_FILE, Context.MODE_PRIVATE);
         return sharedPreferences.getString(Global.PREF_USER_API_TOKEN, "");
     }
-
     public static double[] getDummyLocation(){
         double[] loc = new double[2];
         loc[0] = DUMMY_LAT;
         loc[1] = DUMMY_LNG;
         return loc;
     }
-
-
 }

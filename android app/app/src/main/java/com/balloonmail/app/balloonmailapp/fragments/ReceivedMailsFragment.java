@@ -1,6 +1,7 @@
 package com.balloonmail.app.balloonmailapp.fragments;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -15,15 +16,16 @@ import android.widget.ProgressBar;
 import com.balloonmail.app.balloonmailapp.CardReceived;
 import com.balloonmail.app.balloonmailapp.R;
 import com.balloonmail.app.balloonmailapp.activities.MailsTabbedActivity;
+import com.balloonmail.app.balloonmailapp.activities.ReceivedAndLikedMailDetailsActivity;
 import com.balloonmail.app.balloonmailapp.async.PostHandler;
 import com.balloonmail.app.balloonmailapp.async.ReusableAsync;
 import com.balloonmail.app.balloonmailapp.async.SuccessHandler;
-import com.balloonmail.app.balloonmailapp.models.Balloon;
 import com.balloonmail.app.balloonmailapp.models.DatabaseHelper;
 import com.balloonmail.app.balloonmailapp.models.ReceivedBalloon;
 import com.balloonmail.app.balloonmailapp.utilities.Global;
 import com.j256.ormlite.android.apptools.OpenHelperManager;
 import com.j256.ormlite.dao.Dao;
+import com.j256.ormlite.stmt.QueryBuilder;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -97,7 +99,6 @@ public class ReceivedMailsFragment extends Fragment {
         if (!Global.isConnected(context)) {
             try {
                 cards = initCardsFromLocalDb();
-                Collections.reverse(cards);
                 mCardArrayAdapter.setCards(cards);
 
                 Global.showMessage(context, "No internet conn",
@@ -130,7 +131,10 @@ public class ReceivedMailsFragment extends Fragment {
         Card card;
 
         // a received balloon in Db?
-        List<ReceivedBalloon> receivedBalloonsListInDb = receivedBalloonDao.queryForAll();
+        QueryBuilder<ReceivedBalloon, Integer> q = receivedBalloonDao.queryBuilder();
+        q.orderBy("sent_at", false);
+        List<ReceivedBalloon> receivedBalloonsListInDb = q.query();
+        //List<ReceivedBalloon> receivedBalloonsListInDb = receivedBalloonDao.queryForAll();
         if (receivedBalloonsListInDb.size() > 0 && receivedBalloonsListInDb != null) {
             for (int i = 0; i < receivedBalloonsListInDb.size(); i++) {
                 card = createCard(receivedBalloonsListInDb.get(i));
@@ -138,11 +142,25 @@ public class ReceivedMailsFragment extends Fragment {
             }
         }
 
+        Global.balloonHolder.setBalloon(null);
+
         return cards_temp;
     }
 
-    private Card createCard(Balloon balloon) {
-        Card card = new CardReceived(balloon, getActivity(), savedInstanceState);
+    private Card createCard(final ReceivedBalloon balloon) {
+        Card card = new CardReceived(balloon, getActivity().getBaseContext(), savedInstanceState);
+
+        card.setOnClickListener(new Card.OnCardClickListener() {
+            @Override
+            public void onClick(Card card, View view) {
+                Intent intent = new Intent(getContext(), ReceivedAndLikedMailDetailsActivity.class);
+                Global.balloonHolder.setBalloon((ReceivedBalloon) balloon);
+                intent.putExtra(Global.RECEIVED_OR_LIKED, "r");
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                getContext().startActivity(intent);
+            }
+        });
+
         card.setCardElevation(getResources().getDimension(R.dimen.card_shadow_elevation));
         return card;
     }
@@ -156,6 +174,7 @@ public class ReceivedMailsFragment extends Fragment {
     public void onPause() {
         super.onPause();
         Log.d(MailsTabbedActivity.class.getSimpleName(), "onPause saving");
+        //receivedBalloonList.clear();
         receivedBalloonList.addAll(balloonsMap.keySet());
         saveReceivedBalloonsToDatabase(receivedBalloonList);
     }
@@ -172,7 +191,7 @@ public class ReceivedMailsFragment extends Fragment {
                     e.printStackTrace();
                 }
             }
-            OpenHelperManager.releaseHelper();
+            //OpenHelperManager.releaseHelper();
         }
     }
 

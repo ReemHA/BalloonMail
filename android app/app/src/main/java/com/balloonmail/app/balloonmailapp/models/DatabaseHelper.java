@@ -105,5 +105,18 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 
         return likedBalloonRuntimeExceptionDao;
     }
+    /**
+     * Close the database connections and clear any cached DAOs.
+     */
+    @Override
+    public void close() {
+        super.close();
+        receivedBalloonDao = null;
+        receivedBalloonRuntimeExceptionDao = null;
+        sentBalloonDao = null;
+        sentBalloonRuntimeExceptionDao = null;
+        likedBalloonDao = null;
+        likedBalloonRuntimeExceptionDao = null;
+    }
 }
 

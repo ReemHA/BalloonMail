@@ -116,6 +116,7 @@ public class WriteMailActivity extends AppCompatActivity {
                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK |
                                 Intent.FLAG_ACTIVITY_CLEAR_TOP |
                                 Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        intent.putExtra(Global.ARG_MAILS_TABBED_TAG, Global.SENT_TABBED_PAGE);
                         startActivity(intent);
                         finish();
                     }

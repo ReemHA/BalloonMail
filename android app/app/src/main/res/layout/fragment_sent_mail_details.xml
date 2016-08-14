@@ -1,9 +1,10 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".fragments.MailDetailsAndMapActivityFragment"
-    tools:showIn="@layout/activity_mail_details_and_map">
+    tools:context=".fragments.SentMailDetailsFragment"
+    tools:showIn="@layout/activity_sent_mail_details">
 
     <RelativeLayout
         android:layout_width="wrap_content"
@@ -27,7 +28,7 @@
             android:layout_centerVertical="true"
             android:layout_alignParentRight="true"
             android:layout_alignParentLeft="true"
-            android:weightSum="3">
+            android:weightSum="2">
 
             <RelativeLayout
                 android:layout_width="wrap_content"
@@ -102,15 +103,28 @@
 
     </RelativeLayout>
 
-    <fragment
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:name="com.google.android.gms.maps.SupportMapFragment"
-        android:id="@+id/map_detail_fragment"
+        android:id="@+id/map_layout"
         android:layout_below="@id/mail_detail_layout"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
-        android:layout_marginTop="16dp" />
+        android:layout_marginTop="16dp">
 
+        <View
+            android:layout_width="10dp"
+            android:layout_height="match_parent"
+            android:id="@+id/sentiment_indication"
+            android:background="@color/red">
+        </View>
+        <fragment
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:name="com.google.android.gms.maps.SupportMapFragment"
+            android:id="@+id/map_detail_fragment" />
+
+    </LinearLayout>
 
 </RelativeLayout>

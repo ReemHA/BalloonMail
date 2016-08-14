@@ -1,20 +1,14 @@
 package com.balloonmail.app.balloonmailapp;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
-import com.balloonmail.app.balloonmailapp.async.PostHandler;
-import com.balloonmail.app.balloonmailapp.async.ReusableAsync;
-import com.balloonmail.app.balloonmailapp.async.SuccessHandler;
-import com.balloonmail.app.balloonmailapp.models.Balloon;
 import com.balloonmail.app.balloonmailapp.models.ReceivedBalloon;
-import com.balloonmail.app.balloonmailapp.utilities.Global;
+import com.balloonmail.app.balloonmailapp.utilities.ActionButtonsHandler;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -25,9 +19,6 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import it.gmariotti.cardslib.library.internal.Card;
 
 /**
@@ -35,20 +26,16 @@ import it.gmariotti.cardslib.library.internal.Card;
  */
 public class CardReceived extends Card {
 
-    Balloon balloon;
+    ReceivedBalloon balloon;
     private Context context;
     private Bundle savedInstanceState;
-    private SharedPreferences sharedPreferences;
-    private static String api_token;
     ReceivedCardViewHolder holder;
 
-    public CardReceived(Balloon balloon, Context context, Bundle savedInstanceState) {
+    public CardReceived(ReceivedBalloon balloon, Context context, Bundle savedInstanceState) {
         super(context, R.layout.card_received_item);
         this.balloon = balloon;
         this.context = context;
         this.savedInstanceState = savedInstanceState;
-        sharedPreferences = context.getSharedPreferences(Global.USER_INFO_PREF_FILE, Context.MODE_PRIVATE);
-
     }
 
     @Override
@@ -77,179 +64,37 @@ public class CardReceived extends Card {
                 setMapLocation(holder.map);
             }
 
-            api_token = sharedPreferences.getString(Global.PREF_USER_API_TOKEN, "");
             holder.refillBtn = (ImageButton) view.findViewById(R.id.refillActionBtn_received);
             holder.likeBtn = (ImageButton) view.findViewById(R.id.likeActionBtn_received);
             holder.creepBtn = (ImageButton) view.findViewById(R.id.creepActionBtn_received);
             holder.sentimentIndication = view.findViewById(R.id.sentiment_indication);
 
-            changeStateOfLikeBtn();
-            changeStateOfRefillBtn();
-            changeStateOfCreepBtn();
+            ActionButtonsHandler.changeStateOfLikeBtn(balloon, holder.likeBtn);
+            ActionButtonsHandler.changeStateOfRefillBtn(balloon, holder.refillBtn);
+            ActionButtonsHandler.changeStateOfCreepBtn(balloon, holder.creepBtn);
 
             holder.likeBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    requestLikeToServer(balloon);
+                    ActionButtonsHandler.onClickOfLikeButton(balloon, getContext(), holder.likeBtn);
                 }
             });
 
             holder.refillBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (((ReceivedBalloon) balloon).getIs_refilled() == 0) {
-                        Log.d(CardReceived.class.getSimpleName(), " 1 refill is clicked");
-                        requestRefillToServer(balloon);
-                        Log.d(CardReceived.class.getSimpleName(), "refill change color");
-                    } else {
-                        // in case no internet connection the server conn fail msg should appear
-                        if (!Global.isConnected(context)) {
-                            Global.showMessage(context, "No internet connection",
-                                    Global.ERROR_MSG.SERVER_CONN_FAIL.getMsg());
-                        } else {
-                            Global.showMessage(context, "refill btn clicked twice",
-                                    Global.ERROR_MSG.REFILL_REQ_FAIL.getMsg());
-                        }
-                    }
+                    ActionButtonsHandler.onClickOfRefillButton(balloon, getContext(), holder.refillBtn);
                 }
             });
 
             holder.creepBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (((ReceivedBalloon) balloon).getIs_creeped() == 0) {
-                        requestCreepToServer(balloon);
-                    } else {
-
-                        // in case no internet connection the server conn fail msg should appear
-                        if (!Global.isConnected(context)) {
-                            Global.showMessage(context, "No internet connection",
-                                    Global.ERROR_MSG.SERVER_CONN_FAIL.getMsg());
-                        } else {
-                            Global.showMessage(context, "creep btn clicked twice",
-                                    Global.ERROR_MSG.CREEP_REQ_FAIL.getMsg());
-                        }
-                    }
+                    ActionButtonsHandler.onClickOfCreepButton(balloon, getContext(), holder.creepBtn);
                 }
             });
 
-            changeColorOfSentimentIndication(balloon.getSentiment());
-        }
-    }
-
-    private void changeStateOfLikeBtn() {
-        if (((ReceivedBalloon) balloon).getIs_liked() == 0) {
-            holder.likeBtn.setImageResource(R.drawable.ic_like_grey_24px);
-        } else {
-            holder.likeBtn.setImageResource(R.drawable.ic_like_clicked_24px);
-        }
-    }
-
-    private void requestLikeToServer(Balloon likedBalloon) {
-        new ReusableAsync<Void>(context)
-                .bearer(api_token)
-                .post("/balloons/like")
-                .addData("balloon_id", Integer.toString(likedBalloon.getBalloon_id()))
-                .onSuccess(new SuccessHandler<Void>() {
-                    @Override
-                    public Void handle(JSONObject data) {
-                        int isLiked = ((ReceivedBalloon) balloon).getIs_liked();
-                        if (isLiked == 0) {
-                            ((ReceivedBalloon) balloon).setIs_liked(1);
-                        } else {
-                            ((ReceivedBalloon) balloon).setIs_liked(0);
-                        }
-                        return null;
-                    }
-                })
-                .onPost(new PostHandler<Void>() {
-                    @Override
-                    public void handle(Void data) {
-                        changeStateOfLikeBtn();
-                    }
-                })
-                .send();
-    }
-
-    private void requestRefillToServer(Balloon refilledBalloon) {
-        new ReusableAsync<Void>(context)
-                .post("/balloons/refill")
-                .bearer(Global.getApiToken(getContext()))
-                .addData("balloon_id", Integer.toString(refilledBalloon.getBalloon_id()))
-                .onSuccess(new SuccessHandler<Void>() {
-                    @Override
-                    public Void handle(JSONObject data) throws JSONException {
-                        Log.d(CardReceived.class.getSimpleName(), "2 onSuccess");
-                        int isRefilled = ((ReceivedBalloon) balloon).getIs_refilled();
-                        if (isRefilled == 0) {
-                            Log.d(CardReceived.class.getSimpleName(), "2.1");
-                            ((ReceivedBalloon) balloon).setIs_refilled(1);
-                        } else {
-                            Log.d(CardReceived.class.getSimpleName(), "2.0");
-                            ((ReceivedBalloon) balloon).setIs_refilled(0);
-                        }
-                        return null;
-                    }
-                })
-                .onPost(new PostHandler<Void>() {
-                    @Override
-                    public void handle(Void data) {
-                        Log.d(CardReceived.class.getSimpleName(), "3 onPost");
-                        changeStateOfRefillBtn();
-                    }
-                })
-                .send();
-    }
-
-    private void requestCreepToServer(Balloon creepedBalloon) {
-        new ReusableAsync<Void>(context)
-                .post("/balloons/creep")
-                .bearer(Global.getApiToken(getContext()))
-                .addData("balloon_id", Integer.toString(creepedBalloon.getBalloon_id()))
-                .onSuccess(new SuccessHandler<Void>() {
-                    @Override
-                    public Void handle(JSONObject data) throws JSONException {
-                        int isCreeped = ((ReceivedBalloon) balloon).getIs_creeped();
-                        if (isCreeped == 0) {
-                            ((ReceivedBalloon) balloon).setIs_creeped(1);
-                        } else {
-                            ((ReceivedBalloon) balloon).setIs_creeped(0);
-                        }
-                        return null;
-                    }
-                })
-                .onPost(new PostHandler<Void>() {
-                    @Override
-                    public void handle(Void data) {
-                        changeStateOfCreepBtn();
-                    }
-                })
-                .send();
-    }
-
-    private void changeStateOfRefillBtn() {
-        if (((ReceivedBalloon) balloon).getIs_refilled() == 0) {
-            holder.refillBtn.setImageResource(R.drawable.ic_refill_grey_24px);
-        } else {
-            holder.refillBtn.setImageResource(R.drawable.ic_refill_primary_24px);
-        }
-    }
-
-    private void changeStateOfCreepBtn() {
-        if (((ReceivedBalloon) balloon).getIs_creeped() == 0) {
-            holder.creepBtn.setImageResource(R.drawable.ic_creepy_grey_24px);
-        } else {
-            holder.creepBtn.setImageResource(R.drawable.ic_creepy_clicked_24px);
-        }
-    }
-
-    private void changeColorOfSentimentIndication(double sentiment) {
-        if (sentiment < 0) {
-            holder.sentimentIndication.setBackgroundResource(R.color.red);
-        } else if (sentiment > 0) {
-            holder.sentimentIndication.setBackgroundResource(R.color.green);
-        } else {
-            holder.sentimentIndication.setBackgroundResource(R.color.colorPrimary);
+            ActionButtonsHandler.changeColorOfSentimentIndication(balloon.getSentiment(), holder.sentimentIndication);
         }
     }
 

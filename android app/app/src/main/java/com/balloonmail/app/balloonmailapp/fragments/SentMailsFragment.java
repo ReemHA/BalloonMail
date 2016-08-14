@@ -15,8 +15,8 @@ import android.widget.ProgressBar;
 
 import com.balloonmail.app.balloonmailapp.CardSent;
 import com.balloonmail.app.balloonmailapp.R;
-import com.balloonmail.app.balloonmailapp.activities.MailDetailsAndMapActivity;
 import com.balloonmail.app.balloonmailapp.activities.MailsTabbedActivity;
+import com.balloonmail.app.balloonmailapp.activities.SentMailDetailsActivity;
 import com.balloonmail.app.balloonmailapp.async.PostHandler;
 import com.balloonmail.app.balloonmailapp.async.ReusableAsync;
 import com.balloonmail.app.balloonmailapp.async.SuccessHandler;
@@ -27,6 +27,7 @@ import com.balloonmail.app.balloonmailapp.utilities.Global;
 import com.google.android.gms.maps.model.LatLng;
 import com.j256.ormlite.android.apptools.OpenHelperManager;
 import com.j256.ormlite.dao.Dao;
+import com.j256.ormlite.stmt.QueryBuilder;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -92,7 +93,6 @@ public class SentMailsFragment extends Fragment {
         if (!Global.isConnected(context)) {
             try {
                 cards = initCardsFromLocalDb();
-                Collections.reverse(cards);
                 mCardArrayAdapter.setCards(cards);
                 Global.showMessage(context, "No internet conn",
                         Global.ERROR_MSG.SERVER_CONN_FAIL.getMsg());
@@ -127,7 +127,10 @@ public class SentMailsFragment extends Fragment {
         Card card;
 
         // a sent balloon in Db?
-        List<SentBalloon> sentBalloonListInDb = sentBalloonDao.queryForAll();
+        QueryBuilder<SentBalloon, Integer> q = sentBalloonDao.queryBuilder();
+        q.orderBy("sent_at", false);
+        List<SentBalloon> sentBalloonListInDb = q.query();
+        //List<SentBalloon> sentBalloonListInDb = sentBalloonDao.queryForAll();
         if (sentBalloonListInDb.size() > 0 && sentBalloonListInDb != null) {
             for (int i = 0; i < sentBalloonListInDb.size(); i++) {
                 card = createCard(sentBalloonListInDb.get(i));
@@ -136,13 +139,13 @@ public class SentMailsFragment extends Fragment {
         }
 
         // a sent balloon in holder?
-        SentBalloon balloon = Global.balloonHolder.getBalloon();
+        Balloon balloon = Global.balloonHolder.getBalloon();
         if (balloon != null) {
             card = createCard(balloon);
             cards.add(card);
 
             // to hash map
-            balloonsMap.put(balloon, card);
+            balloonsMap.put((SentBalloon)balloon, card);
         }
 
         //reset balloon object in holder
@@ -158,7 +161,8 @@ public class SentMailsFragment extends Fragment {
             public void onClick(Card card, View view) {
                 updateBalloonWithPaths(balloon);
                 Global.balloonHolder.setBalloon((SentBalloon) balloon);
-                Intent intent = new Intent(context, MailDetailsAndMapActivity.class);
+
+                Intent intent = new Intent(getContext(), SentMailDetailsActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 context.startActivity(intent);
             }
@@ -180,6 +184,7 @@ public class SentMailsFragment extends Fragment {
     public void onPause() {
         super.onPause();
         Log.d(MailsTabbedActivity.class.getSimpleName(), "onPause saving");
+        //sentBalloonList.clear();
         sentBalloonList.addAll(balloonsMap.keySet());
         saveSentBalloonsToDatabase(sentBalloonList);
     }
@@ -253,7 +258,7 @@ public class SentMailsFragment extends Fragment {
                     e.printStackTrace();
                 }
             }
-            OpenHelperManager.releaseHelper();
+            //OpenHelperManager.releaseHelper();
         }
     }
 

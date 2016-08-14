@@ -3,7 +3,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:mstb="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
-    android:padding="16dp"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     style="@style/card.shadow_image">
@@ -39,7 +38,7 @@
             android:layout_centerVertical="true"
             android:layout_alignParentRight="true"
             android:layout_alignParentLeft="true"
-            android:weightSum="3">
+            android:weightSum="2">
 
             <RelativeLayout
                 android:layout_width="wrap_content"

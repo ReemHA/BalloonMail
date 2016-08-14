@@ -1,6 +1,7 @@
 package com.balloonmail.app.balloonmailapp.fragments;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -14,15 +15,16 @@ import android.widget.ProgressBar;
 
 import com.balloonmail.app.balloonmailapp.CardLikes;
 import com.balloonmail.app.balloonmailapp.R;
+import com.balloonmail.app.balloonmailapp.activities.ReceivedAndLikedMailDetailsActivity;
 import com.balloonmail.app.balloonmailapp.async.PostHandler;
 import com.balloonmail.app.balloonmailapp.async.ReusableAsync;
 import com.balloonmail.app.balloonmailapp.async.SuccessHandler;
-import com.balloonmail.app.balloonmailapp.models.Balloon;
 import com.balloonmail.app.balloonmailapp.models.DatabaseHelper;
 import com.balloonmail.app.balloonmailapp.models.LikedBalloon;
 import com.balloonmail.app.balloonmailapp.utilities.Global;
 import com.j256.ormlite.android.apptools.OpenHelperManager;
 import com.j256.ormlite.dao.Dao;
+import com.j256.ormlite.stmt.QueryBuilder;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -100,7 +102,6 @@ public class LikedMailsFragment extends Fragment {
         if (!Global.isConnected(getContext())) {
             try {
                 cards = initCardsFromLocalDb();
-                Collections.reverse(cards);
                 mCardArrayAdapter.setCards(cards);
                 Global.showMessage(this.getContext(), "No internet conn",
                         Global.ERROR_MSG.SERVER_CONN_FAIL.getMsg());
@@ -131,18 +132,35 @@ public class LikedMailsFragment extends Fragment {
         Card card;
 
         // a liked balloon in Db?
-        List<LikedBalloon> likedBalloonsListInDb = likedBalloonDao.queryForAll();
+        QueryBuilder<LikedBalloon, Integer> q = likedBalloonDao.queryBuilder();
+        q.orderBy("sent_at", false);
+        List<LikedBalloon> likedBalloonsListInDb = q.query();
+        //List<LikedBalloon> likedBalloonsListInDb = likedBalloonDao.queryForAll();
         if (likedBalloonsListInDb.size() > 0 && likedBalloonsListInDb != null) {
             for (int i = 0; i < likedBalloonsListInDb.size(); i++) {
                 card = createCard(likedBalloonsListInDb.get(i));
                 cards.add(card);
             }
         }
+
+        //reset balloon object in holder
+        Global.balloonHolder.setBalloon(null);
+
         return cards;
     }
 
-    private Card createCard(Balloon balloon) {
-        Card card = new CardLikes(getActivity(), balloon, savedInstanceState);
+    private Card createCard(final LikedBalloon balloon) {
+        Card card = new CardLikes(getActivity().getBaseContext(), balloon, savedInstanceState);
+        card.setOnClickListener(new Card.OnCardClickListener() {
+            @Override
+            public void onClick(Card card, View view) {
+                Intent intent = new Intent(getContext(), ReceivedAndLikedMailDetailsActivity.class);
+                Global.balloonHolder.setBalloon(balloon);
+                intent.putExtra(Global.RECEIVED_OR_LIKED, "l");
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                getContext().startActivity(intent);
+            }
+        });
         card.setCardElevation(getResources().getDimension(R.dimen.card_shadow_elevation));
         return card;
     }
@@ -155,6 +173,7 @@ public class LikedMailsFragment extends Fragment {
     @Override
     public void onPause() {
         super.onPause();
+        //likedBalloonList.clear();
         likedBalloonList.addAll(balloonsMap.keySet());
         saveLikedBalloonsToDatabase(likedBalloonList);
     }
@@ -171,7 +190,7 @@ public class LikedMailsFragment extends Fragment {
                     e.printStackTrace();
                 }
             }
-            OpenHelperManager.releaseHelper();
+            //OpenHelperManager.releaseHelper();
         }
     }
 

@@ -7,8 +7,9 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.balloonmail.app.balloonmailapp.activities.MailDetailsAndMapActivity;
+import com.balloonmail.app.balloonmailapp.activities.SentMailDetailsActivity;
 import com.balloonmail.app.balloonmailapp.models.Balloon;
+import com.balloonmail.app.balloonmailapp.utilities.ActionButtonsHandler;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -69,7 +70,7 @@ public class CustomSentExpandCard extends CardExpand{
 
         holder.sentimentIndication = view.findViewById(R.id.sentiment_indication);
 
-        changeColorOfSentimentIndication(balloon.getSentiment());
+        ActionButtonsHandler.changeColorOfSentimentIndication(balloon.getSentiment(), holder.sentimentIndication);
     }
 
     public void createMapOfExpandCard(){
@@ -78,16 +79,6 @@ public class CustomSentExpandCard extends CardExpand{
         if (holder.map != null) {
             // The map is already ready to be used
             setMapLocation(holder.map);
-        }
-    }
-
-    private void changeColorOfSentimentIndication(double sentiment){
-        if(sentiment < 0){
-            holder.sentimentIndication.setBackgroundResource(R.color.red);
-        }else if(sentiment > 0){
-            holder.sentimentIndication.setBackgroundResource(R.color.green);
-        }else{
-            holder.sentimentIndication.setBackgroundResource(R.color.colorPrimary);
         }
     }
 
@@ -132,7 +123,7 @@ public class CustomSentExpandCard extends CardExpand{
         map.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng latLng) {
-                Intent intent = new Intent(context, MailDetailsAndMapActivity.class);
+                Intent intent = new Intent(context, SentMailDetailsActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 //Bundle bundle = new Bundle();
                 //bundle.putSerializable("balloon", balloon);
