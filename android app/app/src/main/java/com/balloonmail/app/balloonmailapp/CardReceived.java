@@ -2,7 +2,6 @@ package com.balloonmail.app.balloonmailapp;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
@@ -10,7 +9,6 @@ import android.widget.TextView;
 
 import com.balloonmail.app.balloonmailapp.models.ReceivedBalloon;
 import com.balloonmail.app.balloonmailapp.utilities.ActionButtonsHandler;
-import com.balloonmail.app.balloonmailapp.utilities.Global;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -78,46 +76,21 @@ public class CardReceived extends Card {
             holder.likeBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    ActionButtonsHandler.requestLikeToServer(balloon, getContext(), holder.likeBtn);
+                    ActionButtonsHandler.onClickOfLikeButton(balloon, getContext(), holder.likeBtn);
                 }
             });
 
             holder.refillBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (balloon.getIs_refilled() == 0) {
-                        Log.d(CardReceived.class.getSimpleName(), " 1 refill is clicked");
-                        ActionButtonsHandler.requestRefillToServer(balloon, getContext(), holder.refillBtn);
-                        Log.d(CardReceived.class.getSimpleName(), "refill change color");
-                    } else {
-                        // in case no internet connection the server conn fail msg should appear
-                        if (!Global.isConnected(context)) {
-                            Global.showMessage(context, "No internet connection",
-                                    Global.ERROR_MSG.SERVER_CONN_FAIL.getMsg());
-                        } else {
-                            Global.showMessage(context, "refill btn clicked twice",
-                                    Global.ERROR_MSG.REFILL_REQ_FAIL.getMsg());
-                        }
-                    }
+                    ActionButtonsHandler.onClickOfRefillButton(balloon, getContext(), holder.refillBtn);
                 }
             });
 
             holder.creepBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (balloon.getIs_creeped() == 0) {
-                        ActionButtonsHandler.requestCreepToServer(balloon, getContext(), holder.creepBtn);
-                    } else {
-
-                        // in case no internet connection the server conn fail msg should appear
-                        if (!Global.isConnected(context)) {
-                            Global.showMessage(context, "No internet connection",
-                                    Global.ERROR_MSG.SERVER_CONN_FAIL.getMsg());
-                        } else {
-                            Global.showMessage(context, "creep btn clicked twice",
-                                    Global.ERROR_MSG.CREEP_REQ_FAIL.getMsg());
-                        }
-                    }
+                    ActionButtonsHandler.onClickOfCreepButton(balloon, getContext(), holder.creepBtn);
                 }
             });
 

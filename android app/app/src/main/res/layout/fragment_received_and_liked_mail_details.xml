@@ -39,7 +39,7 @@
                 android:id="@+id/refillRelativeLayout"
                 android:layout_weight="1">
 
-                <ImageView
+                <ImageButton
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
@@ -52,16 +52,16 @@
             <RelativeLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/reachRelativeLayout"
+                android:id="@+id/likeRelativeLayout"
                 android:layout_weight="1">
 
-                <ImageView
+                <ImageButton
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
                     android:id="@+id/likeActionBtn_details"
                     android:layout_centerInParent="true"
-                    android:src="@drawable/ic_like_grey_24px"
+                    android:background="@drawable/ic_like_grey_24px"
                     />
             </RelativeLayout>
 
@@ -71,7 +71,7 @@
                 android:id="@+id/creepRelativeLayout"
                 android:layout_weight="1">
 
-                <ImageView
+                <ImageButton
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"

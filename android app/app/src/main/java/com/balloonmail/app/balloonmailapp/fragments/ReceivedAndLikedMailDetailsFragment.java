@@ -6,6 +6,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.balloonmail.app.balloonmailapp.R;
@@ -26,6 +27,9 @@ public class ReceivedAndLikedMailDetailsFragment extends Fragment implements OnM
     Balloon balloon;
     View rootView;
     GoogleMap map;
+    ImageButton refillBtn;
+    ImageButton creepBtn;
+    ImageButton likeBtn;
 
     public ReceivedAndLikedMailDetailsFragment() {
     }
@@ -44,6 +48,36 @@ public class ReceivedAndLikedMailDetailsFragment extends Fragment implements OnM
 
         TextView text = (TextView)rootView.findViewById(R.id.sentBalloonTextTv);
         text.setText(balloon.getText());
+
+        refillBtn = (ImageButton)rootView.findViewById(R.id.refillActionBtn_details);
+        creepBtn = (ImageButton)rootView.findViewById(R.id.creepActionBtn_details);
+        likeBtn = (ImageButton)rootView.findViewById(R.id.likeActionBtn_details);
+
+
+        ActionButtonsHandler.changeStateOfLikeBtn(balloon, likeBtn);
+        ActionButtonsHandler.changeStateOfRefillBtn(balloon, refillBtn);
+        ActionButtonsHandler.changeStateOfCreepBtn(balloon, creepBtn);
+
+        refillBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ActionButtonsHandler.onClickOfRefillButton(balloon, getContext(), refillBtn);
+            }
+        });
+
+        creepBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ActionButtonsHandler.onClickOfCreepButton(balloon, getContext(), creepBtn);
+            }
+        });
+
+        likeBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ActionButtonsHandler.onClickOfLikeButton(balloon, getContext(), likeBtn);
+            }
+        });
 
         //Map
         SupportMapFragment mapFragment =

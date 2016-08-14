@@ -9,7 +9,6 @@ import android.widget.TextView;
 
 import com.balloonmail.app.balloonmailapp.models.LikedBalloon;
 import com.balloonmail.app.balloonmailapp.utilities.ActionButtonsHandler;
-import com.balloonmail.app.balloonmailapp.utilities.Global;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -79,32 +78,21 @@ public class CardLikes extends Card {
             holder.likeBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    ActionButtonsHandler.requestLikeToServer(balloon, context, holder.likeBtn);
+                    ActionButtonsHandler.onClickOfLikeButton(balloon, context, holder.likeBtn);
                 }
             });
 
             holder.refillBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    ActionButtonsHandler.requestRefillToServer(balloon, context, holder.refillBtn);
+                    ActionButtonsHandler.onClickOfRefillButton(balloon, context, holder.refillBtn);
                 }
             });
 
             holder.creepBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (((LikedBalloon) balloon).getIs_creeped() == 0) {
-                        ActionButtonsHandler.requestCreepToServer(balloon, context, holder.creepBtn);
-                    } else {
-                        // in case no internet connection the server conn fail msg should appear
-                        if (!Global.isConnected(context)) {
-                            Global.showMessage(context, "No internet connection",
-                                    Global.ERROR_MSG.SERVER_CONN_FAIL.getMsg());
-                        } else {
-                            Global.showMessage(context, "creep btn clicked twice",
-                                    Global.ERROR_MSG.CREEP_REQ_FAIL.getMsg());
-                        }
-                    }
+                    ActionButtonsHandler.onClickOfCreepButton(balloon, context, holder.creepBtn);
                 }
             });
 

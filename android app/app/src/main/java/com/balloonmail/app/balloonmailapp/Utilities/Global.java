@@ -37,7 +37,7 @@ public class Global {
     public static final String PREF_USER_LNG = "lon";
     private static final double DUMMY_LAT = 51.507351;
     private static final double DUMMY_LNG = -0.127758;
-    public static final boolean inDebug = true;
+    public static final boolean inDebug = false;
     public static final String RECEIVED_OR_LIKED = "rOrl";
 
     public enum ERROR_MSG {
@@ -113,15 +113,5 @@ public class Global {
         loc[0] = DUMMY_LAT;
         loc[1] = DUMMY_LNG;
         return loc;
-    }
-    
-    public static void changeColorOfSentimentIndication(double sentiment, View view){
-        if(sentiment < 0){
-            view.setBackgroundResource(R.color.red);
-        }else if(sentiment > 0){
-            view.setBackgroundResource(R.color.green);
-        }else{
-            view.setBackgroundResource(R.color.colorPrimary);
-        }
     }
 }
