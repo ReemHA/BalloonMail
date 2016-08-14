@@ -19,7 +19,6 @@ import com.balloonmail.app.balloonmailapp.activities.ReceivedAndLikedMailDetails
 import com.balloonmail.app.balloonmailapp.async.PostHandler;
 import com.balloonmail.app.balloonmailapp.async.ReusableAsync;
 import com.balloonmail.app.balloonmailapp.async.SuccessHandler;
-import com.balloonmail.app.balloonmailapp.models.Balloon;
 import com.balloonmail.app.balloonmailapp.models.DatabaseHelper;
 import com.balloonmail.app.balloonmailapp.models.LikedBalloon;
 import com.balloonmail.app.balloonmailapp.utilities.Global;
@@ -150,13 +149,13 @@ public class LikedMailsFragment extends Fragment {
         return cards;
     }
 
-    private Card createCard(final Balloon balloon) {
+    private Card createCard(final LikedBalloon balloon) {
         Card card = new CardLikes(getActivity().getBaseContext(), balloon, savedInstanceState);
         card.setOnClickListener(new Card.OnCardClickListener() {
             @Override
             public void onClick(Card card, View view) {
                 Intent intent = new Intent(getContext(), ReceivedAndLikedMailDetailsActivity.class);
-                Global.balloonHolder.setBalloon((LikedBalloon) balloon);
+                Global.balloonHolder.setBalloon(balloon);
                 intent.putExtra(Global.RECEIVED_OR_LIKED, "l");
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 getContext().startActivity(intent);

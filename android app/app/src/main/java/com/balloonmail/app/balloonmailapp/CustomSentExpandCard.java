@@ -9,7 +9,7 @@ import android.view.ViewGroup;
 
 import com.balloonmail.app.balloonmailapp.activities.SentMailDetailsActivity;
 import com.balloonmail.app.balloonmailapp.models.Balloon;
-import com.balloonmail.app.balloonmailapp.utilities.Global;
+import com.balloonmail.app.balloonmailapp.utilities.ActionButtonsHandler;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -70,7 +70,7 @@ public class CustomSentExpandCard extends CardExpand{
 
         holder.sentimentIndication = view.findViewById(R.id.sentiment_indication);
 
-        Global.changeColorOfSentimentIndication(balloon.getSentiment(), holder.sentimentIndication);
+        ActionButtonsHandler.changeColorOfSentimentIndication(balloon.getSentiment(), holder.sentimentIndication);
     }
 
     public void createMapOfExpandCard(){

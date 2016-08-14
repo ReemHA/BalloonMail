@@ -15,6 +15,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
 
+
 /**
  * Created by Reem Hamdy on 4/24/2016.
  */
@@ -107,7 +108,6 @@ public class Global {
         SharedPreferences sharedPreferences = context.getSharedPreferences(Global.USER_INFO_PREF_FILE, Context.MODE_PRIVATE);
         return sharedPreferences.getString(Global.PREF_USER_API_TOKEN, "");
     }
-
     public static double[] getDummyLocation(){
         double[] loc = new double[2];
         loc[0] = DUMMY_LAT;
@@ -124,5 +124,4 @@ public class Global {
             view.setBackgroundResource(R.color.colorPrimary);
         }
     }
-
 }

@@ -10,8 +10,9 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.balloonmail.app.balloonmailapp.R;
-import com.balloonmail.app.balloonmailapp.utilities.Global;
 import com.balloonmail.app.balloonmailapp.models.Balloon;
+import com.balloonmail.app.balloonmailapp.utilities.ActionButtonsHandler;
+import com.balloonmail.app.balloonmailapp.utilities.Global;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -69,11 +70,10 @@ public class SentMailDetailsFragment extends Fragment implements OnMapReadyCallb
         mapFragment.getMapAsync(this);
 
         View sentimentView = rootView.findViewById(R.id.sentiment_indication);
-        Global.changeColorOfSentimentIndication(balloon.getSentiment(), sentimentView);
+        ActionButtonsHandler.changeColorOfSentimentIndication(balloon.getSentiment(), sentimentView);
 
         Global.balloonHolder.setBalloon(null);
 
-        //}
 
         return rootView;
     }

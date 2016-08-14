@@ -42,7 +42,7 @@ public class LikedBalloon extends Balloon {
         return is_liked;
     }
 
-    public void setIs_liked(int is_liked) {
+    private void setIs_liked(int is_liked) {
         this.is_liked = is_liked;
     }
 
@@ -60,5 +60,22 @@ public class LikedBalloon extends Balloon {
         this.sentiment = sentiment;
         this.setSourceBalloon(lat, lng);
         this.sent_at = sent_date;
+    }
+    public void onLikeClick(){
+        is_liked = 0;
+    }
+    public void onRefillClick(){
+        if (is_refilled == 0) {
+            setIs_refilled(1);
+        } else {
+            setIs_refilled(0);
+        }
+    }
+    public void onCreepClick(){
+        if (is_creeped == 0) {
+            setIs_creeped(1);
+        } else {
+            setIs_creeped(0);
+        }
     }
 }

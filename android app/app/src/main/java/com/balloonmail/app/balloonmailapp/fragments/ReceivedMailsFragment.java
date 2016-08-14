@@ -20,7 +20,6 @@ import com.balloonmail.app.balloonmailapp.activities.ReceivedAndLikedMailDetails
 import com.balloonmail.app.balloonmailapp.async.PostHandler;
 import com.balloonmail.app.balloonmailapp.async.ReusableAsync;
 import com.balloonmail.app.balloonmailapp.async.SuccessHandler;
-import com.balloonmail.app.balloonmailapp.models.Balloon;
 import com.balloonmail.app.balloonmailapp.models.DatabaseHelper;
 import com.balloonmail.app.balloonmailapp.models.ReceivedBalloon;
 import com.balloonmail.app.balloonmailapp.utilities.Global;
@@ -148,7 +147,7 @@ public class ReceivedMailsFragment extends Fragment {
         return cards_temp;
     }
 
-    private Card createCard(final Balloon balloon) {
+    private Card createCard(final ReceivedBalloon balloon) {
         Card card = new CardReceived(balloon, getActivity().getBaseContext(), savedInstanceState);
 
         card.setOnClickListener(new Card.OnCardClickListener() {
