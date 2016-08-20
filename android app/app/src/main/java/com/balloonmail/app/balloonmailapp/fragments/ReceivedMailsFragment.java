@@ -148,7 +148,7 @@ public class ReceivedMailsFragment extends Fragment {
     }
 
     private Card createCard(final ReceivedBalloon balloon) {
-        Card card = new CardReceived(balloon, getActivity().getBaseContext(), savedInstanceState);
+        Card card = new CardReceived(balloon, getActivity(), savedInstanceState);
 
         card.setOnClickListener(new Card.OnCardClickListener() {
             @Override

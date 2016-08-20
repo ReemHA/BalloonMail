@@ -150,7 +150,7 @@ public class LikedMailsFragment extends Fragment {
     }
 
     private Card createCard(final LikedBalloon balloon) {
-        Card card = new CardLikes(getActivity().getBaseContext(), balloon, savedInstanceState);
+        Card card = new CardLikes(getActivity(), balloon, savedInstanceState);
         card.setOnClickListener(new Card.OnCardClickListener() {
             @Override
             public void onClick(Card card, View view) {
