@@ -23,6 +23,7 @@ import java.util.HashMap;
 
 import it.gmariotti.cardslib.library.internal.Card;
 import it.gmariotti.cardslib.library.internal.CardExpand;
+import it.gmariotti.cardslib.library.internal.ViewToClickToExpand;
 
 /**
  * Created by Dalia on 4/25/2016.
@@ -56,7 +57,7 @@ public class CardSent extends Card {
             creep.setText(String.valueOf(balloon.getCreeps()) + " creeps");
 
             _card = this;
-            mapBtn.setOnClickListener(new View.OnClickListener() {
+            /* mapBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     if (_card.isExpanded()) {
@@ -64,8 +65,21 @@ public class CardSent extends Card {
                         _card.setExpanded(false);
                     } else {
                         _card.setExpanded(true);
+                        _card.doExpand();
                         drawPaths();
                     }
+                }
+            }); */
+            ViewToClickToExpand viewToClickToExpand =
+                    ViewToClickToExpand.builder()
+                            .setupView(mapBtn)
+                            .highlightView(false);
+            setViewToClickToExpand(viewToClickToExpand);
+
+            _card.setOnExpandAnimatorEndListener(new OnExpandAnimatorEndListener() {
+                @Override
+                public void onExpandEnd(Card card) {
+                    drawPaths();
                 }
             });
         }
