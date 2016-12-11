@@ -36,7 +36,7 @@ public class CardSent extends Card {
     public CardSent(Balloon balloon, Context context) {
         super(context, R.layout.card_sent_item);
         this.balloon = balloon;
-        cardExpand = new CustomSentExpandCard(balloon, context, null);
+        cardExpand = new CardSentExpand(balloon, context, null);
         this.addCardExpand(cardExpand);
     }
 
@@ -123,7 +123,7 @@ public class CardSent extends Card {
                 .onPost(new PostHandler <Void>() {
                     @Override
                     public void handle(Void data) {
-                        ((CustomSentExpandCard) cardExpand).setPathsOnMap(balloon);
+                        ((CardSentExpand) cardExpand).setPathsOnMap(balloon);
                         _card.doExpand();
                     }
                 })

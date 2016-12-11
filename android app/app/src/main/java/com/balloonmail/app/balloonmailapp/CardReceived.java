@@ -9,13 +9,12 @@ import android.widget.TextView;
 
 import com.balloonmail.app.balloonmailapp.models.ReceivedBalloon;
 import com.balloonmail.app.balloonmailapp.utilities.ActionButtonsHandler;
-import com.google.android.gms.maps.CameraUpdateFactory;
+import com.balloonmail.app.balloonmailapp.utilities.MapsHandler;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
@@ -108,13 +107,7 @@ public class CardReceived extends Card {
                     .icon(BitmapDescriptorFactory.fromResource(R.drawable.marker_source_balloon)));
         }
 
-        CameraPosition cameraPosition = new CameraPosition.Builder()
-                .target(sourceBalloon)      // Sets the center of the map to Mountain View
-                .zoom(1)                   // Sets the zoom
-                .bearing(90)                // Sets the orientation of the camera to east
-                .tilt(30)                   // Sets the tilt of the camera to 30 degrees
-                .build();                   // Creates a CameraPosition from the builder
-        map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+        MapsHandler.animateCameraToSource(map, sourceBalloon);
 
         map.getUiSettings().setCompassEnabled(false);
         map.getUiSettings().setMapToolbarEnabled(false);
