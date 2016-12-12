@@ -20,6 +20,8 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import it.gmariotti.cardslib.library.internal.Card;
 
+import static com.balloonmail.app.balloonmailapp.utilities.Global.KEY_MAP_SAVED_STATE;
+
 /**
  * Created by Dalia on 5/5/2016.
  */
@@ -136,12 +138,11 @@ public class CardReceived extends Card {
          */
         public void initializeMapView() {
             if (mapView != null) {
-                // Initialise the MapView
-                mapView.onCreate(savedInstanceState);
-                // Set the map ready callback to receive the GoogleMap object
-                mapView.getMapAsync(this);
+                Bundle mapState = (savedInstanceState != null)
+                        ? savedInstanceState.getBundle(KEY_MAP_SAVED_STATE): null;
+                mapView.onCreate(mapState); // Initialise the MapView
+                mapView.getMapAsync(this); // Set the map ready callback to receive the GoogleMap object
                 mapView.setClickable(false);
-
             }
         }
 
