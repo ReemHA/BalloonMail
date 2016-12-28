@@ -39,6 +39,7 @@ public class Global {
     private static final double DUMMY_LNG = -0.127758;
     public static final boolean inDebug = false;
     public static final String RECEIVED_OR_LIKED = "rOrl";
+    public static final String KEY_MAP_SAVED_STATE = "mapState";
 
     public enum ERROR_MSG {
         SERVER_CONN_FAIL("Couldn't connect to server."),

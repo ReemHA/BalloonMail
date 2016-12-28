@@ -23,6 +23,7 @@ import java.util.HashMap;
 
 import it.gmariotti.cardslib.library.internal.Card;
 import it.gmariotti.cardslib.library.internal.CardExpand;
+import it.gmariotti.cardslib.library.internal.ViewToClickToExpand;
 
 /**
  * Created by Dalia on 4/25/2016.
@@ -35,7 +36,7 @@ public class CardSent extends Card {
     public CardSent(Balloon balloon, Context context) {
         super(context, R.layout.card_sent_item);
         this.balloon = balloon;
-        cardExpand = new CustomSentExpandCard(balloon, context, null);
+        cardExpand = new CardSentExpand(balloon, context, null);
         this.addCardExpand(cardExpand);
     }
 
@@ -56,7 +57,7 @@ public class CardSent extends Card {
             creep.setText(String.valueOf(balloon.getCreeps()) + " creeps");
 
             _card = this;
-            mapBtn.setOnClickListener(new View.OnClickListener() {
+            /* mapBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     if (_card.isExpanded()) {
@@ -64,8 +65,21 @@ public class CardSent extends Card {
                         _card.setExpanded(false);
                     } else {
                         _card.setExpanded(true);
+                        _card.doExpand();
                         drawPaths();
                     }
+                }
+            }); */
+            ViewToClickToExpand viewToClickToExpand =
+                    ViewToClickToExpand.builder()
+                            .setupView(mapBtn)
+                            .highlightView(false);
+            setViewToClickToExpand(viewToClickToExpand);
+
+            _card.setOnExpandAnimatorEndListener(new OnExpandAnimatorEndListener() {
+                @Override
+                public void onExpandEnd(Card card) {
+                    drawPaths();
                 }
             });
         }
@@ -109,7 +123,7 @@ public class CardSent extends Card {
                 .onPost(new PostHandler <Void>() {
                     @Override
                     public void handle(Void data) {
-                        ((CustomSentExpandCard) cardExpand).setPathsOnMap(balloon);
+                        ((CardSentExpand) cardExpand).setPathsOnMap(balloon);
                         _card.doExpand();
                     }
                 })

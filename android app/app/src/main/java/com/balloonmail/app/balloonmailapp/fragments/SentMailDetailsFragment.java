@@ -1,6 +1,5 @@
 package com.balloonmail.app.balloonmailapp.fragments;
 
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -13,15 +12,11 @@ import com.balloonmail.app.balloonmailapp.R;
 import com.balloonmail.app.balloonmailapp.models.Balloon;
 import com.balloonmail.app.balloonmailapp.utilities.ActionButtonsHandler;
 import com.balloonmail.app.balloonmailapp.utilities.Global;
-import com.google.android.gms.maps.CameraUpdateFactory;
+import com.balloonmail.app.balloonmailapp.utilities.MapsHandler;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.PolylineOptions;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -81,68 +76,26 @@ public class SentMailDetailsFragment extends Fragment implements OnMapReadyCallb
     @Override
     public void onMapReady(GoogleMap googleMap) {
         map = googleMap;
+
+        setMapLocation(map);
+    }
+
+    private void setMapLocation(GoogleMap map){
         LatLng sourceBalloon = balloon.getSourceBalloon();
         HashMap<LatLng, ArrayList<LatLng>> destinationsHashMap = balloon.getDestinationsHashMap();
 
 
         if(sourceBalloon != null){
-            map.addMarker(new MarkerOptions()
-                    .position(sourceBalloon)
-                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.marker_source_balloon)));
+            MapsHandler.addSourceBalloonMarker(map, sourceBalloon);
 
             if(destinationsHashMap != null){
-                for(int i=0; i<destinationsHashMap.get(sourceBalloon).size(); i++){
-                    LatLng destination = destinationsHashMap.get(sourceBalloon).get(i);
-                    map.addPolyline(new PolylineOptions().add(sourceBalloon, destination)
-                            .color(Color.parseColor("#D86C74"))
-                            .width(5)
-                            .zIndex(i)
-                            .geodesic(true)
-                    );
-                    map.addMarker(new MarkerOptions()
-                            .position(destination)
-                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.marker_destination_light)));
-
-                    //check if destination has another refills
-                    if(destinationsHashMap.get(destination) != null){
-                        for(int j=0; j<destinationsHashMap.get(destination).size(); j++){
-                            LatLng refilledDestination = destinationsHashMap.get(destination).get(j);
-                            map.addPolyline(new PolylineOptions().add(destination, refilledDestination)
-                                    .color(Color.parseColor("#A52831"))
-                                    .width(4)
-                                    .zIndex(i)
-                                    .geodesic(true)
-                            );
-                            map.addMarker(new MarkerOptions()
-                                    .position(refilledDestination)
-                                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.marker_destination)));
-                        }
-                    }
-                }
+                MapsHandler.addDestinationsBalloonPolylines(map, sourceBalloon, destinationsHashMap, true);
             }
 
-            CameraPosition cameraPosition = new CameraPosition.Builder()
-                    .target(sourceBalloon)      // Sets the center of the map to Mountain View
-                    .zoom(1)                   // Sets the zoom
-                    .tilt(30)                   // Sets the tilt of the camera to 30 degrees
-                    .build();                   // Creates a CameraPosition from the builder
-            map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+            MapsHandler.animateCameraToSource(map, sourceBalloon);
         }
 
-        map.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
-            @Override
-            public void onCameraChange(CameraPosition position) {
-                float maxZoom = 4.0f;
-                float minZoom = 2.0f;
-
-                if (position.zoom > maxZoom) {
-                    map.animateCamera(CameraUpdateFactory.zoomTo(maxZoom));
-                } else if (position.zoom < minZoom) {
-                    map.animateCamera(CameraUpdateFactory.zoomTo(minZoom));
-                }
-            }
-        });
-        map.getUiSettings().setCompassEnabled(false);
-        map.getUiSettings().setMapToolbarEnabled(false);
+        MapsHandler.setMaximumZoomToMapAndDisableCompass(map, 7.0f, 2.0f);
     }
+
 }

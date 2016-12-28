@@ -13,14 +13,11 @@ import com.balloonmail.app.balloonmailapp.R;
 import com.balloonmail.app.balloonmailapp.models.Balloon;
 import com.balloonmail.app.balloonmailapp.utilities.ActionButtonsHandler;
 import com.balloonmail.app.balloonmailapp.utilities.Global;
-import com.google.android.gms.maps.CameraUpdateFactory;
+import com.balloonmail.app.balloonmailapp.utilities.MapsHandler;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
 
 public class ReceivedAndLikedMailDetailsFragment extends Fragment implements OnMapReadyCallback{
 
@@ -100,20 +97,12 @@ public class ReceivedAndLikedMailDetailsFragment extends Fragment implements OnM
         LatLng sourceBalloon = balloon.getSourceBalloon();
 
         if(sourceBalloon != null){
-            map.addMarker(new MarkerOptions()
-                    .position(sourceBalloon)
-                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.marker_source_balloon)));
+            MapsHandler.addSourceBalloonMarker(map, sourceBalloon);
 
-            CameraPosition cameraPosition = new CameraPosition.Builder()
-                    .target(sourceBalloon)      // Sets the center of the map to Mountain View
-                    .zoom(1)                   // Sets the zoom
-                    .tilt(30)                   // Sets the tilt of the camera to 30 degrees
-                    .build();                   // Creates a CameraPosition from the builder
-            map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+            MapsHandler.animateCameraToSource(map, sourceBalloon);
         }
 
 
-        map.getUiSettings().setCompassEnabled(false);
-        map.getUiSettings().setMapToolbarEnabled(false);
+        MapsHandler.setMaximumZoomToMapAndDisableCompass(map, 7.0f, 2.0f);
     }
 }
