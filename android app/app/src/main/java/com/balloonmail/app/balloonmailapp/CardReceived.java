@@ -8,12 +8,11 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.balloonmail.app.balloonmailapp.manager.AppManager;
+import com.balloonmail.app.balloonmailapp.manager.ISentimentUI;
 import com.balloonmail.app.balloonmailapp.manager.creep.ICreepableUI;
 import com.balloonmail.app.balloonmailapp.manager.like.ILikeableUI;
-import com.balloonmail.app.balloonmailapp.manager.like.LikeHandler;
 import com.balloonmail.app.balloonmailapp.manager.refill.IRefillableUI;
 import com.balloonmail.app.balloonmailapp.models.ReceivedBalloon;
-import com.balloonmail.app.balloonmailapp.utilities.ActionButtonsHandler;
 import com.balloonmail.app.balloonmailapp.utilities.MapsHandler;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -30,13 +29,14 @@ import static com.balloonmail.app.balloonmailapp.utilities.Global.KEY_MAP_SAVED_
 /**
  * Created by Dalia on 5/5/2016.
  */
-public class CardReceived extends Card implements ILikeableUI, IRefillableUI, ICreepableUI{
+public class CardReceived extends Card implements ILikeableUI, IRefillableUI, ICreepableUI, ISentimentUI {
 
     ReceivedBalloon balloon;
     private Context context;
     private Bundle savedInstanceState;
     ReceivedCardViewHolder holder;
     private AppManager manager;
+
     public CardReceived(ReceivedBalloon balloon, Context context, Bundle savedInstanceState) {
         super(context, R.layout.card_received_item);
         this.balloon = balloon;
@@ -76,12 +76,13 @@ public class CardReceived extends Card implements ILikeableUI, IRefillableUI, IC
             holder.creepBtn = (ImageButton) view.findViewById(R.id.creepActionBtn_received);
             holder.sentimentIndication = view.findViewById(R.id.sentiment_indication);
 
-
-            LikeHandler likeHandler = new LikeHandler(balloon, holder.likeBtn);
-            likeHandler.handleButtonUI();
-
-//            ActionButtonsHandler.changeStateOfRefillBtn(balloon, holder.refillBtn);
-//            ActionButtonsHandler.changeStateOfCreepBtn(balloon, holder.creepBtn);
+            /**
+             * instantiate the actions buttons and sentiment indication states.
+             */
+            manager.instantiateLikeButtonState(getBalloon(), holder.likeBtn);
+            manager.instantiateRefillButtonState(getBalloon(), holder.refillBtn);
+            manager.instantiateCreepButtonState(getBalloon(), holder.creepBtn);
+            manager.instantiateSentimentState(balloon.getSentiment(), holder.sentimentIndication);
 
             holder.likeBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -93,18 +94,17 @@ public class CardReceived extends Card implements ILikeableUI, IRefillableUI, IC
             holder.refillBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                   // ActionButtonsHandler.onClickOfRefillButton(balloon, getContext(), holder.refillBtn);
+                    manager.refill(CardReceived.this);
                 }
             });
 
             holder.creepBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    //ActionButtonsHandler.onClickOfCreepButton(balloon, getContext(), holder.creepBtn);
+                    manager.creep(CardReceived.this);
                 }
             });
 
-            ActionButtonsHandler.changeColorOfSentimentIndication(balloon.getSentiment(), holder.sentimentIndication);
         }
     }
 
@@ -123,6 +123,7 @@ public class CardReceived extends Card implements ILikeableUI, IRefillableUI, IC
         map.getUiSettings().setCompassEnabled(false);
         map.getUiSettings().setMapToolbarEnabled(false);
     }
+
 
     @Override
     public ImageButton getCreepButton() {
@@ -149,6 +150,11 @@ public class CardReceived extends Card implements ILikeableUI, IRefillableUI, IC
         return balloon;
     }
 
+    @Override
+    public View getSentimentBar() {
+        return holder.sentimentIndication;
+    }
+
     class ReceivedCardViewHolder implements OnMapReadyCallback {
 
         MapView mapView;
@@ -173,7 +179,7 @@ public class CardReceived extends Card implements ILikeableUI, IRefillableUI, IC
         public void initializeMapView() {
             if (mapView != null) {
                 Bundle mapState = (savedInstanceState != null)
-                        ? savedInstanceState.getBundle(KEY_MAP_SAVED_STATE): null;
+                        ? savedInstanceState.getBundle(KEY_MAP_SAVED_STATE) : null;
                 mapView.onCreate(mapState); // Initialise the MapView
                 mapView.getMapAsync(this); // Set the map ready callback to receive the GoogleMap object
                 mapView.setClickable(false);

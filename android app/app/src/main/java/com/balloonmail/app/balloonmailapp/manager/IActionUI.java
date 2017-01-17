@@ -5,9 +5,9 @@ import android.content.Context;
 import com.balloonmail.app.balloonmailapp.models.Balloon;
 
 /**
- * Created by Reem Hamdy on 1/14/2017.
+ * Created by Reem Hamdy on 1/17/2017.
  */
-public interface UI {
+public interface IActionUI {
     Context getCurrentContext();
     Balloon getBalloon();
 }

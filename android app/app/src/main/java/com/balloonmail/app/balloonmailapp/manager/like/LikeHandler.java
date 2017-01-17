@@ -7,8 +7,9 @@ import com.balloonmail.app.balloonmailapp.manager.ActionHandler;
 
 /**
  * Created by Reem Hamdy on 1/14/2017.
+ * This class handles any UI related issues of the like button.
  */
-public class LikeHandler implements ActionHandler{
+public class LikeHandler extends ActionHandler{
     private ILikeableModel likeableBalloon;
     private ImageButton likeButton;
 

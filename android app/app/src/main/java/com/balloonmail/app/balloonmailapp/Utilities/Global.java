@@ -6,10 +6,7 @@ import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.support.design.widget.Snackbar;
-import android.view.View;
 import android.widget.Toast;
-
-import com.balloonmail.app.balloonmailapp.R;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -43,11 +40,10 @@ public class Global {
 
     public enum ERROR_MSG {
         SERVER_CONN_FAIL("Couldn't connect to server."),
-        CREEP_REQ_FAIL("You already creeped this balloon once."),
-        REFILL_REQ_FAIL("You can't refill this balloon again."),
+        CREEP_BUTTON_CLICKED_TWICE("You can't creep this balloon again."),
+        REFILL_BUTTON_CLICKED_TWICE("You can't refill this balloon again."),
         DEFAULT_LOCATION_WARNING("A dummy location will be used."),
         NETWORK_CONN_FAIL("No internet connection.");
-
         String msg;
 
         ERROR_MSG(String msg) {
