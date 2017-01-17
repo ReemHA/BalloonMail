@@ -1,21 +1,8 @@
 package com.balloonmail.app.balloonmailapp.utilities;
 
-import android.content.Context;
-import android.util.Log;
 import android.view.View;
-import android.widget.ImageButton;
 
-import com.balloonmail.app.balloonmailapp.CardReceived;
 import com.balloonmail.app.balloonmailapp.R;
-import com.balloonmail.app.balloonmailapp.async.PostHandler;
-import com.balloonmail.app.balloonmailapp.async.ReusableAsync;
-import com.balloonmail.app.balloonmailapp.async.SuccessHandler;
-import com.balloonmail.app.balloonmailapp.models.Balloon;
-import com.balloonmail.app.balloonmailapp.models.LikedBalloon;
-import com.balloonmail.app.balloonmailapp.models.ReceivedBalloon;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 /**
  * Created by Dalia on 8/10/2016.
@@ -30,7 +17,7 @@ public class ActionButtonsHandler {
             view.setBackgroundResource(R.color.colorPrimary);
         }
     }
-
+/*
     public static void changeStateOfRefillBtn(Balloon balloon, ImageButton refillBtn) {
         if(balloon instanceof ReceivedBalloon){
             if (((ReceivedBalloon) balloon).getIs_refilled() == 0) {
@@ -257,4 +244,5 @@ public class ActionButtonsHandler {
                 })
                 .send();
     }
+    */
 }

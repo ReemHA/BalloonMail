@@ -51,28 +51,28 @@ public class ReceivedAndLikedMailDetailsFragment extends Fragment implements OnM
         likeBtn = (ImageButton)rootView.findViewById(R.id.likeActionBtn_details);
 
 
-        ActionButtonsHandler.changeStateOfLikeBtn(balloon, likeBtn);
-        ActionButtonsHandler.changeStateOfRefillBtn(balloon, refillBtn);
-        ActionButtonsHandler.changeStateOfCreepBtn(balloon, creepBtn);
+//        ActionButtonsHandler.changeStateOfLikeBtn(balloon, likeBtn);
+//        ActionButtonsHandler.changeStateOfRefillBtn(balloon, refillBtn);
+//        ActionButtonsHandler.changeStateOfCreepBtn(balloon, creepBtn);
 
         refillBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ActionButtonsHandler.onClickOfRefillButton(balloon, getContext(), refillBtn);
+                //ActionButtonsHandler.onClickOfRefillButton(balloon, getContext(), refillBtn);
             }
         });
 
         creepBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ActionButtonsHandler.onClickOfCreepButton(balloon, getContext(), creepBtn);
+                //ActionButtonsHandler.onClickOfCreepButton(balloon, getContext(), creepBtn);
             }
         });
 
         likeBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ActionButtonsHandler.onClickOfLikeButton(balloon, getContext(), likeBtn);
+               // ActionButtonsHandler.onClickOfLikeButton(balloon, getContext(), likeBtn);
             }
         });
 

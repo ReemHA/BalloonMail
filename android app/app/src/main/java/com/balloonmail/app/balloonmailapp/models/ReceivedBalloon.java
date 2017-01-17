@@ -1,8 +1,10 @@
 package com.balloonmail.app.balloonmailapp.models;
 
-import com.j256.ormlite.table.DatabaseTable;
-
+import com.balloonmail.app.balloonmailapp.manager.creep.ICreepableModel;
+import com.balloonmail.app.balloonmailapp.manager.like.ILikeableModel;
+import com.balloonmail.app.balloonmailapp.manager.refill.IRefillableModel;
 import com.j256.ormlite.field.DatabaseField;
+import com.j256.ormlite.table.DatabaseTable;
 
 import java.util.Date;
 
@@ -11,7 +13,7 @@ import java.util.Date;
  */
 
 @DatabaseTable(tableName="receivedballoon")
-public class ReceivedBalloon extends Balloon {
+public class ReceivedBalloon extends Balloon implements ILikeableModel, IRefillableModel, ICreepableModel {
 
     @DatabaseField
     int is_refilled;
@@ -29,30 +31,6 @@ public class ReceivedBalloon extends Balloon {
         super(text, noOfRefills, noOfCreeps, reach);
     }
 
-    public int getIs_creeped() {
-        return is_creeped;
-    }
-
-    public void setIs_creeped(int is_creeped) {
-        this.is_creeped = is_creeped;
-    }
-
-    public int getIs_liked() {
-        return is_liked;
-    }
-
-    public void setIs_liked(int is_liked) {
-        this.is_liked = is_liked;
-    }
-
-    public int getIs_refilled() {
-        return is_refilled;
-    }
-
-    public void setIs_refilled(int is_refilled) {
-        this.is_refilled = is_refilled;
-    }
-
     public ReceivedBalloon(String text, int balloon_id,double sentiment, double lat, double lng,Date sent_date) {
         this.text = text;
         this.balloon_id = balloon_id;
@@ -60,25 +38,33 @@ public class ReceivedBalloon extends Balloon {
         this.setSourceBalloon(lat, lng);
         this.sent_at = sent_date;
     }
-    public void onLikeClick(){
-        if (is_liked == 0) {
-            setIs_liked(1);
-        } else {
-            setIs_liked(0);
-        }
+    @Override
+    public void setIsCreeped(int x) {
+        this.is_creeped = x;
     }
-    public void onRefillClick(){
-        if (is_refilled == 0) {
-            setIs_refilled(1);
-        } else {
-            setIs_refilled(0);
-        }
+
+    @Override
+    public int getIsCreeped() {
+        return is_creeped;
     }
-    public void onCreepClick(){
-        if (is_creeped == 0) {
-            setIs_creeped(1);
-        } else {
-            setIs_creeped(0);
-        }
+
+    @Override
+    public void setIsLiked(int x) {
+        this.is_liked = x;
+    }
+
+    @Override
+    public int getIsLiked() {
+        return is_liked;
+    }
+
+    @Override
+    public void setIsRefilled(int x) {
+        this.is_refilled = x;
+    }
+
+    @Override
+    public int getIsRefilled() {
+        return is_refilled;
     }
 }
