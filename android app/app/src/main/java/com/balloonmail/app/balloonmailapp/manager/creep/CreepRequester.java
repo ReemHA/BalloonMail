@@ -15,15 +15,15 @@ import org.json.JSONObject;
  * Created by Reem Hamdy on 1/14/2017.
  */
 public class CreepRequester {
-    public static void requestCreepToServer(final ICreepableUI creepableCard) {
-        final ICreepableModel creepableBalloon = (ICreepableModel) creepableCard.getBalloon();
-        final ImageButton creepButton = creepableCard.getCreepButton();
+    public static void requestCreepToServer(final ICreepableUI creepableUI) {
+        final ICreepableModel creepableBalloon = (ICreepableModel) creepableUI.getBalloon();
+        final ImageButton creepButton = creepableUI.getCreepButton();
         final CreepHandler creepHandler = new CreepHandler(creepableBalloon, creepButton);
-        Context context = creepableCard.getCurrentContext();
+        Context context = creepableUI.getCurrentContext();
         ReusableAsync<Void> task = new ReusableAsync(context)
                 .post("/balloons/creep")
                 .bearer(Global.getApiToken(context))
-                .addData("balloon_id", Integer.toString(creepableCard.getBalloon().getBalloon_id()))
+                .addData("balloon_id", Integer.toString(creepableUI.getBalloon().getBalloon_id()))
                 .onSuccess(new SuccessHandler<Void>() {
                         @Override
                         public Void handle(JSONObject data) throws JSONException {

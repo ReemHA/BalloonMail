@@ -38,28 +38,6 @@ public class ReceivedBalloon extends Balloon implements ILikeableModel, IRefilla
         this.setSourceBalloon(lat, lng);
         this.sent_at = sent_date;
     }
-    /*public void onLikeClick(){
-        if (is_liked == 0) {
-            setIs_liked(1);
-        } else {
-            setIs_liked(0);
-        }
-    }
-    public void onRefillClick(){
-        if (is_refilled == 0) {
-            setIs_refilled(1);
-        } else {
-            setIs_refilled(0);
-        }
-    }
-    public void onCreepClick(){
-        if (is_creeped == 0) {
-            setIs_creeped(1);
-        } else {
-            setIs_creeped(0);
-        }
-    }
-*/
     @Override
     public void setIsCreeped(int x) {
         this.is_creeped = x;

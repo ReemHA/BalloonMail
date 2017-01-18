@@ -7,9 +7,9 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.balloonmail.app.balloonmailapp.activities.SentMailDetailsActivity;
+import com.balloonmail.app.balloonmailapp.manager.AppManager;
 import com.balloonmail.app.balloonmailapp.models.Balloon;
 import com.balloonmail.app.balloonmailapp.models.SentBalloon;
-import com.balloonmail.app.balloonmailapp.utilities.ActionButtonsHandler;
 import com.balloonmail.app.balloonmailapp.utilities.Global;
 import com.balloonmail.app.balloonmailapp.utilities.MapsHandler;
 import com.google.android.gms.maps.GoogleMap;
@@ -29,10 +29,9 @@ import it.gmariotti.cardslib.library.internal.CardExpand;
 public class CardSentExpand extends CardExpand{
 
     Balloon balloon;
-
     private Context context;
     private Bundle savedInstanceState;
-
+    AppManager manager;
     SentExpandCardViewHolder holder;
 
     //Use your resource ID for your inner layout
@@ -45,6 +44,7 @@ public class CardSentExpand extends CardExpand{
         this.balloon = balloon;
         this.context = context;
         this.savedInstanceState = savedInstanceState;
+        this.manager = AppManager.getInstance();
     }
 
 
@@ -66,8 +66,10 @@ public class CardSentExpand extends CardExpand{
         createMapOfExpandCard();
 
         holder.sentimentIndication = view.findViewById(R.id.sentiment_indication);
-
-        ActionButtonsHandler.changeColorOfSentimentIndication(balloon.getSentiment(), holder.sentimentIndication);
+        /**
+         * call manager to instantiate sentiment state.
+         */
+        manager.instantiateSentimentState(balloon.getSentiment(), holder.sentimentIndication);
     }
 
     public void createMapOfExpandCard(){

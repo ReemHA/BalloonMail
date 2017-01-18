@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,11 +14,12 @@ import android.widget.ProgressBar;
 
 import com.balloonmail.app.balloonmailapp.CardSent;
 import com.balloonmail.app.balloonmailapp.R;
-import com.balloonmail.app.balloonmailapp.activities.MailsTabbedActivity;
 import com.balloonmail.app.balloonmailapp.activities.SentMailDetailsActivity;
 import com.balloonmail.app.balloonmailapp.async.PostHandler;
 import com.balloonmail.app.balloonmailapp.async.ReusableAsync;
 import com.balloonmail.app.balloonmailapp.async.SuccessHandler;
+import com.balloonmail.app.balloonmailapp.manager.AppManager;
+import com.balloonmail.app.balloonmailapp.manager.IBalloonLoadable;
 import com.balloonmail.app.balloonmailapp.models.Balloon;
 import com.balloonmail.app.balloonmailapp.models.DatabaseHelper;
 import com.balloonmail.app.balloonmailapp.models.SentBalloon;
@@ -44,21 +44,22 @@ import it.gmariotti.cardslib.library.internal.Card;
 import it.gmariotti.cardslib.library.recyclerview.internal.CardArrayRecyclerViewAdapter;
 import it.gmariotti.cardslib.library.recyclerview.view.CardRecyclerView;
 
-public class SentMailsFragment extends Fragment {
-
+public class SentMailsFragment extends Fragment implements IBalloonLoadable {
+    private AppManager manager;
     private ArrayList<Card> cards;
     private LinearLayoutManager mLayoutManager;
     private HashMap<SentBalloon, Card> balloonsMap;
     private static List<SentBalloon> sentBalloonList;
     private DatabaseHelper dbHelper;
     private Dao<SentBalloon, Integer> sentBalloonDao;
+    private Context context;
     ProgressBar progressBar;
     SwipeRefreshLayout swipeRefreshLayout;
     View rootView;
     Bundle savedInstanceState;
     CardArrayRecyclerViewAdapter mCardArrayAdapter;
     ImageView emptyStateImage;
-    private Context context;
+
     public SentMailsFragment() {
         // Required empty public constructor
     }
@@ -73,12 +74,13 @@ public class SentMailsFragment extends Fragment {
         this.savedInstanceState = savedInstanceState;
         balloonsMap = new HashMap<>();
         cards = new ArrayList<>();
+        manager = AppManager.getInstance();
         sentBalloonList = new ArrayList<>();
         swipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipe_refresh_layout);
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                loadSentBalloons();
+                manager.loadBalloons(SentMailsFragment.this);
             }
         });
 
@@ -100,10 +102,8 @@ public class SentMailsFragment extends Fragment {
                 e.printStackTrace();
             }
         } else {
-            loadSentBalloons();
+            manager.loadBalloons(SentMailsFragment.this);
         }
-
-        Log.d(SentMailsFragment.class.getSimpleName(), "1");
 
         //Staggered grid view
         CardRecyclerView mRecyclerView = (CardRecyclerView) rootView.findViewById(R.id.cvCardRecyclerView);
@@ -122,68 +122,15 @@ public class SentMailsFragment extends Fragment {
         return rootView;
     }
 
-    public ArrayList<Card> initCardsFromLocalDb() throws SQLException {
-        ArrayList<Card> cards = new ArrayList<>();
-        Card card;
-
-        // a sent balloon in Db?
-        QueryBuilder<SentBalloon, Integer> q = sentBalloonDao.queryBuilder();
-        q.orderBy("sent_at", false);
-        List<SentBalloon> sentBalloonListInDb = q.query();
-        //List<SentBalloon> sentBalloonListInDb = sentBalloonDao.queryForAll();
-        if (sentBalloonListInDb.size() > 0 && sentBalloonListInDb != null) {
-            for (int i = 0; i < sentBalloonListInDb.size(); i++) {
-                card = createCard(sentBalloonListInDb.get(i));
-                cards.add(card);
-            }
-        }
-
-        // a sent balloon in holder?
-        Balloon balloon = Global.balloonHolder.getBalloon();
-        if (balloon != null) {
-            card = createCard(balloon);
-            cards.add(card);
-
-            // to hash map
-            balloonsMap.put((SentBalloon)balloon, card);
-        }
-
-        //reset balloon object in holder
-        Global.balloonHolder.setBalloon(null);
-        return cards;
-    }
-
-    private Card createCard(final Balloon balloon) {
-        Card card = new CardSent(balloon, getActivity());
-
-        card.setOnClickListener(new Card.OnCardClickListener() {
-            @Override
-            public void onClick(Card card, View view) {
-                updateBalloonWithPaths(balloon);
-                Global.balloonHolder.setBalloon((SentBalloon) balloon);
-
-                Intent intent = new Intent(getContext(), SentMailDetailsActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                context.startActivity(intent);
-            }
-        });
-
-        card.setId(balloon.getSent_at().toString());
-        card.setCardElevation(getResources().getDimension(R.dimen.card_shadow_elevation));
-
-        return card;
-    }
-
     @Override
     public void onResume() {
         super.onResume();
     }
 
-
     @Override
     public void onPause() {
         super.onPause();
-        Log.d(MailsTabbedActivity.class.getSimpleName(), "onPause saving");
+        //Log.d(MailsTabbedActivity.class.getSimpleName(), "onPause saving");
         //sentBalloonList.clear();
         sentBalloonList.addAll(balloonsMap.keySet());
         saveSentBalloonsToDatabase(sentBalloonList);
@@ -194,7 +141,8 @@ public class SentMailsFragment extends Fragment {
         super.setUserVisibleHint(isVisibleToUser);
     }
 
-    private void loadSentBalloons() {
+    @Override
+    public void loadBalloons() {
         new ReusableAsync<Integer>(context)
                 .get("/balloons/sent")
                 .bearer(Global.getApiToken(context))
@@ -245,6 +193,27 @@ public class SentMailsFragment extends Fragment {
                 .send();
     }
 
+    @Override
+    public Card createCard(Balloon _balloon) {
+        final SentBalloon balloon = (SentBalloon) _balloon;
+        Card card = new CardSent(balloon, getActivity());
+        card.setOnClickListener(new Card.OnCardClickListener() {
+            @Override
+            public void onClick(Card card, View view) {
+                updateBalloonWithPaths(balloon);
+                Global.balloonHolder.setBalloon((SentBalloon) balloon);
+
+                Intent intent = new Intent(getContext(), SentMailDetailsActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                context.startActivity(intent);
+            }
+        });
+
+        card.setId(balloon.getSent_at().toString());
+        card.setCardElevation(getResources().getDimension(R.dimen.card_shadow_elevation));
+
+        return card;
+    }
 
     private void saveSentBalloonsToDatabase(List<SentBalloon> balloonList) {
 
@@ -298,6 +267,37 @@ public class SentMailsFragment extends Fragment {
                     }
                 })
                 .send();
+    }
+
+    public ArrayList<Card> initCardsFromLocalDb() throws SQLException {
+        ArrayList<Card> cards = new ArrayList<>();
+        Card card;
+
+        // a sent balloon in Db?
+        QueryBuilder<SentBalloon, Integer> q = sentBalloonDao.queryBuilder();
+        q.orderBy("sent_at", false);
+        List<SentBalloon> sentBalloonListInDb = q.query();
+        //List<SentBalloon> sentBalloonListInDb = sentBalloonDao.queryForAll();
+        if (sentBalloonListInDb.size() > 0 && sentBalloonListInDb != null) {
+            for (int i = 0; i < sentBalloonListInDb.size(); i++) {
+                card = createCard(sentBalloonListInDb.get(i));
+                cards.add(card);
+            }
+        }
+
+        // a sent balloon in holder?
+        Balloon balloon = Global.balloonHolder.getBalloon();
+        if (balloon != null) {
+            card = createCard(balloon);
+            cards.add(card);
+
+            // to hash map
+            balloonsMap.put((SentBalloon) balloon, card);
+        }
+
+        //reset balloon object in holder
+        Global.balloonHolder.setBalloon(null);
+        return cards;
     }
 
 }

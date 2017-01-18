@@ -30,12 +30,11 @@ import static com.balloonmail.app.balloonmailapp.utilities.Global.KEY_MAP_SAVED_
  * Created by Dalia on 5/5/2016.
  */
 public class CardReceived extends Card implements ILikeableUI, IRefillableUI, ICreepableUI, ISentimentUI {
-
+    private AppManager manager;
     ReceivedBalloon balloon;
     private Context context;
     private Bundle savedInstanceState;
     ReceivedCardViewHolder holder;
-    private AppManager manager;
 
     public CardReceived(ReceivedBalloon balloon, Context context, Bundle savedInstanceState) {
         super(context, R.layout.card_received_item);

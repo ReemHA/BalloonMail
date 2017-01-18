@@ -40,17 +40,15 @@ public class AppManager {
         }
         return manager;
     }
-
-    public void like(ILikeableUI likeableCard) {
+    public void like(ILikeableUI likeableUI) {
         likeRequester = new LikeRequester();
-        likeRequester.requestLikeToServer(likeableCard);
+        likeRequester.requestLikeToServer(likeableUI);
     }
-
-    public void refill(IRefillableUI refillableCard) {
+    public void refill(IRefillableUI refillableUI) {
         /**
          * if the balloon is refilled show error message to user.
          */
-        Context context = refillableCard.getCurrentContext();
+        Context context = refillableUI.getCurrentContext();
         if (refillHandler.isRefilled()) {
             if (!Global.isConnected(context)) {
                 Global.showMessage(context, "No Internet Connection",
@@ -61,15 +59,14 @@ public class AppManager {
             }
         } else {
             refillRequester = new RefillRequester();
-            refillRequester.requestRefillToServer(refillableCard);
+            refillRequester.requestRefillToServer(refillableUI);
         }
     }
-
-    public void creep(ICreepableUI creepableCard) {
+    public void creep(ICreepableUI creepableUI) {
         /**
          * if the balloon is creeped show error message to user.
          */
-        Context context = creepableCard.getCurrentContext();
+        Context context = creepableUI.getCurrentContext();
         if (creepHandler.isCreeped()) {
             if (!Global.isConnected(context)) {
                 Global.showMessage(context, "No Internet Connection",
@@ -80,10 +77,9 @@ public class AppManager {
             }
         } else {
             creepRequester = new CreepRequester();
-            creepRequester.requestCreepToServer(creepableCard);
+            creepRequester.requestCreepToServer(creepableUI);
         }
     }
-
     public void instantiateSentimentState(double sentimentValue, View sentimentIndication){
         ActionHandler.changeColorOfSentimentIndication(sentimentValue, sentimentIndication);
     }
@@ -91,15 +87,15 @@ public class AppManager {
         likeHandler = new LikeHandler(balloon, likeButton);
         likeHandler.handleButtonUI();
     }
-
     public void instantiateRefillButtonState(IRefillableModel balloon, ImageButton refillButton) {
         refillHandler = new RefillHandler(balloon, refillButton);
         refillHandler.handleButtonUI();
     }
-
     public void instantiateCreepButtonState(ICreepableModel balloon, ImageButton creepButton) {
         creepHandler = new CreepHandler(balloon, creepButton);
         creepHandler.handleButtonUI();
     }
-
+    public void loadBalloons(IBalloonLoadable fragment){
+        fragment.loadBalloons();
+    }
 }

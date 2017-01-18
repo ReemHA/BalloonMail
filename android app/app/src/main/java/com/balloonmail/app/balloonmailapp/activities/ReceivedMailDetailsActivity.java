@@ -10,7 +10,7 @@ import android.view.MenuItem;
 import com.balloonmail.app.balloonmailapp.R;
 import com.balloonmail.app.balloonmailapp.utilities.Global;
 
-public class ReceivedAndLikedMailDetailsActivity extends AppCompatActivity {
+public class ReceivedMailDetailsActivity extends AppCompatActivity {
     String receivedOrLiked; //"r" or "l"
 
     @Override
@@ -45,10 +45,8 @@ public class ReceivedAndLikedMailDetailsActivity extends AppCompatActivity {
     public void backIntentToReceivedOrLiked(String receivedOrLiked){
         Intent intent = new Intent(getApplicationContext(), MailsTabbedActivity.class);
         if(receivedOrLiked.equals("r")){
-            Log.d("Intents", "MailDetails back to received");
             intent.putExtra(Global.ARG_MAILS_TABBED_TAG, Global.RECEIVED_TABBED_PAGE);
         }else if(receivedOrLiked.equals("l")){
-            Log.d("Intents", "MailDetails back to liked");
             intent.putExtra(Global.ARG_MAILS_TABBED_TAG, Global.LIKES_TABBED_PAGE);
         }
         finish();
