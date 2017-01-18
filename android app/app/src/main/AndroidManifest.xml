@@ -88,7 +88,7 @@
             </intent-filter>
         </service>
 
-        <activity android:name=".activities.ReceivedAndLikedMailDetailsActivity"
+        <activity android:name=".activities.ReceivedMailDetailsActivity"
             android:label="@string/title_activity_mail_details_and_map"
             android:parentActivityName=".activities.MailsTabbedActivity"
             android:theme="@style/AppTheme.NoActionBar">

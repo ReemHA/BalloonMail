@@ -16,10 +16,13 @@ import android.widget.ProgressBar;
 import com.balloonmail.app.balloonmailapp.CardReceived;
 import com.balloonmail.app.balloonmailapp.R;
 import com.balloonmail.app.balloonmailapp.activities.MailsTabbedActivity;
-import com.balloonmail.app.balloonmailapp.activities.ReceivedAndLikedMailDetailsActivity;
+import com.balloonmail.app.balloonmailapp.activities.ReceivedMailDetailsActivity;
 import com.balloonmail.app.balloonmailapp.async.PostHandler;
 import com.balloonmail.app.balloonmailapp.async.ReusableAsync;
 import com.balloonmail.app.balloonmailapp.async.SuccessHandler;
+import com.balloonmail.app.balloonmailapp.manager.AppManager;
+import com.balloonmail.app.balloonmailapp.manager.IBalloonLoadable;
+import com.balloonmail.app.balloonmailapp.models.Balloon;
 import com.balloonmail.app.balloonmailapp.models.DatabaseHelper;
 import com.balloonmail.app.balloonmailapp.models.ReceivedBalloon;
 import com.balloonmail.app.balloonmailapp.utilities.Global;
@@ -47,7 +50,8 @@ import it.gmariotti.cardslib.library.recyclerview.internal.CardArrayRecyclerView
 import it.gmariotti.cardslib.library.recyclerview.view.CardRecyclerView;
 
 
-public class ReceivedMailsFragment extends Fragment {
+public class ReceivedMailsFragment extends Fragment implements IBalloonLoadable {
+    private AppManager manager;
     private ArrayList<Card> cards;
     private LinearLayoutManager mLayoutManager;
     private HashMap<ReceivedBalloon, Card> balloonsMap;
@@ -55,18 +59,17 @@ public class ReceivedMailsFragment extends Fragment {
     private DatabaseHelper dbHelper;
     private Dao<ReceivedBalloon, Integer> receivedBalloonDao;
     private DateFormat dateFormat;
+    private Context context;
     ProgressBar progressBar;
     SwipeRefreshLayout swipeRefreshLayout;
     View rootView;
     Bundle savedInstanceState;
     CardArrayRecyclerViewAdapter mCardArrayAdapter;
-    private Context context;
     ImageView emptyStateImage;
 
     public ReceivedMailsFragment() {
         // Required empty public constructor
     }
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -79,12 +82,13 @@ public class ReceivedMailsFragment extends Fragment {
         dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss", Locale.ENGLISH);
         balloonsMap = new HashMap<>();
         cards = new ArrayList<>();
+        manager = AppManager.getInstance();
         receivedBalloonList = new ArrayList<>();
         swipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipe_refresh_layout);
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                loadReceivedBalloons();
+                manager.loadBalloons(ReceivedMailsFragment.this);
             }
         });
 
@@ -108,7 +112,7 @@ public class ReceivedMailsFragment extends Fragment {
                 e.printStackTrace();
             }
         } else {
-            loadReceivedBalloons();
+            manager.loadBalloons(ReceivedMailsFragment.this);
         }
         //Staggered grid view
         CardRecyclerView mRecyclerView = (CardRecyclerView) rootView.findViewById(R.id.cvReceivedCardRecyclerView);
@@ -126,45 +130,6 @@ public class ReceivedMailsFragment extends Fragment {
         return rootView;
     }
 
-    public ArrayList<Card> initCardsFromLocalDb() throws SQLException {
-        ArrayList<Card> cards_temp = new ArrayList<>();
-        Card card;
-
-        // a received balloon in Db?
-        QueryBuilder<ReceivedBalloon, Integer> q = receivedBalloonDao.queryBuilder();
-        q.orderBy("sent_at", false);
-        List<ReceivedBalloon> receivedBalloonsListInDb = q.query();
-        //List<ReceivedBalloon> receivedBalloonsListInDb = receivedBalloonDao.queryForAll();
-        if (receivedBalloonsListInDb.size() > 0 && receivedBalloonsListInDb != null) {
-            for (int i = 0; i < receivedBalloonsListInDb.size(); i++) {
-                card = createCard(receivedBalloonsListInDb.get(i));
-                cards_temp.add(card);
-            }
-        }
-
-        Global.balloonHolder.setBalloon(null);
-
-        return cards_temp;
-    }
-
-    private Card createCard(final ReceivedBalloon balloon) {
-        Card card = new CardReceived(balloon, getActivity(), savedInstanceState);
-
-        card.setOnClickListener(new Card.OnCardClickListener() {
-            @Override
-            public void onClick(Card card, View view) {
-                Intent intent = new Intent(getContext(), ReceivedAndLikedMailDetailsActivity.class);
-                Global.balloonHolder.setBalloon((ReceivedBalloon) balloon);
-                intent.putExtra(Global.RECEIVED_OR_LIKED, "r");
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                getContext().startActivity(intent);
-            }
-        });
-
-        card.setCardElevation(getResources().getDimension(R.dimen.card_shadow_elevation));
-        return card;
-    }
-
     @Override
     public void onResume() {
         super.onResume();
@@ -174,25 +139,8 @@ public class ReceivedMailsFragment extends Fragment {
     public void onPause() {
         super.onPause();
         Log.d(MailsTabbedActivity.class.getSimpleName(), "onPause saving");
-        //receivedBalloonList.clear();
         receivedBalloonList.addAll(balloonsMap.keySet());
         saveReceivedBalloonsToDatabase(receivedBalloonList);
-    }
-
-    private void saveReceivedBalloonsToDatabase(List<ReceivedBalloon> balloonList) {
-
-        if (balloonList.size() > 0 && balloonList != null) {
-
-            // save balloon onto db
-            for (int i = 0; i < balloonList.size(); i++) {
-                try {
-                    receivedBalloonDao.create(balloonList.get(i));
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            //OpenHelperManager.releaseHelper();
-        }
     }
 
     @Override
@@ -200,7 +148,8 @@ public class ReceivedMailsFragment extends Fragment {
         super.setUserVisibleHint(isVisibleToUser);
     }
 
-    private void loadReceivedBalloons() {
+    @Override
+    public void loadBalloons() {
         new ReusableAsync<Integer>(context)
                 .get("/balloons/received")
                 .bearer(Global.getApiToken(context))
@@ -254,4 +203,61 @@ public class ReceivedMailsFragment extends Fragment {
                 })
                 .send();
     }
+
+    @Override
+    public Card createCard(Balloon _balloon) {
+        final ReceivedBalloon balloon = (ReceivedBalloon) _balloon;
+        Card card = new CardReceived(balloon, getActivity(), savedInstanceState);
+        card.setOnClickListener(new Card.OnCardClickListener() {
+            @Override
+            public void onClick(Card card, View view) {
+                Intent intent = new Intent(getContext(), ReceivedMailDetailsActivity.class);
+                Global.balloonHolder.setBalloon(balloon);
+                intent.putExtra(Global.RECEIVED_OR_LIKED, "r");
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                getContext().startActivity(intent);
+            }
+        });
+
+        card.setCardElevation(getResources().getDimension(R.dimen.card_shadow_elevation));
+        return card;
+    }
+
+    private void saveReceivedBalloonsToDatabase(List<ReceivedBalloon> balloonList) {
+
+        if (balloonList.size() > 0 && balloonList != null) {
+
+            // save balloon onto db
+            for (int i = 0; i < balloonList.size(); i++) {
+                try {
+                    receivedBalloonDao.create(balloonList.get(i));
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+            //OpenHelperManager.releaseHelper();
+        }
+    }
+
+    public ArrayList<Card> initCardsFromLocalDb() throws SQLException {
+        ArrayList<Card> cards_temp = new ArrayList<>();
+        Card card;
+
+        // a received balloon in Db?
+        QueryBuilder<ReceivedBalloon, Integer> q = receivedBalloonDao.queryBuilder();
+        q.orderBy("sent_at", false);
+        List<ReceivedBalloon> receivedBalloonsListInDb = q.query();
+        //List<ReceivedBalloon> receivedBalloonsListInDb = receivedBalloonDao.queryForAll();
+        if (receivedBalloonsListInDb.size() > 0 && receivedBalloonsListInDb != null) {
+            for (int i = 0; i < receivedBalloonsListInDb.size(); i++) {
+                card = createCard(receivedBalloonsListInDb.get(i));
+                cards_temp.add(card);
+            }
+        }
+
+        Global.balloonHolder.setBalloon(null);
+
+        return cards_temp;
+    }
+
 }

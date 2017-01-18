@@ -9,8 +9,8 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.balloonmail.app.balloonmailapp.R;
+import com.balloonmail.app.balloonmailapp.manager.AppManager;
 import com.balloonmail.app.balloonmailapp.models.Balloon;
-import com.balloonmail.app.balloonmailapp.utilities.ActionButtonsHandler;
 import com.balloonmail.app.balloonmailapp.utilities.Global;
 import com.balloonmail.app.balloonmailapp.utilities.MapsHandler;
 import com.google.android.gms.maps.GoogleMap;
@@ -24,8 +24,8 @@ import java.util.HashMap;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class SentMailDetailsFragment extends Fragment implements OnMapReadyCallback{
-
+public class SentMailDetailsFragment extends Fragment implements OnMapReadyCallback {
+    private AppManager manager;
     Balloon balloon;
     View rootView;
     GoogleMap map;
@@ -45,17 +45,17 @@ public class SentMailDetailsFragment extends Fragment implements OnMapReadyCallb
             return rootView;
 
         rootView = inflater.inflate(R.layout.fragment_sent_mail_details, container, false);
-
+        manager = AppManager.getInstance();
         balloon = Global.balloonHolder.getBalloon();
 
-        TextView text = (TextView)rootView.findViewById(R.id.sentBalloonTextTv);
+        TextView text = (TextView) rootView.findViewById(R.id.sentBalloonTextTv);
         text.setText(balloon.getText());
 
-        TextView refill = (TextView)rootView.findViewById(R.id.refillTv_details);
+        TextView refill = (TextView) rootView.findViewById(R.id.refillTv_details);
         refill.setText(String.valueOf(balloon.getRefills()) + " refills");
 
 
-        TextView creep = (TextView)rootView.findViewById(R.id.creepTv_details);
+        TextView creep = (TextView) rootView.findViewById(R.id.creepTv_details);
         creep.setText(String.valueOf(balloon.getCreeps()) + " creeps");
 
         //Map
@@ -65,8 +65,10 @@ public class SentMailDetailsFragment extends Fragment implements OnMapReadyCallb
         mapFragment.getMapAsync(this);
 
         View sentimentView = rootView.findViewById(R.id.sentiment_indication);
-        ActionButtonsHandler.changeColorOfSentimentIndication(balloon.getSentiment(), sentimentView);
-
+        /**
+         * call manager to instantiate sentiment state.
+         */
+        manager.instantiateSentimentState(balloon.getSentiment(), sentimentView);
         Global.balloonHolder.setBalloon(null);
 
 
@@ -80,15 +82,15 @@ public class SentMailDetailsFragment extends Fragment implements OnMapReadyCallb
         setMapLocation(map);
     }
 
-    private void setMapLocation(GoogleMap map){
+    private void setMapLocation(GoogleMap map) {
         LatLng sourceBalloon = balloon.getSourceBalloon();
         HashMap<LatLng, ArrayList<LatLng>> destinationsHashMap = balloon.getDestinationsHashMap();
 
 
-        if(sourceBalloon != null){
+        if (sourceBalloon != null) {
             MapsHandler.addSourceBalloonMarker(map, sourceBalloon);
 
-            if(destinationsHashMap != null){
+            if (destinationsHashMap != null) {
                 MapsHandler.addDestinationsBalloonPolylines(map, sourceBalloon, destinationsHashMap, true);
             }
 

@@ -10,7 +10,7 @@ import java.util.Date;
  * Created by Reem Hamdy on 4/26/2016.
  */
 @DatabaseTable(tableName="likedballoon")
-public class LikedBalloon extends Balloon {
+public class LikedBalloon extends ReceivedBalloon {
 
 
     @DatabaseField
@@ -30,52 +30,17 @@ public class LikedBalloon extends Balloon {
         is_liked = 1;
     }
 
-    public int getIs_creeped() {
-        return is_creeped;
-    }
-
-    public void setIs_creeped(int is_creeped) {
-        this.is_creeped = is_creeped;
-    }
-
-    public int getIs_liked() {
-        return is_liked;
-    }
-
-    private void setIs_liked(int is_liked) {
-        this.is_liked = is_liked;
-    }
-
-    public int getIs_refilled() {
-        return is_refilled;
-    }
-
-    public void setIs_refilled(int is_refilled) {
-        this.is_refilled = is_refilled;
-    }
-
     public LikedBalloon(String text, int balloon_id, double sentiment, double lat, double lng, Date sent_date) {
         this.text = text;
         this.balloon_id = balloon_id;
         this.sentiment = sentiment;
         this.setSourceBalloon(lat, lng);
         this.sent_at = sent_date;
+        is_liked = 1;
     }
-    public void onLikeClick(){
-        is_liked = 0;
-    }
-    public void onRefillClick(){
-        if (is_refilled == 0) {
-            setIs_refilled(1);
-        } else {
-            setIs_refilled(0);
-        }
-    }
-    public void onCreepClick(){
-        if (is_creeped == 0) {
-            setIs_creeped(1);
-        } else {
-            setIs_creeped(0);
-        }
+
+    @Override
+    public void setIsLiked(int x) {
+        super.setIsLiked(is_liked);
     }
 }

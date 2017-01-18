@@ -15,16 +15,16 @@ import org.json.JSONObject;
  * Created by Reem Hamdy on 1/14/2017.
  */
 public class RefillRequester {
-    public void requestRefillToServer(IRefillableUI refillableCard){
-        final IRefillableModel refillableBalloon = (IRefillableModel) refillableCard.getBalloon();
-        final ImageButton refillButton = refillableCard.getRefillButton();
+    public void requestRefillToServer(IRefillableUI refillableUI){
+        final IRefillableModel refillableBalloon = (IRefillableModel) refillableUI.getBalloon();
+        final ImageButton refillButton = refillableUI.getRefillButton();
         final RefillHandler refillHandler = new RefillHandler(refillableBalloon, refillButton);
-        Context currentContext = refillableCard.getCurrentContext();
+        Context currentContext = refillableUI.getCurrentContext();
 
         ReusableAsync<Void> task = new ReusableAsync<>(currentContext)
                 .post("/balloons/refill")
                 .bearer(Global.getApiToken(currentContext))
-                .addData("balloon_id", Integer.toString(refillableCard.getBalloon().getBalloon_id()))
+                .addData("balloon_id", Integer.toString(refillableUI.getBalloon().getBalloon_id()))
                 .onSuccess(new SuccessHandler<Void>() {
                         @Override
                         public Void handle(JSONObject data) throws JSONException {

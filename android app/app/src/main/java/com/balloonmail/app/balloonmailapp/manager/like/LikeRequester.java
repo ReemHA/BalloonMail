@@ -14,15 +14,15 @@ import org.json.JSONObject;
  * Created by Reem Hamdy on 1/14/2017.
  */
 public class LikeRequester {
-    public void requestLikeToServer(final ILikeableUI likeableCard) {
-        final ILikeableModel likeableBalloon = (ILikeableModel) likeableCard.getBalloon();
-        final ImageButton likeButton = likeableCard.getLikeButton();
+    public void requestLikeToServer(final ILikeableUI likeableUI) {
+        final ILikeableModel likeableBalloon = (ILikeableModel) likeableUI.getBalloon();
+        final ImageButton likeButton = likeableUI.getLikeButton();
         final LikeHandler likeHandler = new LikeHandler(likeableBalloon, likeButton);
-        Context currentContext = likeableCard.getCurrentContext();
+        Context currentContext = likeableUI.getCurrentContext();
         ReusableAsync<Void> task = new ReusableAsync<>(currentContext)
                 .bearer(Global.getApiToken(currentContext))
                 .post("/balloons/like")
-                .addData("balloon_id", Integer.toString(likeableCard.getBalloon().getBalloon_id()))
+                .addData("balloon_id", Integer.toString(likeableUI.getBalloon().getBalloon_id()))
                 .onSuccess(new SuccessHandler<Void>() {
                         @Override
                         public Void handle(JSONObject data) {
