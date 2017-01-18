@@ -68,7 +68,13 @@ public class MailsTabbedActivity extends AppCompatActivity {
         });
         getSupportActionBar().setDisplayHomeAsUpEnabled(false);
 
+
         viewPager = (ViewPager) findViewById(R.id.viewpager);
+          /*
+            set the number of pages that should be retained in the view hierarchy in the idle state
+            (2 pages + the current page). To increase performance.
+         */
+        viewPager.setOffscreenPageLimit(2);
         setupViewPager(viewPager);
         int defaultValue = 1;
         int page = getIntent().getIntExtra(Global.ARG_MAILS_TABBED_TAG, defaultValue);

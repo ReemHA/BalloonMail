@@ -222,9 +222,9 @@ public class ReceivedMailsFragment extends Fragment {
                             ReceivedBalloon balloon = new ReceivedBalloon(object.getString("text"), object.getInt("balloon_id"),
                                     object.getDouble("sentiment"), object.getDouble("lat"), object.getDouble("lng"),
                                     sent_at);
-                            balloon.setIs_liked(object.getInt("liked"));
-                            balloon.setIs_refilled(object.getInt("refilled"));
-                            balloon.setIs_creeped(object.getInt("creeped"));
+                            balloon.setIsLiked(object.getInt("liked"));
+                            balloon.setIsRefilled(object.getInt("refilled"));
+                            balloon.setIsCreeped(object.getInt("creeped"));
                             Card card = createCard(balloon);
                             cards.add(card);
                             balloonsMap.put(balloon, card);
