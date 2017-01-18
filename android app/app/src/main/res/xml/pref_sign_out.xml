@@ -1,5 +1,19 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <PreferenceCategory android:title="@string/location_setting">
+        <Preference
+            android:title="@string/update_current_location_msg"
+            android:summary=""
+            android:key="current_location" />
+
+        <com.balloonmail.app.balloonmailapp.activities.LocationDialogPreference
+            android:title="@string/current_location"
+            android:dialogMessage="@string/use_dummy_location_msg"
+            android:negativeButtonText="Cancel"
+            android:positiveButtonText="Ok"
+            />
+    </PreferenceCategory>
+
     <PreferenceCategory android:title="@string/general_setting">
         <com.balloonmail.app.balloonmailapp.activities.SignOutDialogPreference
             android:title="@string/sign_out_title"

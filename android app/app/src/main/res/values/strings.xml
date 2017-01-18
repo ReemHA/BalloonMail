@@ -68,6 +68,10 @@
     <string name="google_maps_key">AIzaSyC6qeyCbfRtqTs1Rehh66aZ46504NvovOE</string>
     <string name="title_activity_mail_details_and_map">Mail</string>
     <string name="general_setting">General</string>
+    <string name="location_setting">Location</string>
+    <string name="current_location">Current Location</string>
+    <string name="use_dummy_location_msg">Use Dummy Location</string>
+    <string name="update_current_location_msg">Update Current Location</string>
 
     <string-array name="sentiment">
         <item>positive</item>
