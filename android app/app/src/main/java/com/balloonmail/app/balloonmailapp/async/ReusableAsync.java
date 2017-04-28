@@ -4,7 +4,6 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Build;
-import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 
@@ -201,11 +200,9 @@ public class ReusableAsync<T> {
 
         } catch (MalformedURLException e) {
             e.printStackTrace();
-            Log.d(ReusableAsync.class.getSimpleName(), "URL exception");
             error_msg = "URL exception";
         } catch (IOException e) {
             e.printStackTrace();
-            Log.d(ReusableAsync.class.getSimpleName(), "IO exception");
             error_msg = "IO exception";
         } catch (JSONException e) {
             e.printStackTrace();
@@ -241,7 +238,6 @@ public class ReusableAsync<T> {
             }
             // convert StringBuilder object to string and store it in a variable
             String JSONResponse = sb.toString();
-            Log.d(ReusableAsync.class.getSimpleName(), JSONResponse);
             // convert response to JSONObject
             JSONObject response = new JSONObject(JSONResponse);
 

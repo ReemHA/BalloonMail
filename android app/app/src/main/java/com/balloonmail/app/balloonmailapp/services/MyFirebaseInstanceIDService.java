@@ -4,7 +4,6 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
-import android.util.Log;
 
 import com.balloonmail.app.balloonmailapp.activities.WriteMailActivity;
 import com.balloonmail.app.balloonmailapp.utilities.Global;
@@ -111,7 +110,6 @@ public class MyFirebaseInstanceIDService extends FirebaseInstanceIdService {
 
             // convert StringBuilder object to string and store it in a variable
             String JSONResponse = sb.toString();
-            Log.d(WriteMailActivity.class.getSimpleName(), JSONResponse);
 
             // convert response to JSONObject
             JSONObject response = new JSONObject(JSONResponse);

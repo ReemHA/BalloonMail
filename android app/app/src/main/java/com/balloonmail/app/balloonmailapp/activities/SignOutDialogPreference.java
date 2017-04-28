@@ -5,9 +5,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.preference.DialogPreference;
 import android.util.AttributeSet;
-import android.util.Log;
-
-import com.balloonmail.app.balloonmailapp.utilities.Global;
 
 /**
  * Created by Reem Hamdy on 5/3/2016.
@@ -26,7 +23,6 @@ public class SignOutDialogPreference extends DialogPreference {
                     Intent.FLAG_ACTIVITY_CLEAR_TOP |
                     Intent.FLAG_ACTIVITY_CLEAR_TASK);
             intent.putExtra("isSignedOut", true);
-            Log.d(Global.LOG_TAG, SignOutDialogPreference.class.getSimpleName());
             getContext().startActivity(intent);
         }else{
 

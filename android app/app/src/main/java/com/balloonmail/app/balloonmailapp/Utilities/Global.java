@@ -18,7 +18,7 @@ import java.util.TimeZone;
  */
 public class Global {
     //public static final String SERVER_URL = "http://6.6.6.149:8080";
-    public static final String SERVER_URL = "http://app2-balloonmail.rhcloud.com";
+    public static final String SERVER_URL = "https://balloonmail-app.azurewebsites.net";
     public static final String SERVER_CLIENT_ID =
             "113808451021-5bbh4fp49eo7tdq8j93arot30tt49q8j.apps.googleusercontent.com";
     public static final String ARG_MAILS_TABBED_TAG = "tabbedPage";

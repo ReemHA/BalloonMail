@@ -14,7 +14,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 
 import com.balloonmail.app.balloonmailapp.R;
@@ -170,7 +169,6 @@ public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiC
             }
         } else {
             if (requestCode == RC_LOCATION) {
-                Log.d(LoginTabbedActivity.class.getSimpleName(), "true");
                 getLocation();
             }
         }
@@ -359,7 +357,6 @@ public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiC
     public void onLocationChanged(Location location) {
         mLastLocation = location;
         if (mLastLocation != null) {
-            Log.d("location", "Latitude:" + mLastLocation.getLatitude() + ", Longitude:" + mLastLocation.getLongitude());
             if (sharedPreferences.edit().putFloat(Global.PREF_USER_LAT, (float) mLastLocation.getLatitude()).commit() &&
                     sharedPreferences.edit().putFloat(Global.PREF_USER_LNG, (float) mLastLocation.getLongitude()).commit()) {
             }
