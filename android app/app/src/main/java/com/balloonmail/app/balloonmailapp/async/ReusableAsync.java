@@ -207,7 +207,7 @@ public class ReusableAsync<T> {
         } catch (JSONException e) {
             e.printStackTrace();
             error_msg = "JSON exception";
-        } finally {
+        }finally {
             try {
                 if (outputStream != null) {
                     outputStream.close();
@@ -238,6 +238,7 @@ public class ReusableAsync<T> {
             }
             // convert StringBuilder object to string and store it in a variable
             String JSONResponse = sb.toString();
+
             // convert response to JSONObject
             JSONObject response = new JSONObject(JSONResponse);
 
@@ -263,7 +264,7 @@ public class ReusableAsync<T> {
 
     private void handlePost(AsyncResult<T> result) {
         if (result.error_msg != null) {
-            Global.showMessage(context, result.error_msg, Global.ERROR_MSG.SERVER_CONN_FAIL.getMsg());
+            Global.showMessage(context, result.error_msg, Global.ERROR_MSG.NETWORK_CONN_FAIL.getMsg());
         } else {
             if (postHandler != null) {
                 postHandler.handle(result.data);

@@ -73,4 +73,14 @@
         <item>neutral</item>
         <item>negative</item>
     </string-array>
+
+    <string name="pref_invite_friends_title">Invite Friends</string>
+    <string name="invitation_deep_link">https://fkd2f.app.goo.gl/PeSx</string>
+    <string name="invitation_title">Invite Friends</string>
+    <string name="invitation_message">Send your thoughts in a BalloonMail! I tried it out, and it\'s awesome. </string>
+    <string name="invitation_custom_image">https://www.dropbox.com/s/na2lmtup432hy5h/logo_balloonmail_word.png</string>
+    <string name="invitation_cta">Get BalloonMail now!</string>
+    <string name="email_subject">Hello! I would love to invite you to try BalloonMail app.</string>
+    <string name="email_content">Get BalloonMail now and start your ripple effect of happiness!</string>
+
 </resources>

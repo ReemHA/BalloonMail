@@ -34,7 +34,7 @@ public class Global {
     public static final String PREF_USER_LNG = "lon";
     private static final double DUMMY_LAT = 51.507351;
     private static final double DUMMY_LNG = -0.127758;
-    public static final boolean inDebug = false;
+    public static final boolean inDebug = true;
     public static final String RECEIVED_OR_LIKED = "rOrl";
     public static final String KEY_MAP_SAVED_STATE = "mapState";
 
@@ -43,7 +43,7 @@ public class Global {
         CREEP_BUTTON_CLICKED_TWICE("You can't creep this balloon again."),
         REFILL_BUTTON_CLICKED_TWICE("You can't refill this balloon again."),
         DEFAULT_LOCATION_WARNING("A dummy location will be used."),
-        NETWORK_CONN_FAIL("No internet connection.");
+        NETWORK_CONN_FAIL("Please check your internet connection.");
         String msg;
 
         ERROR_MSG(String msg) {
@@ -80,8 +80,8 @@ public class Global {
     }
 
     public static Date getDateFromString(String date) {
-        //Assuming date format yyyy-mm-dd hh:MM:ss
-        String[] token = date.split(" +");
+        //Assuming date format yyyy-mm-ddThh:MM:ss.zz
+        String[] token = date.split("T");
         if (token.length != 2)
             return null;
         String[] _date = token[0].split("-");
@@ -95,8 +95,8 @@ public class Global {
                 Integer.parseInt(_date[1]),
                 Integer.parseInt(_date[2]),
                 Integer.parseInt(time[0]),
-                Integer.parseInt(time[0]),
-                Integer.parseInt(time[0])
+                Integer.parseInt(time[1]),
+                Integer.parseInt(time[2].split("\\.")[0])
         );
         return c.getTime();
     }

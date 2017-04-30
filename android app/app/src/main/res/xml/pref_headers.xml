@@ -1,7 +1,8 @@
 <preference-headers xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <header
-        android:fragment="com.balloonmail.app.balloonmailapp.activities.SettingsActivity$SignOutPreferenceFragment"
-        android:title="@string/pref_header_sign_out" />
+    <!--<header-->
+        <!--android:fragment="com.balloonmail.app.balloonmailapp.activities.SettingsActivity$SignOutPreferenceFragment"-->
+        <!--android:title="@string/pref_header_sign_out" />-->
+
 
 </preference-headers>

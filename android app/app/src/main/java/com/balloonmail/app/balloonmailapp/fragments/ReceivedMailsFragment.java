@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,7 +15,6 @@ import android.widget.ProgressBar;
 
 import com.balloonmail.app.balloonmailapp.CardReceived;
 import com.balloonmail.app.balloonmailapp.R;
-import com.balloonmail.app.balloonmailapp.activities.MailsTabbedActivity;
 import com.balloonmail.app.balloonmailapp.activities.ReceivedMailDetailsActivity;
 import com.balloonmail.app.balloonmailapp.async.PostHandler;
 import com.balloonmail.app.balloonmailapp.async.ReusableAsync;
@@ -172,6 +172,8 @@ public class ReceivedMailsFragment extends Fragment implements IBalloonLoadable 
                             balloon.setIsLiked(object.getInt("liked"));
                             balloon.setIsRefilled(object.getInt("refilled"));
                             balloon.setIsCreeped(object.getInt("creeped"));
+                            Log.d(ReceivedMailsFragment.class.getSimpleName(), balloon.toString());
+
                             Card card = createCard(balloon);
                             cards.add(card);
                             balloonsMap.put(balloon, card);

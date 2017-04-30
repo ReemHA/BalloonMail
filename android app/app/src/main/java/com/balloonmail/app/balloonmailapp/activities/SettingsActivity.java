@@ -25,6 +25,8 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setupActionBar();
+        getFragmentManager().beginTransaction().replace(android.R.id.content, new SettingsPreferenceFragment()).commit();
+
     }
 
     private void setupActionBar() {
@@ -46,15 +48,15 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     }
 
     protected boolean isValidFragment(String fragmentName) {
-        return SignOutPreferenceFragment.class.getName().equals(fragmentName);
+        return SettingsPreferenceFragment.class.getName().equals(fragmentName);
     }
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    public static class SignOutPreferenceFragment extends PreferenceFragment {
+    public static class SettingsPreferenceFragment extends PreferenceFragment {
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
-            addPreferencesFromResource(R.xml.pref_sign_out);
+            addPreferencesFromResource(R.xml.preferences);
         }
     }
 
