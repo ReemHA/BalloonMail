@@ -20,7 +20,6 @@ import java.util.List;
 
 public class SettingsActivity extends AppCompatPreferenceActivity {
     private static final int REQUEST_INVITE = 2;
-
     private static boolean isXLargeTablet(Context context) {
         return (context.getResources().getConfiguration().screenLayout
                 & Configuration.SCREENLAYOUT_SIZE_MASK) >= Configuration.SCREENLAYOUT_SIZE_XLARGE;

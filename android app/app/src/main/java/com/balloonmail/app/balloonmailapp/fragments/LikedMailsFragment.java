@@ -34,7 +34,6 @@ import org.json.JSONObject;
 
 import java.sql.SQLException;
 import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -158,17 +157,16 @@ public class LikedMailsFragment extends Fragment implements IBalloonLoadable {
                             LikedBalloon balloon = null;
 
                             Date sent_at = null;
-                            try {
-                                sent_at = dateFormat.parse(object.getString("sent_at"));
-                            } catch (ParseException e) {
-                                e.printStackTrace();
+                            sent_at = Global.getDateFromString(object.getString("sent_at"));
+                            if (sent_at == null) {
+                                throw new JSONException("error date format");
                             }
                             balloon = new LikedBalloon(object.getString("text"),
                                     object.getInt("balloon_id"), object.getDouble("sentiment"),
                                     object.getDouble("lat"), object.getDouble("lng"), sent_at);
                             balloon.setIsLiked(1);
-                            balloon.setIsCreeped(object.getInt("creeped"));
-                            balloon.setIsRefilled(object.getInt("refilled"));
+                            balloon.setIsCreeped(object.getBoolean("creeped")? 1:0);
+                            balloon.setIsRefilled(object.getBoolean("refilled")? 1:0);
                             Card card = createCard(balloon);
                             cards.add(card);
                             balloonsMap.put(balloon, card);

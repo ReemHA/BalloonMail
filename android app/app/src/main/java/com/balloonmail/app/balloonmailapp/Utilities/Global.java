@@ -34,7 +34,7 @@ public class Global {
     public static final String PREF_USER_LNG = "lon";
     private static final double DUMMY_LAT = 51.507351;
     private static final double DUMMY_LNG = -0.127758;
-    public static final boolean inDebug = true;
+    public static final boolean inDebug = false;
     public static final String RECEIVED_OR_LIKED = "rOrl";
     public static final String KEY_MAP_SAVED_STATE = "mapState";
 

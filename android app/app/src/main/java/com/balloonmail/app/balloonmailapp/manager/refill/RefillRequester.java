@@ -38,7 +38,7 @@ public class RefillRequester {
                         @Override
                         public Void handle(JSONObject data) throws JSONException {
                             // check if the balloon reached all users in the app
-                            if (data.getBoolean("full")){
+                            if (data.has("full")){
                                 // show invite friends dialog
                                 new AlertDialog.Builder(currentContext)
                                         .setTitle("Invite Friends")
