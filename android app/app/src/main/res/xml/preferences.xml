@@ -6,7 +6,8 @@
         android:negativeButtonText="No"
         android:positiveButtonText="Yes"
         />
-    <com.balloonmail.app.balloonmailapp.activities.InviteFriendsDialogPreference
+    <Preference
         android:title="@string/pref_invite_friends_title"
+        android:key="invite"
         />
 </PreferenceScreen>
