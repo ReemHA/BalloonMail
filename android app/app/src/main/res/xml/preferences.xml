@@ -1,10 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-
     <com.balloonmail.app.balloonmailapp.activities.SignOutDialogPreference
         android:title="@string/sign_out_title"
         android:dialogMessage="@string/sign_out_confirmation_msg"
         android:negativeButtonText="No"
         android:positiveButtonText="Yes"
         />
-
+    <Preference
+        android:title="@string/pref_invite_friends_title"
+        android:key="invite"
+        />
 </PreferenceScreen>

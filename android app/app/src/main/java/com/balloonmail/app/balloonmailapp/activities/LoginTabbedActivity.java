@@ -22,6 +22,9 @@ import com.balloonmail.app.balloonmailapp.async.ReusableAsync;
 import com.balloonmail.app.balloonmailapp.async.SuccessHandler;
 import com.balloonmail.app.balloonmailapp.utilities.DatabaseUtilities;
 import com.balloonmail.app.balloonmailapp.utilities.Global;
+import com.google.android.gms.appinvite.AppInvite;
+import com.google.android.gms.appinvite.AppInviteInvitationResult;
+import com.google.android.gms.appinvite.AppInviteReferral;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -70,6 +73,7 @@ public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiC
         // GoogleApiClient is main entry for Google Play services integration. Build GoogleApiClient to access the options specified by gso
         googleApiClient = buildApiClient();
 
+        checkDeepLink();
         if (!isSignedOut() && api_token != "") {
             getLocation();
             Intent intent = new Intent(LoginTabbedActivity.this, MailsTabbedActivity.class); //HomeActivity
@@ -102,6 +106,26 @@ public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiC
 
     }
 
+    private void checkDeepLink() {
+
+        // Check if this app was launched from a deep link. Setting autoLaunchDeepLink to true
+        // would automatically launch the deep link if one is found.
+        boolean autoLaunchDeepLink = false;
+        AppInvite.AppInviteApi.getInvitation(googleApiClient, this, autoLaunchDeepLink)
+                .setResultCallback(new ResultCallback<AppInviteInvitationResult>() {
+                    @Override
+                    public void onResult(@NonNull AppInviteInvitationResult result) {
+                        if(result.getStatus().isSuccess() ){
+                            Intent intent = result.getInvitationIntent();
+                            String deepLink = AppInviteReferral.getDeepLink(intent);
+                            //Log.d(LoginTabbedActivity.class.getSimpleName(), deepLink);
+                        } else {
+                            //Log.d(LoginTabbedActivity.class.getSimpleName(), "getInvitation: no deep link found.");
+                        }
+                    }
+                });
+    }
+
     private GoogleSignInOptions buildSignInOptions() {
         return new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(Global.SERVER_CLIENT_ID)
@@ -117,6 +141,7 @@ public class LoginTabbedActivity extends AppCompatActivity implements GoogleApiC
                 .addOnConnectionFailedListener(this)
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .addApi(LocationServices.API)
+                .addApi(AppInvite.API)
                 .build();
     }
 

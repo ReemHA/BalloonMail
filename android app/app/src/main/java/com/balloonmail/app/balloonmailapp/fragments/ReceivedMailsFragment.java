@@ -14,7 +14,6 @@ import android.widget.ProgressBar;
 
 import com.balloonmail.app.balloonmailapp.CardReceived;
 import com.balloonmail.app.balloonmailapp.R;
-import com.balloonmail.app.balloonmailapp.activities.MailsTabbedActivity;
 import com.balloonmail.app.balloonmailapp.activities.ReceivedMailDetailsActivity;
 import com.balloonmail.app.balloonmailapp.async.PostHandler;
 import com.balloonmail.app.balloonmailapp.async.ReusableAsync;
@@ -35,7 +34,6 @@ import org.json.JSONObject;
 
 import java.sql.SQLException;
 import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -160,18 +158,16 @@ public class ReceivedMailsFragment extends Fragment implements IBalloonLoadable 
                         for (int i = 0; i < jsonArray.length(); i++) {
                             JSONObject object = jsonArray.getJSONObject(i);
                             Date sent_at = null;
-                            try {
-                                sent_at = dateFormat.parse(object.getString("sent_at"));
-                            } catch (ParseException e) {
-                                e.printStackTrace();
+                            sent_at = Global.getDateFromString(object.getString("sent_at"));
+                            if (sent_at == null) {
+                                throw new JSONException("error date format");
                             }
-
                             ReceivedBalloon balloon = new ReceivedBalloon(object.getString("text"), object.getInt("balloon_id"),
                                     object.getDouble("sentiment"), object.getDouble("lat"), object.getDouble("lng"),
                                     sent_at);
-                            balloon.setIsLiked(object.getInt("liked"));
-                            balloon.setIsRefilled(object.getInt("refilled"));
-                            balloon.setIsCreeped(object.getInt("creeped"));
+                            balloon.setIsLiked(object.getBoolean("liked")? 1:0);
+                            balloon.setIsRefilled(object.getBoolean("refilled")? 1:0);
+                            balloon.setIsCreeped(object.getBoolean("creeped")? 1:0);
                             Card card = createCard(balloon);
                             cards.add(card);
                             balloonsMap.put(balloon, card);
