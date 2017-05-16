@@ -56,7 +56,9 @@ public class RefillRequester {
                 .onPost(new PostHandler<JSONObject>() {
                     @Override
                     public void handle(JSONObject data) {
-                        if (data.has("full")) {
+                        if (data == null) {
+                            refillHandler.handleButtonUI();
+                        } else if (data.has("full")) {
                             // show invite friends dialog
                             new AlertDialog.Builder(currentContext)
                                     .setTitle("Invite Friends")
@@ -77,8 +79,6 @@ public class RefillRequester {
                                     })
                                     .setIcon(R.drawable.logo_balloonmail_app)
                                     .show();
-                        } else if (data == null) {
-                            refillHandler.handleButtonUI();
                         }
                     }
                 });
