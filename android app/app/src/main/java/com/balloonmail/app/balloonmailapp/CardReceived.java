@@ -86,6 +86,7 @@ public class CardReceived extends Card implements ILikeableUI, IRefillableUI, IC
             holder.likeBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    manager.instantiateLikeButtonState(getBalloon(), holder.likeBtn);
                     manager.like(CardReceived.this);
                 }
             });
@@ -93,6 +94,7 @@ public class CardReceived extends Card implements ILikeableUI, IRefillableUI, IC
             holder.refillBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    manager.instantiateRefillButtonState(getBalloon(), holder.refillBtn);
                     manager.refill(CardReceived.this);
                 }
             });
@@ -100,6 +102,7 @@ public class CardReceived extends Card implements ILikeableUI, IRefillableUI, IC
             holder.creepBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    manager.instantiateCreepButtonState(getBalloon(), holder.creepBtn);
                     manager.creep(CardReceived.this);
                 }
             });
