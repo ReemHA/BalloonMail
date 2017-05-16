@@ -37,7 +37,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         switch (typeOfNotification) {
 
             case "REC":
-                msg = "You received a balloon from "+
+                msg = "You received a balloon from " +
                         getCountryName(getApplicationContext(), Double.valueOf(data.get("lng")), Double.valueOf(data.get("lat")))
                         + ".";
                 break;
@@ -46,9 +46,14 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             case "CRP":
                 msg = data.get("creeps") + " creeped your balloon!";
                 break;
-            case "RFL":
-                msg = "You have got " + data.get("refills") + " new refills.";
+            case "RFL": {
+                if (Integer.valueOf(data.get("refills")) > 1) {
+                    msg = "You have got " + data.get("refills") + " new refills.";
+                } else {
+                    msg = "You have got " + data.get("refills") + " new refill.";
+                }
                 break;
+            }
             default:
                 msg = "Hello";
         }
