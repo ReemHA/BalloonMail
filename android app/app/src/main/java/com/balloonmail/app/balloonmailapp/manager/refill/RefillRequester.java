@@ -38,16 +38,18 @@ public class RefillRequester {
                 .onSuccess(new SuccessHandler<JSONObject>() {
                     @Override
                     public JSONObject handle(JSONObject data) throws JSONException {
-                        // check if the balloon reached all users in the app
-                        if (data.has("full")) {
-                            return data;
-                        } else {
-                            // get whether the balloon is refilled or not.
-                            int isRefilled = refillableBalloon.getIsRefilled();
-                            if (isRefilled == 0) {
-                                refillableBalloon.setIsRefilled(1);
+                        if (data != null) {
+                            // check if the balloon reached all users in the app
+                            if (data.has("full")) {
+                                return data;
                             } else {
-                                refillableBalloon.setIsRefilled(0);
+                                // get whether the balloon is refilled or not.
+                                int isRefilled = refillableBalloon.getIsRefilled();
+                                if (isRefilled == 0) {
+                                    refillableBalloon.setIsRefilled(1);
+                                } else {
+                                    refillableBalloon.setIsRefilled(0);
+                                }
                             }
                         }
                         return null;
